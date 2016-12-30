@@ -1,0 +1,141 @@
+package org.openhab.binding.heos.api;
+
+import org.openhab.binding.heos.resources.HeosCommands;
+import org.openhab.binding.heos.resources.HeosResponse;
+import org.openhab.binding.heos.resources.MyEventListener;
+
+public class HeosEventController extends MyEventListener {
+
+    private MyEventListener listener = null;
+    private HeosResponse response = null;
+    private HeosSystem system = null;
+    private HeosCommands command = null;
+    private String eventType = null;
+    private String eventCommand = null;
+
+    // private boolean playerAvailabe = false;
+
+    public HeosEventController(HeosResponse response, HeosCommands command, HeosSystem system) {
+        this.response = response;
+        this.system = system;
+        this.command = command;
+    }
+
+    public void handleEvent() {
+
+        if (response.getEvent().getResult().equals("fail")) {
+            System.out.println("Failure during event");
+            return;
+        } else {
+            this.eventType = response.getEvent().getEventType();
+            this.eventCommand = response.getEvent().getCommandType();
+
+            switch (eventType) {
+
+                case "event":
+                    eventTypeEvent();
+                    break;
+                case "player":
+                    eventTypePlayer();
+                    break;
+                case "system":
+                    eventTypeSystem();
+                    break;
+                case "browse":
+                    eventTypeBrowse();
+                    break;
+                case "group":
+                    eventTypeGroup();
+                    break;
+
+            }
+
+        }
+    }
+
+    private void eventTypeEvent() {
+
+        switch (eventCommand) {
+
+            case "player_now_playing_progress":
+                break;
+            case "players_changed":
+                break;
+            case "player_now_playing_changed":
+                break;
+            case "player_state_changed":
+                playerStateChanged();
+                break;
+            case "player_queue_changed":
+                break;
+            case "sources_changed":
+                break;
+            case "player_volume_changed":
+                volumeChanged();
+                break;
+        }
+    }
+
+    private void eventTypePlayer() {
+
+        switch (eventCommand) {
+
+            case "get_now_playing_media":
+                break;
+            case "get_player_info":
+                break;
+            case "get_play_state":
+                playerStateChanged();
+                break;
+            case "get_volume":
+                volumeChanged();
+                break;
+            case "get_queue":
+                break;
+            case "set_play_state":
+                break;
+            case "set_volume":
+                break;
+        }
+    }
+
+    private void eventTypeBrowse() {
+
+        switch (eventCommand) {
+
+            case "get_music_sources":
+                break;
+            case "browse":
+                break;
+
+        }
+    }
+
+    private void eventTypeSystem() {
+
+    }
+
+    private void eventTypeGroup() {
+        // not implemented yet
+    }
+
+    private void playerStateChanged() {
+
+        String pid = response.getPid();
+        String event = "state";
+        String command = response.getEvent().getMessagesMap().get("state");
+        fireEvent(pid, event, command);
+    }
+
+    private void volumeChanged() {
+        String pid = response.getPid();
+        String event = "volume";
+        String command = response.getEvent().getMessagesMap().get("level");
+        fireEvent(pid, event, command);
+        event = "mute";
+        command = response.getEvent().getMessagesMap().get("mute");
+        fireEvent(pid, event, command);
+
+    }
+
+}
