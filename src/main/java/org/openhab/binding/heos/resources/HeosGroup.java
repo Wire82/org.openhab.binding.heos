@@ -2,7 +2,7 @@ package org.openhab.binding.heos.resources;
 
 import java.util.HashMap;
 
-public class HeosGroup {
+public class HeosGroup extends HeosMediaObject {
 
     private final String[] supportedGroupInfo = { "name", "gip", "leader" };
     private final String[] supportedGroupStates = { "state", "level", "mute" };

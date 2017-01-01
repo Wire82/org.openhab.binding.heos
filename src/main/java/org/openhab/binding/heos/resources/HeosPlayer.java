@@ -2,7 +2,7 @@ package org.openhab.binding.heos.resources;
 
 import java.util.HashMap;
 
-public class HeosPlayer {
+public class HeosPlayer extends HeosMediaObject {
 
     private final String[] supportedPlayerInfo = { "name", "pid", "gip", "ip", "model", "version", "lineout, network" };
     private final String[] supportedPlayerStates = { "state", "level", "mute", "duration", "cur_pos" };
@@ -28,7 +28,7 @@ public class HeosPlayer {
     private String cur_pos;
 
     public HeosPlayer() {
-
+        super();
         initPlayer();
 
     }
