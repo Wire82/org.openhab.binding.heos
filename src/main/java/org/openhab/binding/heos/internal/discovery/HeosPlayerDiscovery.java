@@ -2,20 +2,23 @@ package org.openhab.binding.heos.internal.discovery;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.heos.HeosBindingConstants;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
+import org.openhab.binding.heos.resources.HeosGroup;
 import org.openhab.binding.heos.resources.HeosPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
@@ -32,7 +35,8 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
     private ScheduledFuture<?> scanningJob;
 
     public HeosPlayerDiscovery(HeosBridgeHandler bridge) throws IllegalArgumentException {
-        super(Collections.singleton(HeosBindingConstants.THING_TYPE_PLAYER), 20);
+        super(20);
+        // super(Collections.singleton(HeosBindingConstants.THING_TYPE_PLAYER), 20);
         this.bridge = bridge;
 
         this.scanningRunnable = new PlayerScan();
@@ -40,6 +44,14 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         // Debug
         // this.startBackgroundDiscovery();
 
+    }
+
+    @Override
+    public Set<ThingTypeUID> getSupportedThingTypes() {
+
+        Set<ThingTypeUID> supportedThings = Sets.newHashSet(THING_TYPE_GROUP, THING_TYPE_PLAYER);
+
+        return supportedThings;
     }
 
     @Override
@@ -70,6 +82,35 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
                 DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(player.getName())
                         .withProperties(properties).withBridge(bridgeUID).build();
                 thingDiscovered(result);
+            }
+
+        }
+
+        logger.info("Start scan for HEOS Groups");
+
+        HashMap<String, HeosGroup> groupMap = new HashMap<>();
+        groupMap = bridge.getNewGroups();
+
+        if (playerMap == null) {
+            // Debug
+            System.out.println("Debug: Player Map = Null");
+
+        } else {
+
+            logger.info("Found: {} new Groups", groupMap.size());
+            ThingUID bridgeUID = bridge.getThing().getUID();
+
+            for (String groupGID : groupMap.keySet()) {
+                HeosGroup group = groupMap.get(groupGID);
+                ThingUID uid = new ThingUID(THING_TYPE_GROUP, groupMap.get(groupGID).getGid());
+                HashMap<String, Object> properties = new HashMap<String, Object>();
+                properties.put(NAME, group.getName());
+                properties.put(GID, group.getGid());
+                properties.put(LEADER, group.getLeader());
+                DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(group.getName())
+                        .withProperties(properties).withBridge(bridgeUID).build();
+                thingDiscovered(result);
+
             }
 
         }

@@ -36,11 +36,11 @@ public class HeosCommands {
     private final String getGroups = "heos://group/get_groups";
     private final String getGroupsInfo = "heos://group/get_group_info?gid=";
     private final String setGroup = "heos://group/set_group?pid=";
-    private final String getGroupVolume = "heos://group/get_volume?gid";
-    private final String setGroupVolume = "heos://group/set_volume?gid";
-    private final String getGroupMute = "heos://group/get_mute?gid";
+    private final String getGroupVolume = "heos://group/get_volume?gid=";
+    private final String setGroupVolume = "heos://group/set_volume?gid=";
+    private final String getGroupMute = "heos://group/get_mute?gid=";
     private final String setGroupMute = "heos://group/set_mute?gid=";
-    private final String toggleGroupMute = "heos://group/toggle_mute?gid";
+    private final String toggleGroupMute = "heos://group/toggle_mute?gid=";
     private final String groupVolumeUp = "heos://group/volume_up?gid=";
     private final String groupVolumeDown = "heos://group/volume_down?gid=";
 
@@ -246,7 +246,7 @@ public class HeosCommands {
     }
 
     public String setGroupVolume(String volume, String gid) {
-        return setGroupVolume + gid + "&level=" + gid;
+        return setGroupVolume + gid + "&level=" + volume;
     }
 
     public String getGroupMute(String gid) {

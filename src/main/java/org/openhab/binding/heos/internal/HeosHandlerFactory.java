@@ -24,6 +24,7 @@ import org.openhab.binding.heos.HeosBindingConstants;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
+import org.openhab.binding.heos.handler.HeosGroupHandler;
 import org.openhab.binding.heos.handler.HeosPlayerHandler;
 import org.openhab.binding.heos.internal.discovery.HeosPlayerDiscovery;
 import org.osgi.framework.ServiceRegistration;
@@ -60,7 +61,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
             discoveryServiceRegs.put(bridgeHandler.getThing().getUID(),
                     bundleContext.registerService(DiscoveryService.class.getName(), playerDiscovery, null));
-            logger.info("Register discovery service for HEOS player by bridge '{}'",
+            logger.info("Register discovery service for HEOS player and HEOS groups by bridge '{}'",
                     bridgeHandler.getThing().getUID().getId());
             return bridgeHandler;
         }
@@ -68,8 +69,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return new HeosPlayerHandler(thing, heos, api);
         }
         if (thingTypeUID.equals(THING_TYPE_GROUP)) {
-            // Debug: Just for first Test!!
-            return new HeosPlayerHandler(thing, heos, api);
+            return new HeosGroupHandler(thing, heos, api);
         }
 
         return null;
@@ -84,7 +84,8 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             if (serviceRegistration != null) {
                 serviceRegistration.unregister();
                 discoveryServiceRegs.remove(thing.getUID());
-                logger.info("Unregister discovery service for HEOS player by bridge '{}'", thing.getUID().getId());
+                logger.info("Unregister discovery service for HEOS player and HEOS groups by bridge '{}'",
+                        thing.getUID().getId());
             }
         }
 
