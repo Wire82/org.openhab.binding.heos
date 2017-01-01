@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="heos"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+        xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+        
+           <thing-type id="Group">
+               <supported-bridge-type-refs>
+                   <bridge-type-ref id="Bridge"/>
+               </supported-bridge-type-refs>
+               <label>HEOS Group</label>
+               <description>A group of HEOS Player</description>
+                
+            <channels>
+                    <channel id="Control"   typeId="control"/>
+                    <channel id="Volume"    typeId ="volume" />
+                    <channel id="Mute"      typeId = "mute" />
+                    <channel id="Ungroup"   typeId = "mute" />          
+            </channels>
+            
+            <config-description>
+                <parameter name="gid" type="text" readOnly = "true" > 
+                    <label>Group ID</label>
+                    <description>The internal group ID</description>                    
+                    <required>true</required>                
+                </parameter>                
+            </config-description>                
+          </thing-type>
+          
+     <channel-type id="control">
+        <item-type>Player</item-type>
+        <label>Heos Control</label>
+        <description>Heos Control</description>
+    </channel-type>
+    <channel-type id="volume">
+        <item-type>Dimmer</item-type>
+        <label>Volume</label>    
+    </channel-type>
+    <channel-type id="mute">
+        <item-type>Switch</item-type>
+        <label>Mute</label>
+     </channel-type>
+     <channel-type id="ungroup">
+        <item-type>Switch</item-type>
+        <label>Ungroup</label>
+     </channel-type>
+
+</thing:thing-descriptions>
+          
