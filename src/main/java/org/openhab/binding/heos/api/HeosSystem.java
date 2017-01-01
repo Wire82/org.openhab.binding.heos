@@ -46,6 +46,7 @@ public class HeosSystem {
 
     public boolean establishConnection() {
         this.playerMap = new HashMap<String, HeosPlayer>();
+        this.groupMap = new HashMap<String, HeosGroup>();
         this.commandLine = new Telnet();
         this.eventLine = new Telnet();
 
@@ -104,6 +105,7 @@ public class HeosSystem {
         while (resultEmpty) {
             send(command().getPlayers());
             resultEmpty = response.getPayload().getPayloadList().isEmpty();
+            // Debug
             System.out.println("Is EMPTY!!!!");
         }
 
@@ -129,17 +131,18 @@ public class HeosSystem {
         player.setMute(response.getEvent().getMessagesMap().get("state"));
         send(command().getVolume(pid));
         player.setLevel(response.getEvent().getMessagesMap().get("level"));
+        send(command().getNowPlayingMedia(pid));
+        player.updateMediaInfo(response.getPayload().getPayloadList().get(0));
 
         return player;
     }
 
     public HashMap<String, HeosGroup> getGroups() {
 
-        boolean resultEmpty = true;
-
-        while (resultEmpty) {
-            send(command().getGroups());
-            resultEmpty = response.getPayload().getPayloadList().isEmpty();
+        send(command().getGroups());
+        System.out.println("Found: " + response.getPayload().getPlayerList().size() + " Player in Group");
+        if (response.getPayload().getPayloadList().isEmpty()) {
+            return groupMap;
         }
 
         List<HashMap<String, String>> groupList = response.getPayload().getPayloadList();
@@ -159,13 +162,31 @@ public class HeosSystem {
 
         String gid = group.getGid();
         send(command().getGroupInfo(gid));
-        // System.out.println(response.getPayload().getPayloadList().get(0).toString());
+        int playerCount = response.getPayload().getPlayerList().size();
 
-        // group.setState(response.getEvent().getMessagesMap().get("state"));
-        // send(command().getMute(pid));
-        // group.setMute(response.getEvent().getMessagesMap().get("state"));
-        // send(command().getVolume(pid));
-        // group.setLevel(response.getEvent().getMessagesMap().get("level"));
+        // Defining the Group leader
+
+        for (int i = 0; i < playerCount; i++) {
+            HashMap<String, String> player = new HashMap<>();
+            player = response.getPayload().getPlayerList().get(i);
+            for (String key : player.keySet()) {
+                if (key.equals("role")) {
+                    if (player.get(key).equals("leader")) {
+                        String leader = player.get("pid");
+                        group.setLeader(leader);
+                    }
+                }
+            }
+        }
+
+        send(command().getPlayState(group.getLeader()));
+        group.setState(response.getEvent().getMessagesMap().get("state"));
+        send(command().getGroupMute(gid));
+        group.setMute(response.getEvent().getMessagesMap().get("state"));
+        send(command().getGroupVolume(gid));
+        group.setLevel(response.getEvent().getMessagesMap().get("level"));
+        send(command().getNowPlayingMedia(gid));
+        group.updateMediaInfo(response.getPayload().getPayloadList().get(0));
 
         return group;
     }
@@ -192,6 +213,10 @@ public class HeosSystem {
 
     public HashMap<String, HeosPlayer> getPlayerMap() {
         return playerMap;
+    }
+
+    public HashMap<String, HeosGroup> getGroupMap() {
+        return groupMap;
     }
 
 }
