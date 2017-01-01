@@ -25,4 +25,5 @@ Export-Package: org.openhab.binding.heos,
 Require-Bundle: org.apache.commons.net,
  org.eclipse.smarthome.config.discovery,
  org.jupnp,
- org.eclipse.osgi
+ org.eclipse.osgi,
+ org.eclipse.smarthome.io.transport.upnp

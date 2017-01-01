@@ -32,6 +32,18 @@ public class HeosCommands {
     private String clearQueue = "heos://player/clear_queue?pid=";
     // private String saveQueueToPlayList = ""
 
+    // Group Commands Control
+    private final String getGroups = "heos://group/get_groups";
+    private final String getGroupsInfo = "heos://group/get_group_info?gid=";
+    private final String setGroup = "heos://group/set_group?pid=";
+    private final String getGroupVolume = "heos://group/get_volume?gid";
+    private final String setGroupVolume = "heos://group/set_volume?gid";
+    private final String getGroupMute = "heos://group/get_mute?gid";
+    private final String setGroupMute = "heos://group/set_mute?gid=";
+    private final String toggleGroupMute = "heos://group/toggle_mute?gid";
+    private final String groupVolumeUp = "heos://group/volume_up?gid=";
+    private final String groupVolumeDown = "heos://group/volume_down?gid=";
+
     // Player Commands get Information
 
     private String getPlayers = "heos://player/get_players";
@@ -207,8 +219,58 @@ public class HeosCommands {
         return "heos://system/sign_in?un=" + username + "&pw=" + password;
     }
 
-    public String signOut() {
+    public String signOut(String gid) {
         return signOut;
+    }
+
+    public String getGroups() {
+        return getGroups;
+    }
+
+    public String getGroupInfo(String gid) {
+        return getGroupsInfo + gid;
+    }
+
+    public String setGroup(String[] gid) {
+        String players = "";
+        for (String player : gid) {
+            players.concat("," + player);
+        }
+        players.replaceFirst(",", "");
+
+        return setGroup + players;
+    }
+
+    public String getGroupVolume(String gid) {
+        return getGroupVolume + gid;
+    }
+
+    public String setGroupVolume(String volume, String gid) {
+        return setGroupVolume + gid + "&level=" + gid;
+    }
+
+    public String getGroupMute(String gid) {
+        return getGroupMute + gid;
+    }
+
+    public String setGroupMuteOn(String gid) {
+        return setGroupMute + gid + "&state=on";
+    }
+
+    public String setGroupMuteOff(String gid) {
+        return setGroupMute + gid + "&state=off";
+    }
+
+    public String getToggleGroupMute(String gid) {
+        return toggleGroupMute + gid;
+    }
+
+    public String getGroupVolumeUp(String gid) {
+        return groupVolumeUp;
+    }
+
+    public String getGroupVolumeDown(String gid) {
+        return groupVolumeDown;
     }
 
 }

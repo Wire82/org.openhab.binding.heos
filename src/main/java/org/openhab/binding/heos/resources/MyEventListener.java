@@ -19,9 +19,6 @@ public class MyEventListener {
 
     public void fireEvent(String pid, String event, String command) {
 
-        // Debug
-        // System.out.println("Fire");
-
         for (int i = 0; i < listenerList.size(); i++) {
 
             listenerList.get(i).playerStateChangeEvent(pid, event, command);

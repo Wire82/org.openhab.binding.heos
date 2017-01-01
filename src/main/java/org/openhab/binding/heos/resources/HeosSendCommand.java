@@ -20,7 +20,7 @@ public class HeosSendCommand {
         this.eventController = eventController;
     }
 
-    public boolean send(String command) {
+    public synchronized boolean send(String command) {
         int sendTryCounter = 0;
         this.command = command;
         executeSendCommand();
@@ -30,12 +30,21 @@ public class HeosSendCommand {
                 sendTryCounter++;
             } else if (response.getEvent().getMessagesMap().get("command under process").equals("true")) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     // Debug
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+
+                // Debug
+
+                // try {
+                // Thread.sleep(00);
+                // } catch (InterruptedException e) {
+                // // TODO Auto-generated catch block
+                // e.printStackTrace();
+                // }
                 parser.parseResult(client.readLine());
             } else {
                 return true;
