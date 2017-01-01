@@ -57,7 +57,7 @@
         <item-type>Switch</item-type>
         <label>Mute</label>
      </channel-type>
-     <channel-type id="connect">
+     <channel-type id="group">
         <item-type>Switch</item-type>
         <label>Connect</label>
      </channel-type>
