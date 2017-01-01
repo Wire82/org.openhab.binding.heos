@@ -37,7 +37,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     public void handleCommand(ChannelUID channelUID, Command command) {
         // Debug
         // System.out.println(channelUID.getId());
-        if (channelUID.getId().equals(CONTROL)) {
+        if (channelUID.getId().equals(CH_ID_CONTROL)) {
 
             String com = command.toString();
 
@@ -57,7 +57,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                     break;
 
             }
-        } else if (channelUID.getId().equals("Volume")) {
+        } else if (channelUID.getId().equals(CH_ID_VOLUME)) {
 
             if (command.toString().equals("REFRESH")) {
                 api.volume(player.getLevel(), pid);
@@ -100,7 +100,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     @Override
     public void dispose() {
-
+        api.unregisterforChangeEvents(this);
         updateStatus(ThingStatus.OFFLINE);
 
     }
@@ -123,19 +123,19 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        updateState(VOLUME, PercentType.valueOf(player.getLevel()));
+        updateState(CH_ID_VOLUME, PercentType.valueOf(player.getLevel()));
 
-        if (player.getMute().equals("on")) {
-            updateState(MUTE, OnOffType.ON);
+        if (player.getMute().equals(ON)) {
+            updateState(CH_ID_MUTE, OnOffType.ON);
         } else {
-            updateState(MUTE, OnOffType.OFF);
+            updateState(CH_ID_MUTE, OnOffType.OFF);
         }
 
         if (player.getState().equals(PLAY)) {
-            updateState(CONTROL, PlayPauseType.PLAY);
+            updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
         }
         if (player.getState().equals(PAUSE) || player.getState().equals(STOP)) {
-            updateState(CONTROL, PlayPauseType.PAUSE);
+            updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
         }
 
     }
@@ -147,30 +147,30 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                 switch (command) {
 
                     case PLAY:
-                        updateState(CONTROL, PlayPauseType.PLAY);
+                        updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
                         break;
                     case PAUSE:
-                        updateState(CONTROL, PlayPauseType.PAUSE);
+                        updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
                         break;
                     case STOP:
-                        updateState(CONTROL, PlayPauseType.PAUSE);
+                        updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
                         break;
                 }
 
             }
-            if (event.equals("volume")) {
+            if (event.equals(VOLUME)) {
 
-                updateState(VOLUME, PercentType.valueOf(command));
+                updateState(CH_ID_VOLUME, PercentType.valueOf(command));
 
             }
-            if (event.equals("mute")) {
+            if (event.equals(MUTE)) {
 
                 switch (command) {
                     case ON:
-                        updateState(MUTE, OnOffType.ON);
+                        updateState(CH_ID_MUTE, OnOffType.ON);
                         break;
                     case OFF:
-                        updateState(MUTE, OnOffType.OFF);
+                        updateState(CH_ID_MUTE, OnOffType.OFF);
                         break;
                 }
 

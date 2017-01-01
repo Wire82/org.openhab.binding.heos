@@ -29,11 +29,13 @@ public class HeosBindingConstants {
 
     public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "Bridge");
     public final static ThingTypeUID THING_TYPE_PLAYER = new ThingTypeUID(BINDING_ID, "Player");
+    public final static ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "Group");
 
     // List of all Channel ids
-    public final static String CONTROL = "Control";
-    public final static String VOLUME = "Volume";
-    public final static String MUTE = "Mute";
+    public final static String CH_ID_CONTROL = "Control";
+    public final static String CH_ID_VOLUME = "Volume";
+    public final static String CH_ID_MUTE = "Mute";
+    public final static String CH_ID_UNGROUP = "Ungroup";
 
     public final static String HOST = "ipAddress";
     public final static String PLAYER_TYPE = "model";
@@ -48,11 +50,17 @@ public class HeosBindingConstants {
     public final static String STOP = "stop";
     public final static String ON = "on";
     public final static String OFF = "off";
+    public final static String MUTE = "mute";
+    public final static String VOLUME = "volume";
 
     public static Set<ThingTypeUID> supportedThingTypes() {
 
         SetView<ThingTypeUID> supportedThings = Sets.union(Collections.singleton(THING_TYPE_PLAYER),
                 Collections.singleton(THING_TYPE_BRIDGE));
+        // add Collections.singletons
+        // supportedThings.add(THING_TYPE_BRIDGE);
+        // supportedThings.add(THING_TYPE_GROUP);
+        // supportedThings.add(THING_TYPE_PLAYER);
 
         return supportedThings;
     }
