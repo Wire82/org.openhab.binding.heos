@@ -66,6 +66,29 @@ public class HeosAPI {
 
     }
 
+    public void muteGroup(String pid) {
+
+        controller.send(controller.command().setMuteToggle(pid));
+    }
+
+    public void muteGroupON(String pid) {
+
+        controller.send(controller.command().setGroupMuteOn(pid));
+
+    }
+
+    public void muteGroupOFF(String pid) {
+
+        controller.send(controller.command().setGroupMuteOff(pid));
+
+    }
+
+    public void volumeGroup(String vol, String pid) {
+
+        controller.send(controller.command().setGroupVolume(vol, pid));
+
+    }
+
     public void setHeosConnection(String ip, int port) {
 
         controller.setConnectionIP(ip);
