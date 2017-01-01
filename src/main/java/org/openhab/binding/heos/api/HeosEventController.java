@@ -62,6 +62,7 @@ public class HeosEventController extends MyEventListener {
             case "players_changed":
                 break;
             case "player_now_playing_changed":
+                mediaStateChanged();
                 break;
             case "player_state_changed":
                 playerStateChanged();
@@ -124,17 +125,24 @@ public class HeosEventController extends MyEventListener {
         String pid = response.getPid();
         String event = "state";
         String command = response.getEvent().getMessagesMap().get("state");
-        fireEvent(pid, event, command);
+        fireStateEvent(pid, event, command);
     }
 
     private void volumeChanged() {
         String pid = response.getPid();
         String event = "volume";
         String command = response.getEvent().getMessagesMap().get("level");
-        fireEvent(pid, event, command);
+        fireStateEvent(pid, event, command);
         event = "mute";
         command = response.getEvent().getMessagesMap().get("mute");
-        fireEvent(pid, event, command);
+        fireStateEvent(pid, event, command);
+
+    }
+
+    private void mediaStateChanged() {
+        String pid = response.getPid();
+        system.send(command.getNowPlayingMedia(pid));
+        fireMediaEvent(pid, response.getPayload().getPayloadList().get(0));
 
     }
 
