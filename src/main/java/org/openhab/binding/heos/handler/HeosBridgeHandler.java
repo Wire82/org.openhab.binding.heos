@@ -13,8 +13,10 @@ import java.util.HashMap;
 
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
@@ -66,13 +68,14 @@ public class HeosBridgeHandler extends BaseBridgeHandler {
                     heos.closeConnection();
                     bridgeIsConnected = heos.establishConnection();
                 }
-
+                heos.getPlayer();
+                heos.getGroups();
             }
         };
 
         eventListener.run();
-
         updateStatus(ThingStatus.ONLINE);
+
     }
 
     @Override
@@ -80,9 +83,23 @@ public class HeosBridgeHandler extends BaseBridgeHandler {
         logger.debug("Dispose Brige '{}'", thing.getConfiguration().get(NAME));
 
         heos.closeConnection();
+
+    }
+
+    @Override
+    public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
+        System.out.println("Init ChildHandler");
+
+    }
+
+    @Override
+    public void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
+        System.out.println("Remove ChildHandler");
+
     }
 
     public HashMap<String, HeosPlayer> getNewPlayer() {
+
         return heos.getPlayer();
     }
 

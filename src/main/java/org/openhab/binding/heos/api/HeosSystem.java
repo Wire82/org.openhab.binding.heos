@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.openhab.binding.heos.resources.HeosCommands;
+import org.openhab.binding.heos.resources.HeosGroup;
 import org.openhab.binding.heos.resources.HeosJsonParser;
 import org.openhab.binding.heos.resources.HeosPlayer;
 import org.openhab.binding.heos.resources.HeosResponse;
@@ -25,6 +26,7 @@ public class HeosSystem {
     private HeosEventController eventController = new HeosEventController(response, heosCommand, this);
     private HeosSendCommand sendCommand = new HeosSendCommand(commandLine, parser, response, eventController);
     HashMap<String, HeosPlayer> playerMap;
+    HashMap<String, HeosGroup> groupMap;
     private HeosAPI heosApi = new HeosAPI(this, eventController);
 
     public HeosSystem() {
@@ -51,7 +53,6 @@ public class HeosSystem {
         System.out.println("Debug: Command Line Connected: " + commandLine.connect(connectionIP, connectionPort));
         sendCommand.setTelnetClient(commandLine);
         send(command().registerChangeEventOFF());
-        getPlayer();
         System.out.println("Debug: Event Line Connected " + eventLine.connect(connectionIP, connectionPort));
         eventAction();
 
@@ -79,6 +80,23 @@ public class HeosSystem {
 
     }
 
+    private void eventAction() {
+        sendCommand.setTelnetClient(eventLine);
+        send(command().registerChangeEventOn());
+        eventLine.startInputListener();
+        sendCommand.setTelnetClient(commandLine);
+        eventLine.getReadResultListener().addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                parser.parseResult((String) evt.getNewValue());
+                eventController.handleEvent();
+
+            }
+        });
+
+    }
+
     public HashMap<String, HeosPlayer> getPlayer() {
 
         boolean resultEmpty = true;
@@ -86,6 +104,7 @@ public class HeosSystem {
         while (resultEmpty) {
             send(command().getPlayers());
             resultEmpty = response.getPayload().getPayloadList().isEmpty();
+            System.out.println("Is EMPTY!!!!");
         }
 
         List<HashMap<String, String>> playerList = response.getPayload().getPayloadList();
@@ -104,8 +123,6 @@ public class HeosSystem {
     private HeosPlayer updatePlayerState(HeosPlayer player) {
 
         String pid = player.getPid();
-        // Debug: pid will only changed after one try... I dont know why....
-
         send(command().getPlayState(pid));
         player.setState(response.getEvent().getMessagesMap().get("state"));
         send(command().getMute(pid));
@@ -116,21 +133,41 @@ public class HeosSystem {
         return player;
     }
 
-    private void eventAction() {
-        sendCommand.setTelnetClient(eventLine);
-        send(command().registerChangeEventOn());
-        eventLine.startInputListener();
-        sendCommand.setTelnetClient(commandLine);
-        eventLine.getReadResultListener().addPropertyChangeListener(new PropertyChangeListener() {
+    public HashMap<String, HeosGroup> getGroups() {
 
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                parser.parseResult((String) evt.getNewValue());
-                eventController.handleEvent();
+        boolean resultEmpty = true;
 
-            }
-        });
+        while (resultEmpty) {
+            send(command().getGroups());
+            resultEmpty = response.getPayload().getPayloadList().isEmpty();
+        }
 
+        List<HashMap<String, String>> groupList = response.getPayload().getPayloadList();
+
+        for (HashMap<String, String> group : groupList) {
+            HeosGroup tempGroup = new HeosGroup();
+            tempGroup.updateGroupInfo(group);
+            tempGroup = updateGroupState(tempGroup);
+            groupMap.put(tempGroup.getGid(), tempGroup);
+        }
+
+        return groupMap;
+
+    }
+
+    private HeosGroup updateGroupState(HeosGroup group) {
+
+        String gid = group.getGid();
+        send(command().getGroupInfo(gid));
+        // System.out.println(response.getPayload().getPayloadList().get(0).toString());
+
+        // group.setState(response.getEvent().getMessagesMap().get("state"));
+        // send(command().getMute(pid));
+        // group.setMute(response.getEvent().getMessagesMap().get("state"));
+        // send(command().getVolume(pid));
+        // group.setLevel(response.getEvent().getMessagesMap().get("level"));
+
+        return group;
     }
 
     public HeosAPI getAPI() {
