@@ -101,6 +101,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     @Override
     public void removeThing(ThingUID thingUID) {
         // Debug
+        // System.out.println();
 
     }
 }
