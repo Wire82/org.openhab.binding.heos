@@ -7,13 +7,11 @@
  */
 package org.openhab.binding.heos;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
 import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 
 /**
  * The {@link HeosBinding} class defines common constants, which are
@@ -36,6 +34,9 @@ public class HeosBindingConstants {
     public final static String CH_ID_VOLUME = "Volume";
     public final static String CH_ID_MUTE = "Mute";
     public final static String CH_ID_UNGROUP = "Ungroup";
+    public final static String CH_ID_SONG = "Titel";
+    public final static String CH_ID_ARTIST = "Interpret";
+    public final static String CH_ID_ALBUM = "Album";
 
     public final static String HOST = "ipAddress";
     public final static String PLAYER_TYPE = "model";
@@ -43,6 +44,8 @@ public class HeosBindingConstants {
     public final static String USER_NAME = "userName";
     public final static String PASSWORD = "password";
     public final static String PID = "pid";
+    public final static String GID = "gid";
+    public final static String LEADER = "leader";
 
     public final static String STATE = "state";
     public final static String PLAY = "play";
@@ -52,15 +55,13 @@ public class HeosBindingConstants {
     public final static String OFF = "off";
     public final static String MUTE = "mute";
     public final static String VOLUME = "volume";
+    public final static String SONG = "song";
+    public final static String ALBUM = "album";
+    public final static String ARTIST = "artist";
 
     public static Set<ThingTypeUID> supportedThingTypes() {
 
-        SetView<ThingTypeUID> supportedThings = Sets.union(Collections.singleton(THING_TYPE_PLAYER),
-                Collections.singleton(THING_TYPE_BRIDGE));
-        // add Collections.singletons
-        // supportedThings.add(THING_TYPE_BRIDGE);
-        // supportedThings.add(THING_TYPE_GROUP);
-        // supportedThings.add(THING_TYPE_PLAYER);
+        Set<ThingTypeUID> supportedThings = Sets.newHashSet(THING_TYPE_BRIDGE, THING_TYPE_GROUP, THING_TYPE_PLAYER);
 
         return supportedThings;
     }
