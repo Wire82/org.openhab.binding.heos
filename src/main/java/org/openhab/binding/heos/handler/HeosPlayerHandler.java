@@ -3,14 +3,19 @@ package org.openhab.binding.heos.handler;
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.PlayPauseType;
+import org.eclipse.smarthome.core.library.types.StringType;
+import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
+import org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder;
+import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
@@ -30,6 +35,32 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
         this.heos = heos;
         this.api = api;
         pid = thing.getConfiguration().get(PID).toString();
+
+    }
+
+    // Deug...
+
+    protected synchronized void thingStructureChanged() {
+
+        List<Channel> list = thing.getChannels();
+        System.out.println("List size: " + list.size());
+        for (int i = 0; i < list.size(); i++) {
+            Channel ch = list.get(i);
+            System.out.println("channel UID: " + ch.getUID());
+        }
+
+        ThingBuilder thingBuilder = editThing();
+
+        Channel channel = ChannelBuilder.create(new ChannelUID(this.getThing().getUID(), "test2"), "heos:mute").build();
+        thingBuilder.withChannel(channel);
+        updateThing(thingBuilder.build());
+
+        list = thing.getChannels();
+        System.out.println("List size: " + list.size());
+        for (int i = 0; i < list.size(); i++) {
+            Channel ch = list.get(i);
+            System.out.println("channel UID: " + ch.getUID());
+        }
 
     }
 
@@ -107,7 +138,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     private void initValues() {
 
-        playerMap = heos.getPlayerMap();
+        playerMap = heos.getPlayer();
         this.player = new HeosPlayer();
         // Debug
         if (playerMap.containsKey(pid)) {
@@ -137,6 +168,9 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
         if (player.getState().equals(PAUSE) || player.getState().equals(STOP)) {
             updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
         }
+        updateState(CH_ID_SONG, StringType.valueOf(player.getSong()));
+        updateState(CH_ID_ARTIST, StringType.valueOf(player.getArtist()));
+        updateState(CH_ID_ALBUM, StringType.valueOf(player.getAlbum()));
 
     }
 
@@ -176,6 +210,31 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
             }
 
+        }
+
+    }
+
+    @Override
+    public void playerMediaChangeEvent(String pid, HashMap<String, String> info) {
+
+        if (pid.equals(this.pid)) {
+            for (String key : info.keySet()) {
+
+                switch (key) {
+
+                    case SONG:
+                        updateState(CH_ID_SONG, StringType.valueOf(info.get(key)));
+                        break;
+                    case ARTIST:
+                        updateState(CH_ID_ARTIST, StringType.valueOf(info.get(key)));
+                        break;
+                    case ALBUM:
+                        updateState(CH_ID_ALBUM, StringType.valueOf(info.get(key)));
+                        break;
+
+                }
+
+            }
         }
 
     }
