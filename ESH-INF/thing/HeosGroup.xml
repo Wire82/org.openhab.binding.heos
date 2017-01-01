@@ -15,7 +15,10 @@
                     <channel id="Control"   typeId="control"/>
                     <channel id="Volume"    typeId ="volume" />
                     <channel id="Mute"      typeId = "mute" />
-                    <channel id="Ungroup"   typeId = "mute" />          
+             <channel typeId="titel"      id="Titel"></channel> 
+            <channel typeId="interpret"  id="Interpret"></channel>   
+            <channel typeId="album"      id="Album"></channel> 
+                    <channel id="Ungroup"   typeId = "ungroup" />          
             </channels>
             
             <config-description>
@@ -23,27 +26,24 @@
                     <label>Group ID</label>
                     <description>The internal group ID</description>                    
                     <required>true</required>                
-                </parameter>                
+                </parameter>
+                 <parameter name="name" type="text" readOnly = "true">
+                     <label>Player Name</label>
+                      <description>The Player Name</description>
+                       <required>false</required>
+                 </parameter>
+                <parameter name="leader" type="text" readOnly = "true">
+                     <label>Leading Heos PID</label>
+                     <description>Leading Heos PID</description>
+                     <required>false</required>                   
+            </parameter>
+                               
             </config-description>                
           </thing-type>
           
-     <channel-type id="control">
-        <item-type>Player</item-type>
-        <label>Heos Control</label>
-        <description>Heos Control</description>
-    </channel-type>
-    <channel-type id="volume">
-        <item-type>Dimmer</item-type>
-        <label>Volume</label>    
-    </channel-type>
-    <channel-type id="mute">
-        <item-type>Switch</item-type>
-        <label>Mute</label>
-     </channel-type>
-     <channel-type id="ungroup">
-        <item-type>Switch</item-type>
-        <label>Ungroup</label>
-     </channel-type>
+     
+     
+     
 
 </thing:thing-descriptions>
           

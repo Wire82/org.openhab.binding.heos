@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="heos" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+    xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+    
+   <channel-type id="control">
+       <item-type>Player</item-type>
+       <label>Control</label>
+       <description>Heos Control</description>
+    </channel-type>
+    <channel-type id="volume">
+        <item-type>Dimmer</item-type>
+        <label>Volume</label>    
+    </channel-type>
+    <channel-type id="mute">
+        <item-type>Switch</item-type>
+        <label>Mute</label>
+     </channel-type>
+     <channel-type id="group">
+        <item-type>Switch</item-type>
+        <label>Connect</label>
+     </channel-type>
+     <channel-type id="ungroup">
+        <item-type>Switch</item-type>
+        <label>Ungroup</label>
+     </channel-type>
+     <channel-type id="titel">
+        <item-type>String</item-type>
+        <label>Song</label>
+     </channel-type>
+        <channel-type id="interpret">
+        <item-type>String</item-type>
+        <label>Artist</label>
+     </channel-type>
+      <channel-type id="album">
+        <item-type>String</item-type>
+        <label>Album</label>
+     </channel-type>
+    
+    </thing:thing-descriptions>
