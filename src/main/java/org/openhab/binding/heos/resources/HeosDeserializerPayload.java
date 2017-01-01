@@ -15,6 +15,8 @@ import com.google.gson.JsonParseException;
 
 public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePayload> {
 
+    // Debug: Return value of PLayerList has to be defined if no player found
+
     private HeosResponsePayload responsePayload = new HeosResponsePayload();
 
     @Override
@@ -23,21 +25,17 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
 
         boolean arrayTrue = false;
         List<HashMap<String, String>> mapList = new ArrayList<HashMap<String, String>>();
+        List<HashMap<String, String>> playerList = new ArrayList<HashMap<String, String>>();
 
         JsonObject jsonObject = json.getAsJsonObject();
 
-        // Checks if behind "payload" an array starts or not. Feature might be implemented much better...... :)
-        String check = String.valueOf(json);
-        int payPor = check.indexOf("payload");
-        // jsonObject.get("payload").isArray(); Maybe use this one.....
-        if (String.valueOf(check.charAt(payPor + 9)).equals("[")) {
-            arrayTrue = true;
-        }
+        if (jsonObject.has("payload")) {
+            if (jsonObject.get("payload").isJsonArray()) {
 
-        // if (jsonObject.has("payload")) {
-        // JsonArray obj = jsonObject.get("payload").getAsJsonArray();
-        //
-        // }
+                arrayTrue = true;
+            }
+
+        }
 
         if (jsonObject.has("payload") && arrayTrue) {
 
@@ -45,38 +43,79 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
 
             for (int i = 0; i < jsonArray.size(); i++) {
                 HashMap<String, String> payload = new HashMap<String, String>();
+
                 JsonObject object = jsonArray.get(i).getAsJsonObject();
 
-                System.out.println("contains Player: " + object.has("players"));
-                // object.remove("players");
                 for (Entry<String, JsonElement> entry : object.entrySet()) {
 
-                    payload.put(entry.getKey(), entry.getValue().getAsString());
-                    // Debug
-                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                    if (entry.getValue().isJsonArray()) {
+                        JsonArray playerArray = entry.getValue().getAsJsonArray();
+                        for (int j = 0; j < playerArray.size(); j++) {
+
+                            HashMap<String, String> player = new HashMap<String, String>();
+                            JsonObject playerObj = playerArray.get(j).getAsJsonObject();
+
+                            for (Entry<String, JsonElement> element : playerObj.entrySet()) {
+
+                                player.put(element.getKey(), element.getValue().getAsString());
+
+                            }
+                            playerList.add(player);
+                        }
+
+                    } else {
+                        payload.put(entry.getKey(), entry.getValue().getAsString());
+
+                        // Debug
+                        // System.out.println(entry.getKey() + ": " + entry.getValue());
+                    }
+
                 }
+
                 mapList.add(payload);
 
             }
 
-        } else if (jsonObject.has("payload") && !jsonObject.isJsonArray())
+        } else if (jsonObject.has("payload") && !arrayTrue)
 
         {
             HashMap<String, String> payload = new HashMap<String, String>();
             JsonObject jsonPayload = jsonObject.get("payload").getAsJsonObject();
 
             for (Entry<String, JsonElement> entry : jsonPayload.entrySet()) {
+                if (entry.getValue().isJsonArray()) {
+                    JsonArray playerArray = entry.getValue().getAsJsonArray();
+                    for (int j = 0; j < playerArray.size(); j++) {
 
-                payload.put(entry.getKey(), entry.getValue().getAsString());
-                // System.out.println(entry.getKey()+ ": " + entry.getValue());
+                        HashMap<String, String> player = new HashMap<String, String>();
+                        JsonObject playerObj = playerArray.get(j).getAsJsonObject();
+
+                        for (Entry<String, JsonElement> element : playerObj.entrySet()) {
+
+                            player.put(element.getKey(), element.getValue().getAsString());
+                        }
+                        playerList.add(player);
+                    }
+
+                } else {
+
+                    payload.put(entry.getKey(), entry.getValue().getAsString());
+                    // System.out.println(entry.getKey()+ ": " + entry.getValue());
+                }
+
             }
             mapList.add(payload);
 
         } else {
+            HashMap<String, String> player = new HashMap<String, String>();
             HashMap<String, String> payload = new HashMap<String, String>();
             payload.put("No Payload", "No Payload");
+            player.put("No Player", "No Player");
+            playerList.add(player);
             mapList.add(payload);
         }
+
+        responsePayload.setPlayerList(playerList);
         responsePayload.setPayload(mapList);
         return responsePayload;
     }
