@@ -20,6 +20,7 @@ import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
+import org.openhab.binding.heos.resources.HeosGroup;
 import org.openhab.binding.heos.resources.HeosPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +102,11 @@ public class HeosBridgeHandler extends BaseBridgeHandler {
     public HashMap<String, HeosPlayer> getNewPlayer() {
 
         return heos.getPlayer();
+    }
+
+    public HashMap<String, HeosGroup> getNewGroups() {
+
+        return heos.getGroups();
     }
 
 }
