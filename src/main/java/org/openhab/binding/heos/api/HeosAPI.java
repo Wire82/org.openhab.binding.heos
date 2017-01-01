@@ -92,4 +92,10 @@ public class HeosAPI {
 
     }
 
+    public void unregisterforChangeEvents(HeosEventListener listener) {
+
+        event.removeListener(listener);
+
+    }
+
 }
