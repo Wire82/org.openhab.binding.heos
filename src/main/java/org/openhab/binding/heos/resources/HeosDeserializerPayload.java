@@ -34,6 +34,11 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
             arrayTrue = true;
         }
 
+        // if (jsonObject.has("payload")) {
+        // JsonArray obj = jsonObject.get("payload").getAsJsonArray();
+        //
+        // }
+
         if (jsonObject.has("payload") && arrayTrue) {
 
             JsonArray jsonArray = jsonObject.get("payload").getAsJsonArray();
@@ -41,13 +46,22 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
             for (int i = 0; i < jsonArray.size(); i++) {
                 HashMap<String, String> payload = new HashMap<String, String>();
                 JsonObject object = jsonArray.get(i).getAsJsonObject();
+
+                System.out.println("contains Player: " + object.has("players"));
+                // object.remove("players");
                 for (Entry<String, JsonElement> entry : object.entrySet()) {
+
                     payload.put(entry.getKey(), entry.getValue().getAsString());
-                    // System.out.println(entry.getKey()+ ": " + entry.getValue());
+                    // Debug
+                    System.out.println(entry.getKey() + ": " + entry.getValue());
                 }
                 mapList.add(payload);
+
             }
-        } else if (jsonObject.has("payload") && !jsonObject.isJsonArray()) {
+
+        } else if (jsonObject.has("payload") && !jsonObject.isJsonArray())
+
+        {
             HashMap<String, String> payload = new HashMap<String, String>();
             JsonObject jsonPayload = jsonObject.get("payload").getAsJsonObject();
 
