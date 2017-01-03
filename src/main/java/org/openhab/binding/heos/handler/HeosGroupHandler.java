@@ -69,13 +69,19 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                 api.volumeGroup(command.toString(), gid);
             }
 
-        } else if (channelUID.getId().equals("Mute")) {
+        } else if (channelUID.getId().equals(CH_ID_MUTE)) {
 
             if (command.toString().equals("ON")) {
 
                 api.muteGroupON(gid);
             } else {
                 api.muteGroupOFF(gid);
+            }
+        } else if (channelUID.getId().equals(CH_ID_UNGROUP)) {
+
+            if (command.toString().equals("ON")) {
+                api.ungroupGroup(gid);
+
             }
         }
 
