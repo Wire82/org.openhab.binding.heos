@@ -36,10 +36,9 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
     public HeosPlayerDiscovery(HeosBridgeHandler bridge) throws IllegalArgumentException {
         super(20);
-        // super(Collections.singleton(HeosBindingConstants.THING_TYPE_PLAYER), 20);
         this.bridge = bridge;
-
         this.scanningRunnable = new PlayerScan();
+        bridge.setHeosPlayerDiscovery(this);
 
         // Debug
         // this.startBackgroundDiscovery();
@@ -89,6 +88,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         logger.info("Start scan for HEOS Groups");
 
         HashMap<String, HeosGroup> groupMap = new HashMap<>();
+
         groupMap = bridge.getNewGroups();
 
         if (playerMap == null) {
@@ -97,20 +97,40 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
         } else {
 
-            logger.info("Found: {} new Groups", groupMap.size());
-            ThingUID bridgeUID = bridge.getThing().getUID();
+            if (!groupMap.isEmpty()) {
+                logger.info("Found: {} new Groups", groupMap.size());
+                ThingUID bridgeUID = bridge.getThing().getUID();
 
-            for (String groupGID : groupMap.keySet()) {
-                HeosGroup group = groupMap.get(groupGID);
-                ThingUID uid = new ThingUID(THING_TYPE_GROUP, groupMap.get(groupGID).getGid());
-                HashMap<String, Object> properties = new HashMap<String, Object>();
-                properties.put(NAME, group.getName());
-                properties.put(GID, group.getGid());
-                properties.put(LEADER, group.getLeader());
-                DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(group.getName())
-                        .withProperties(properties).withBridge(bridgeUID).build();
-                thingDiscovered(result);
+                for (String groupGID : groupMap.keySet()) {
+                    HeosGroup group = groupMap.get(groupGID);
+                    ThingUID uid = new ThingUID(THING_TYPE_GROUP, groupMap.get(groupGID).getGid());
+                    HashMap<String, Object> properties = new HashMap<String, Object>();
+                    properties.put(NAME, group.getName());
+                    properties.put(GID, group.getGid());
+                    properties.put(LEADER, group.getLeader());
+                    DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(group.getName())
+                            .withProperties(properties).withBridge(bridgeUID).build();
+                    thingDiscovered(result);
+                }
 
+            } else {
+                logger.info("No Groups found");
+            }
+
+        }
+
+        removedGroups();
+
+    }
+
+    private void removedGroups() {
+        HashMap<String, HeosGroup> removedGroupMap = new HashMap<>();
+        removedGroupMap = bridge.getRemovedGroups();
+        if (!removedGroupMap.isEmpty()) {
+            for (String key : removedGroupMap.keySet()) {
+                ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getGid());
+                System.out.println("Removed Group: " + uid);
+                thingRemoved(uid);
             }
 
         }
@@ -141,6 +161,19 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
             scanningJob.cancel(true);
             scanningJob = null;
         }
+    }
+
+    @Override
+    protected synchronized void stopScan() {
+        super.stopScan();
+        removeOlderResults(getTimestampOfLastScan());
+    }
+
+    public void scanForNewPlayers() {
+
+        scanningRunnable.run();
+        // Debug: does not work....
+        // removeOlderResults(getTimestampOfLastScan());
     }
 
     public class PlayerScan implements Runnable {
