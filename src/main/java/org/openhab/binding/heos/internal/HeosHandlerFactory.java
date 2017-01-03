@@ -10,6 +10,7 @@ package org.openhab.binding.heos.internal;
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class HeosHandlerFactory extends BaseThingHandlerFactory {
 
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
+
     private Logger logger = LoggerFactory.getLogger(HeosHandlerFactory.class);
     private HeosSystem heos = new HeosSystem();
     private HeosAPI api = heos.getAPI();
@@ -49,6 +51,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
         return SUPPORTED_THING_TYPES_UIDS.contains(thingTypeUID);
+
     }
 
     @Override
@@ -59,14 +62,16 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
         if (thingTypeUID.equals(THING_TYPE_BRIDGE)) {
             HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing, heos, api);
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
-            discoveryServiceRegs.put(bridgeHandler.getThing().getUID(),
-                    bundleContext.registerService(DiscoveryService.class.getName(), playerDiscovery, null));
+            playerDiscovery.addDiscoveryListener(bridgeHandler);
+            discoveryServiceRegs.put(bridgeHandler.getThing().getUID(), bundleContext.registerService(
+                    DiscoveryService.class.getName(), playerDiscovery, new Hashtable<String, Object>()));
             logger.info("Register discovery service for HEOS player and HEOS groups by bridge '{}'",
                     bridgeHandler.getThing().getUID().getId());
             return bridgeHandler;
         }
         if (thingTypeUID.equals(THING_TYPE_PLAYER)) {
             return new HeosPlayerHandler(thing, heos, api);
+
         }
         if (thingTypeUID.equals(THING_TYPE_GROUP)) {
             return new HeosGroupHandler(thing, heos, api);
@@ -91,17 +96,4 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
 
     }
 
-    @Override
-    protected synchronized void removeHandler(ThingHandler thingHandler) {
-        // Debug
-        System.out.println("Remove Handler");
-
-    }
-
-    @Override
-    public void removeThing(ThingUID thingUID) {
-        // Debug
-        // System.out.println();
-
-    }
 }
