@@ -60,6 +60,7 @@ public class HeosEventController extends MyEventListener {
             case "player_now_playing_progress":
                 break;
             case "players_changed":
+                fireBridgeEvent("event", eventCommand);
                 break;
             case "player_now_playing_changed":
                 mediaStateChanged();
@@ -74,6 +75,11 @@ public class HeosEventController extends MyEventListener {
             case "player_volume_changed":
                 volumeChanged();
                 break;
+            case "groups_changed":
+                fireBridgeEvent("event", eventCommand);
+
+                break;
+
         }
     }
 
