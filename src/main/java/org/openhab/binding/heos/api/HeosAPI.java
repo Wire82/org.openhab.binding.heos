@@ -89,6 +89,11 @@ public class HeosAPI {
 
     }
 
+    public void ungroupGroup(String gid) {
+        String[] pid = new String[] { gid };
+        controller.send(controller.command().setGroup(pid));
+    }
+
     public void setHeosConnection(String ip, int port) {
 
         controller.setConnectionIP(ip);
