@@ -25,8 +25,11 @@ public class HeosSystem {
     private HeosJsonParser parser = new HeosJsonParser(response);
     private HeosEventController eventController = new HeosEventController(response, heosCommand, this);
     private HeosSendCommand sendCommand = new HeosSendCommand(commandLine, parser, response, eventController);
-    HashMap<String, HeosPlayer> playerMap;
-    HashMap<String, HeosGroup> groupMap;
+    HashMap<String, HeosPlayer> playerMapNew;
+    HashMap<String, HeosGroup> groupMapNew;
+    HashMap<String, HeosPlayer> playerMapOld;
+    HashMap<String, HeosGroup> groupMapOld;
+    HashMap<String, HeosGroup> removedGroupMap;
     private HeosAPI heosApi = new HeosAPI(this, eventController);
 
     public HeosSystem() {
@@ -45,8 +48,11 @@ public class HeosSystem {
     }
 
     public boolean establishConnection() {
-        this.playerMap = new HashMap<String, HeosPlayer>();
-        this.groupMap = new HashMap<String, HeosGroup>();
+        this.playerMapNew = new HashMap<String, HeosPlayer>();
+        this.groupMapNew = new HashMap<String, HeosGroup>();
+        this.playerMapOld = new HashMap<String, HeosPlayer>();
+        this.groupMapOld = new HashMap<String, HeosGroup>();
+        this.removedGroupMap = new HashMap<String, HeosGroup>();
         this.commandLine = new Telnet();
         this.eventLine = new Telnet();
 
@@ -55,13 +61,28 @@ public class HeosSystem {
         sendCommand.setTelnetClient(commandLine);
         send(command().registerChangeEventOFF());
         System.out.println("Debug: Event Line Connected " + eventLine.connect(connectionIP, connectionPort));
-        eventAction();
 
         if (commandLine.isConnected() && eventLine.isConnected()) {
             return true;
         }
 
         return false;
+    }
+
+    public void startEventListener() {
+        sendCommand.setTelnetClient(eventLine);
+        send(command().registerChangeEventOn());
+        eventLine.startInputListener();
+        sendCommand.setTelnetClient(commandLine);
+        eventLine.getReadResultListener().addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                parser.parseResult((String) evt.getNewValue());
+                eventController.handleEvent();
+
+            }
+        });
     }
 
     public void closeConnection() {
@@ -78,23 +99,6 @@ public class HeosSystem {
         sendCommand.setTelnetClient(commandLine);
         eventLine.disconnect();
         commandLine.disconnect();
-
-    }
-
-    private void eventAction() {
-        sendCommand.setTelnetClient(eventLine);
-        send(command().registerChangeEventOn());
-        eventLine.startInputListener();
-        sendCommand.setTelnetClient(commandLine);
-        eventLine.getReadResultListener().addPropertyChangeListener(new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                parser.parseResult((String) evt.getNewValue());
-                eventController.handleEvent();
-
-            }
-        });
 
     }
 
@@ -115,10 +119,11 @@ public class HeosSystem {
             HeosPlayer tempPlay = new HeosPlayer();
             tempPlay.updatePlayerInfo(player);
             tempPlay = updatePlayerState(tempPlay);
-            playerMap.put(tempPlay.getPid(), tempPlay);
+            playerMapNew.put(tempPlay.getPid(), tempPlay);
+
         }
 
-        return playerMap;
+        return playerMapNew;
 
     }
 
@@ -140,9 +145,15 @@ public class HeosSystem {
     public HashMap<String, HeosGroup> getGroups() {
 
         send(command().getGroups());
+
         System.out.println("Found: " + response.getPayload().getPlayerList().size() + " Player in Group");
         if (response.getPayload().getPayloadList().isEmpty()) {
-            return groupMap;
+            groupMapNew.clear();
+            removedGroupMap = compareMaps(groupMapNew, groupMapOld);
+            for (String key : groupMapNew.keySet()) {
+                groupMapOld.put(key, groupMapNew.get(key));
+            }
+            return groupMapNew;
         }
 
         List<HashMap<String, String>> groupList = response.getPayload().getPayloadList();
@@ -151,10 +162,14 @@ public class HeosSystem {
             HeosGroup tempGroup = new HeosGroup();
             tempGroup.updateGroupInfo(group);
             tempGroup = updateGroupState(tempGroup);
-            groupMap.put(tempGroup.getGid(), tempGroup);
+            groupMapNew.put(tempGroup.getGid(), tempGroup);
+            removedGroupMap = compareMaps(groupMapNew, groupMapOld);
+            for (String key : groupMapNew.keySet()) {
+                groupMapOld.put(key, groupMapNew.get(key));
+            }
         }
 
-        return groupMap;
+        return groupMapNew;
 
     }
 
@@ -191,6 +206,20 @@ public class HeosSystem {
         return group;
     }
 
+    private HashMap<String, HeosGroup> compareMaps(HashMap<String, HeosGroup> mapNew,
+            HashMap<String, HeosGroup> mapOld) {
+
+        HashMap<String, HeosGroup> removedItems = new HashMap<String, HeosGroup>();
+        for (String key : mapOld.keySet()) {
+            if (!mapNew.containsKey(key)) {
+                removedItems.put(key, mapOld.get(key));
+            }
+
+        }
+
+        return removedItems;
+    }
+
     public HeosAPI getAPI() {
         return heosApi;
     }
@@ -212,11 +241,15 @@ public class HeosSystem {
     }
 
     public HashMap<String, HeosPlayer> getPlayerMap() {
-        return playerMap;
+        return playerMapNew;
     }
 
     public HashMap<String, HeosGroup> getGroupMap() {
-        return groupMap;
+        return groupMapNew;
+    }
+
+    public HashMap<String, HeosGroup> getGroupsRemoved() {
+        return removedGroupMap;
     }
 
 }
