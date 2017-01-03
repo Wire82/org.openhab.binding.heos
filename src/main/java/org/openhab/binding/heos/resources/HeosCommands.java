@@ -234,9 +234,10 @@ public class HeosCommands {
     public String setGroup(String[] gid) {
         String players = "";
         for (String player : gid) {
-            players.concat("," + player);
+            player = "," + player;
+            players = players + player;
         }
-        players.replaceFirst(",", "");
+        players = players.substring(1, players.length());
 
         return setGroup + players;
     }
