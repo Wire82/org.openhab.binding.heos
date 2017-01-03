@@ -25,7 +25,7 @@
         <label>Ungroup</label>
      </channel-type>
      <channel-type id="titel">
-        <item-type>String</item-type>
+        <item-type>String </item-type>
         <label>Song</label>
      </channel-type>
         <channel-type id="interpret">
