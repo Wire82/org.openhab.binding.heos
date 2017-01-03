@@ -239,4 +239,10 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     }
 
+    @Override
+    public void bridgeChangeEvent(String event, String command) {
+        // TODO Auto-generated method stub
+
+    }
+
 }
