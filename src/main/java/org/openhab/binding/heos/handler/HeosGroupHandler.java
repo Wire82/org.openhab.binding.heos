@@ -17,6 +17,8 @@ import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
 import org.openhab.binding.heos.resources.HeosEventListener;
 import org.openhab.binding.heos.resources.HeosGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeosGroupHandler extends BaseThingHandler implements HeosEventListener {
 
@@ -25,6 +27,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     private String gid;
     private HashMap<String, HeosGroup> groupMap;
     private HeosGroup group;
+    private Logger logger = LoggerFactory.getLogger(HeosGroupHandler.class);
 
     public HeosGroupHandler(Thing thing, HeosSystem heos, HeosAPI api) {
         super(thing);
@@ -36,8 +39,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        // Debug
-        // System.out.println(channelUID.getId());
+
         if (channelUID.getId().equals(CH_ID_CONTROL)) {
 
             String com = command.toString();
@@ -97,13 +99,13 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
         api.registerforChangeEvents(this);
 
         updateStatus(ThingStatus.ONLINE);
+        super.initialize();
 
     }
 
     @Override
     public void dispose() {
         api.unregisterforChangeEvents(this);
-        updateStatus(ThingStatus.OFFLINE);
 
     }
 
@@ -208,6 +210,12 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
 
             }
         }
+
+    }
+
+    @Override
+    public void bridgeChangeEvent(String event, String command) {
+        // TODO Auto-generated method stub
 
     }
 
