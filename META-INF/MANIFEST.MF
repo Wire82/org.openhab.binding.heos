@@ -3,12 +3,12 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Heos Binding
 Bundle-SymbolicName: org.openhab.binding.heos;singleton:=true
 Bundle-Vendor: openHAB
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 0.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .
 Import-Package: 
- com.google.common.collect;version="10.0.1",
- com.google.gson;version="2.5.0",
+ com.google.common.collect,
+ com.google.gson,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.core.library.types,
  org.eclipse.smarthome.core.thing,
@@ -25,5 +25,4 @@ Export-Package: org.openhab.binding.heos,
 Require-Bundle: org.apache.commons.net,
  org.eclipse.smarthome.config.discovery,
  org.jupnp,
- org.eclipse.osgi,
- org.eclipse.smarthome.io.transport.upnp
+ org.eclipse.osgi
