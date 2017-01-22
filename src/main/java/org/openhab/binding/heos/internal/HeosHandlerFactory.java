@@ -60,6 +60,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (thingTypeUID.equals(THING_TYPE_BRIDGE)) {
+
             HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing, heos, api);
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
             playerDiscovery.addDiscoveryListener(bridgeHandler);
@@ -67,7 +68,9 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
                     DiscoveryService.class.getName(), playerDiscovery, new Hashtable<String, Object>()));
             logger.info("Register discovery service for HEOS player and HEOS groups by bridge '{}'",
                     bridgeHandler.getThing().getUID().getId());
+
             return bridgeHandler;
+
         }
         if (thingTypeUID.equals(THING_TYPE_PLAYER)) {
             return new HeosPlayerHandler(thing, heos, api);

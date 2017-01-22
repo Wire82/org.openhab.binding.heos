@@ -4,7 +4,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.resources.HeosCommands;
 import org.openhab.binding.heos.resources.HeosGroup;
 import org.openhab.binding.heos.resources.HeosJsonParser;
@@ -12,6 +17,8 @@ import org.openhab.binding.heos.resources.HeosPlayer;
 import org.openhab.binding.heos.resources.HeosResponse;
 import org.openhab.binding.heos.resources.HeosSendCommand;
 import org.openhab.binding.heos.resources.Telnet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeosSystem {
 
@@ -25,12 +32,16 @@ public class HeosSystem {
     private HeosJsonParser parser = new HeosJsonParser(response);
     private HeosEventController eventController = new HeosEventController(response, heosCommand, this);
     private HeosSendCommand sendCommand = new HeosSendCommand(commandLine, parser, response, eventController);
-    HashMap<String, HeosPlayer> playerMapNew;
-    HashMap<String, HeosGroup> groupMapNew;
-    HashMap<String, HeosPlayer> playerMapOld;
-    HashMap<String, HeosGroup> groupMapOld;
-    HashMap<String, HeosGroup> removedGroupMap;
+    private HashMap<String, HeosPlayer> playerMapNew;
+    private HashMap<String, HeosGroup> groupMapNew;
+    private HashMap<String, HeosPlayer> playerMapOld;
+    private HashMap<String, HeosGroup> groupMapOld;
+    private HashMap<String, HeosGroup> removedGroupMap;
     private HeosAPI heosApi = new HeosAPI(this, eventController);
+
+    private Logger logger = LoggerFactory.getLogger(HeosBridgeHandler.class);
+
+    private final ScheduledExecutorService keepAlive = Executors.newScheduledThreadPool(1);
 
     public HeosSystem() {
 
@@ -56,17 +67,36 @@ public class HeosSystem {
         this.commandLine = new Telnet();
         this.eventLine = new Telnet();
 
-        // Debug
-        System.out.println("Debug: Command Line Connected: " + commandLine.connect(connectionIP, connectionPort));
+        logger.info("Debug: Command Line Connected");
+        commandLine.connect(connectionIP, connectionPort);
         sendCommand.setTelnetClient(commandLine);
         send(command().registerChangeEventOFF());
-        System.out.println("Debug: Event Line Connected " + eventLine.connect(connectionIP, connectionPort));
+        logger.info("Debug: Event Line Connected");
+        eventLine.connect(connectionIP, connectionPort);
+        keepConnectionAlive();
 
         if (commandLine.isConnected() && eventLine.isConnected()) {
             return true;
         }
 
         return false;
+    }
+
+    // Keeps the connection alive even if no data is transmitted
+
+    private void keepConnectionAlive() {
+        final Runnable keepAliveRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                send(command().heartBeat());
+
+            }
+        };
+
+        final ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleAtFixedRate(keepAliveRunnable, 60, 60,
+                TimeUnit.SECONDS);
+
     }
 
     public void startEventListener() {
@@ -145,14 +175,14 @@ public class HeosSystem {
     public HashMap<String, HeosGroup> getGroups() {
 
         send(command().getGroups());
-
-        System.out.println("Found: " + response.getPayload().getPlayerList().size() + " Player in Group");
+        logger.info("Found: {} Player in Group", response.getPayload().getPlayerList().size());
         if (response.getPayload().getPayloadList().isEmpty()) {
             groupMapNew.clear();
             removedGroupMap = compareMaps(groupMapNew, groupMapOld);
-            for (String key : groupMapNew.keySet()) {
-                groupMapOld.put(key, groupMapNew.get(key));
-            }
+            groupMapOld.putAll(groupMapNew);
+            // for (String key : groupMapNew.keySet()) {
+            // groupMapOld.put(key, groupMapNew.get(key));
+            // }
             return groupMapNew;
         }
 
@@ -164,9 +194,10 @@ public class HeosSystem {
             tempGroup = updateGroupState(tempGroup);
             groupMapNew.put(tempGroup.getGid(), tempGroup);
             removedGroupMap = compareMaps(groupMapNew, groupMapOld);
-            for (String key : groupMapNew.keySet()) {
-                groupMapOld.put(key, groupMapNew.get(key));
-            }
+            groupMapOld.putAll(groupMapNew);
+            // for (String key : groupMapNew.keySet()) {
+            // groupMapOld.put(key, groupMapNew.get(key));
+            // }
         }
 
         return groupMapNew;
@@ -218,6 +249,13 @@ public class HeosSystem {
         }
 
         return removedItems;
+    }
+
+    public List<HashMap<String, String>> getFavorits() {
+        // HashMap<String, String> favorits = new HashMap<String, String>();
+        send(command().BrowseSource("1028"));
+        return response.getPayload().getPayloadList();
+
     }
 
     public HeosAPI getAPI() {

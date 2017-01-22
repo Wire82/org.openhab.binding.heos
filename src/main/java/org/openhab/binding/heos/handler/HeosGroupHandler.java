@@ -225,4 +225,9 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
 
     }
 
+    public void setStatusOffline() {
+
+        updateStatus(ThingStatus.OFFLINE);
+    }
+
 }

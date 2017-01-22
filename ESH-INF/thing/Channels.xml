@@ -35,6 +35,27 @@
       <channel-type id="album">
         <item-type>String</item-type>
         <label>Album</label>
+     </channel-type>   
+      <channel-type id="player">
+        <item-type>Switch</item-type>
+        <label>Player</label>
      </channel-type>
+       <channel-type id="buildGroup">
+        <item-type>Switch</item-type>
+        <label>Made Group</label>
+     </channel-type>
+      <channel-type id="dynamicGroupHandling">
+        <item-type>Switch</item-type>
+        <label>Dynamic Group Managment</label>
+     </channel-type>
+         <channel-type id="favorit">
+        <item-type>Switch</item-type>
+        <label>Favorit</label>
+     </channel-type>       
+         <channel-type id="reboot">
+        <item-type>Switch</item-type>
+        <label>Reboot</label>
+     </channel-type>
+     
     
     </thing:thing-descriptions>

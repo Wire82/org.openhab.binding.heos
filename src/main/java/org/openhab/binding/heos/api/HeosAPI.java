@@ -94,6 +94,15 @@ public class HeosAPI {
         controller.send(controller.command().setGroup(pid));
     }
 
+    public void groupPlayer(String[] gid) {
+
+        controller.send(controller.command().setGroup(gid));
+    }
+
+    public void browseSource(String sid) {
+        controller.send(controller.command().BrowseSource(sid));
+    }
+
     public void setHeosConnection(String ip, int port) {
 
         controller.setConnectionIP(ip);
@@ -102,9 +111,20 @@ public class HeosAPI {
 
     }
 
-    public void setUserDate(String name, String password) {
+    public void reboot() {
+        controller.send(controller.command().rebootSystem());
+    }
+
+    public void logIn(String name, String password) {
 
         controller.command().setUsernamePwassword(name, password);
+        controller.send(controller.command().signIn(name, password));
+
+    }
+
+    public void playStation(String pid, String sid, String cid, String mid, String name) {
+
+        controller.send(controller.command().playStation(pid, sid, cid, mid, name));
 
     }
 

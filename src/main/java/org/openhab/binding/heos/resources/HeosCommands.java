@@ -15,6 +15,7 @@ public class HeosCommands {
     private String rebootSystem = "heos://system/reboot";
     private String signIn = "heos://system/sign_in?un=" + username + "&pw=" + password;
     private String signOut = "heos://system/sign_out";
+    private String heartBeat = "heos://system/heart_beat";
 
     // Player Commands Control
     private String setPlayStatePlay = "heos://player/set_play_state?pid=";
@@ -56,7 +57,7 @@ public class HeosCommands {
 
     // Browse Commands
     private String getMusicSources = "heos://browse/get_music_sources";
-    private String browseSource = "heos://browse/browse";
+    private String browseSource = "heos://browse/browse?sid=";
     private String playStation = "heos://browse/play_stream?pid=";
     private String addToQueue = "heos://browse/add_to_queue?pid=";
 
@@ -179,8 +180,8 @@ public class HeosCommands {
         return playQueueItem + pid;
     }
 
-    public String BrowseSource() {
-        return browseSource;
+    public String BrowseSource(String sid) {
+        return browseSource + sid;
     }
 
     public String PlayStation(String pid) {
@@ -197,6 +198,28 @@ public class HeosCommands {
 
     public String rebootSystem() {
         return rebootSystem;
+    }
+
+    public String playStation(String pid, String sid, String cid, String mid, String name) {
+        String newCommand = playStation;
+        if (pid != null) {
+            newCommand = newCommand + pid;
+        }
+        if (sid != null) {
+            newCommand = newCommand + "&sid=" + sid;
+
+        }
+        if (cid != null) {
+            newCommand = newCommand + "&cid=" + cid;
+        }
+        if (mid != null) {
+            newCommand = newCommand + "&mid=" + mid;
+        }
+        if (name != null) {
+            newCommand = newCommand + "&name=" + name;
+        }
+        return newCommand;
+
     }
 
     public void setUsernamePwassword(String username, String password) {
@@ -221,6 +244,10 @@ public class HeosCommands {
 
     public String signOut(String gid) {
         return signOut;
+    }
+
+    public String heartBeat() {
+        return heartBeat;
     }
 
     public String getGroups() {

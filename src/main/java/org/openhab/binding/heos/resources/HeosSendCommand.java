@@ -30,7 +30,7 @@ public class HeosSendCommand {
                 sendTryCounter++;
             } else if (response.getEvent().getMessagesMap().get("command under process").equals("true")) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     // Debug
                     // TODO Auto-generated catch block

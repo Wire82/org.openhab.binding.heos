@@ -16,6 +16,7 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder;
 import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
+import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
@@ -42,16 +43,25 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     protected synchronized void thingStructureChanged() {
 
+        ChannelTypeUID type = new ChannelTypeUID("heos", "mute");
+
         List<Channel> list = thing.getChannels();
         System.out.println("List size: " + list.size());
         for (int i = 0; i < list.size(); i++) {
             Channel ch = list.get(i);
+
             System.out.println("channel UID: " + ch.getUID());
+            System.out.println("channel TypeUID: " + ch.getChannelTypeUID());
+            if (ch.getChannelTypeUID().equals("heos:mute")) {
+                // type = ch.getChannelTypeUID();
+            }
+
         }
 
         ThingBuilder thingBuilder = editThing();
 
-        Channel channel = ChannelBuilder.create(new ChannelUID(this.getThing().getUID(), "test2"), "heos:mute").build();
+        Channel channel = ChannelBuilder.create(new ChannelUID(this.getThing().getUID(), "String"), "Switch")
+                .withType(type).build();
         thingBuilder.withChannel(channel);
         updateThing(thingBuilder.build());
 
@@ -60,6 +70,8 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
         for (int i = 0; i < list.size(); i++) {
             Channel ch = list.get(i);
             System.out.println("channel UID: " + ch.getUID());
+            System.out.println("channel TypeUID: " + ch.getChannelTypeUID());
+            System.out.println("Channel is linked: " + ch.getProperties().toString());
         }
 
     }
@@ -99,7 +111,6 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
         } else if (channelUID.getId().equals("Mute")) {
 
             if (command.toString().equals("ON")) {
-
                 api.muteON(pid);
             } else {
                 api.muteOFF(pid);
@@ -121,10 +132,9 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
         };
 
-        init.run();
-
         api.registerforChangeEvents(this);
-
+        init.run();
+        addFavorits();
         updateStatus(ThingStatus.ONLINE);
 
     }
@@ -132,7 +142,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     @Override
     public void dispose() {
         api.unregisterforChangeEvents(this);
-        updateStatus(ThingStatus.OFFLINE);
+        System.out.println("unregister for changes");
 
     }
 
@@ -198,14 +208,15 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
             }
             if (event.equals(MUTE)) {
-
-                switch (command) {
-                    case ON:
-                        updateState(CH_ID_MUTE, OnOffType.ON);
-                        break;
-                    case OFF:
-                        updateState(CH_ID_MUTE, OnOffType.OFF);
-                        break;
+                if (command != null) {
+                    switch (command) {
+                        case ON:
+                            updateState(CH_ID_MUTE, OnOffType.ON);
+                            break;
+                        case OFF:
+                            updateState(CH_ID_MUTE, OnOffType.OFF);
+                            break;
+                    }
                 }
 
             }
@@ -242,6 +253,11 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     @Override
     public void bridgeChangeEvent(String event, String command) {
         // TODO Auto-generated method stub
+
+    }
+
+    public void addFavorits() {
+        // api.browseSource("1028");
 
     }
 

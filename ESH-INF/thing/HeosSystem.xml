@@ -7,11 +7,17 @@
     <!-- Thing Type -->
     <bridge-type id="Bridge">
         <label>HEOS Bridge</label>
-        <description>The HEOS System Bridge</description>
+        <description>The HEOS System Bridge</description>    
         
-        <properties>
-            <property name="vendor">Denon</property>
-            
+         <channels>
+            <channel typeId="reboot" id="Reboot"></channel>    
+            <channel typeId="dynamicGroupHandling" id="DynamicGroupHandling"></channel>  
+            <channel typeId="buildGroup" id="BuildGroup"></channel> 
+               
+        </channels>
+        
+          <properties>
+            <property name="vendor">Denon</property>            
         </properties>
         
         <config-description>

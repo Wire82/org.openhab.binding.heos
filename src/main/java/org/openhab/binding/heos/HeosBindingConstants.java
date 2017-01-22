@@ -10,6 +10,7 @@ package org.openhab.binding.heos;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 
 import com.google.common.collect.Sets;
 
@@ -29,6 +30,12 @@ public class HeosBindingConstants {
     public final static ThingTypeUID THING_TYPE_PLAYER = new ThingTypeUID(BINDING_ID, "Player");
     public final static ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "Group");
 
+    // List off all Channel Types
+
+    public final static ChannelTypeUID CH_TYPE_PLAYER = new ChannelTypeUID(BINDING_ID, "player");
+    public final static ChannelTypeUID CH_TYPE_FAVORIT = new ChannelTypeUID(BINDING_ID, "favorit");
+    public final static ChannelTypeUID CH_TYPE_GROUP = new ChannelTypeUID(BINDING_ID, "group");
+
     // List of all Channel ids
     public final static String CH_ID_CONTROL = "Control";
     public final static String CH_ID_VOLUME = "Volume";
@@ -37,6 +44,10 @@ public class HeosBindingConstants {
     public final static String CH_ID_SONG = "Titel";
     public final static String CH_ID_ARTIST = "Interpret";
     public final static String CH_ID_ALBUM = "Album";
+    public final static String CH_ID_PLAYER = "Player";
+    public final static String CH_ID_BUILDGROUP = "BuildGroup";
+    public final static String CH_ID_DYNGROUPSHAND = "DynamicGroupHandling";
+    public final static String CH_ID_REBOOT = "Reboot";
 
     public final static String HOST = "ipAddress";
     public final static String PLAYER_TYPE = "model";
@@ -46,6 +57,8 @@ public class HeosBindingConstants {
     public final static String PID = "pid";
     public final static String GID = "gid";
     public final static String LEADER = "leader";
+    public final static String FAVORIT_SID = "1028";
+    public final static String MID = "mid";
 
     public final static String STATE = "state";
     public final static String PLAY = "play";

@@ -33,7 +33,8 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             Map<String, Object> properties = new HashMap<>(2);
             properties.put(HOST, device.getIdentity().getDescriptorURL().getHost());
             properties.put(NAME, device.getDetails().getModelDetails().getModelName());
-
+            // properties.put(USER_NAME, "");
+            // properties.put(PASSWORD, "");
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(device.getDetails().getFriendlyName()).withRepresentationProperty(PLAYER_TYPE).build();
             // Debug
@@ -63,6 +64,7 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
                     if (modelName.startsWith("HEOS")) {
                         if (device.getType().getType().startsWith("ACT")) {
                             return new ThingUID(THING_TYPE_BRIDGE, device.getIdentity().getUdn().getIdentifierString());
+
                         }
                     }
                 }
