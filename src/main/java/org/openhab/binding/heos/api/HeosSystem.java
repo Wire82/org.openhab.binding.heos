@@ -9,7 +9,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.resources.HeosCommands;
 import org.openhab.binding.heos.resources.HeosGroup;
 import org.openhab.binding.heos.resources.HeosJsonParser;
@@ -39,7 +38,7 @@ public class HeosSystem {
     private HashMap<String, HeosGroup> removedGroupMap;
     private HeosAPI heosApi = new HeosAPI(this, eventController);
 
-    private Logger logger = LoggerFactory.getLogger(HeosBridgeHandler.class);
+    private Logger logger = LoggerFactory.getLogger(HeosSystem.class);
 
     private final ScheduledExecutorService keepAlive = Executors.newScheduledThreadPool(1);
 
@@ -49,7 +48,12 @@ public class HeosSystem {
 
     public boolean send(String command) {
 
-        return sendCommand.send(command);
+        if (sendCommand.send(command)) {
+            return true;
+        } else {
+            logger.error("Could not send message. Client is not connected");
+            return false;
+        }
 
     }
 
@@ -67,13 +71,23 @@ public class HeosSystem {
         this.commandLine = new Telnet();
         this.eventLine = new Telnet();
 
-        logger.info("Debug: Command Line Connected");
-        commandLine.connect(connectionIP, connectionPort);
+        if (commandLine.connect(connectionIP, connectionPort)) {
+            logger.info("HEOS command line connected at IP {} @ port {}", connectionIP, connectionPort);
+        } else {
+            logger.error("Could not connect HEOS command line at IP {} @ port {}", connectionIP, connectionPort);
+        }
+
         sendCommand.setTelnetClient(commandLine);
         send(command().registerChangeEventOFF());
-        logger.info("Debug: Event Line Connected");
-        eventLine.connect(connectionIP, connectionPort);
+
+        if (eventLine.connect(connectionIP, connectionPort)) {
+            logger.info("HEOS event line connected at IP {} @ port {}", connectionIP, connectionPort);
+        } else {
+            logger.error("Could not connect HEOS event line at IP {} @ port {}", connectionIP, connectionPort);
+        }
+
         keepConnectionAlive();
+        logger.info("Heos heart Beat startet");
 
         if (commandLine.isConnected() && eventLine.isConnected()) {
             return true;
@@ -90,11 +104,12 @@ public class HeosSystem {
             @Override
             public void run() {
                 send(command().heartBeat());
+                logger.info("Sending Heos heart Beat");
 
             }
         };
 
-        final ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleAtFixedRate(keepAliveRunnable, 60, 60,
+        final ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleAtFixedRate(keepAliveRunnable, 300, 300,
                 TimeUnit.SECONDS);
 
     }
@@ -129,6 +144,7 @@ public class HeosSystem {
         sendCommand.setTelnetClient(commandLine);
         eventLine.disconnect();
         commandLine.disconnect();
+        logger.info("Connection to HEOS system closed");
 
     }
 

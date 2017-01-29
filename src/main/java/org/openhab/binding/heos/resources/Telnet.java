@@ -61,8 +61,14 @@ public class Telnet {
      * For clear send use sendClear
      */
 
-    public void send(String command) {
-        sendClear(command + "\r\n");
+    public boolean send(String command) {
+
+        if (client.isConnected()) {
+            sendClear(command + "\r\n");
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -70,17 +76,25 @@ public class Telnet {
      * Send command without additional commands
      */
 
-    public void sendClear(String command) {
+    public boolean sendClear(String command) {
 
         // Debug
         // System.out.println("Send");
-        try {
-            outStream.writeBytes(command);
-            outStream.flush();
 
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+        if (client.isConnected()) {
+            try {
+                outStream.writeBytes(command);
+                outStream.flush();
+
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+
+        } else {
+            return false;
         }
 
     }
@@ -93,48 +107,59 @@ public class Telnet {
      * Then the single values are merged by function concatReadResult
      */
 
-    public void read() {
+    public boolean read() {
 
-        try {
-            // bufferedStream.read();
-            int i = 1;
-            while (i != -1) {
+        if (client.isConnected()) {
+            try {
+                int i = 1;
+                while (i != -1) {
 
-                i = bufferedStream.available();
-                byte[] buffer = new byte[i];
-                bufferedStream.read(buffer);
-                String str = new String(buffer, "UTF-8");
-                i = concatReadResult(str);
+                    i = bufferedStream.available();
+                    byte[] buffer = new byte[i];
+                    bufferedStream.read(buffer);
+                    String str = new String(buffer, "UTF-8");
+                    i = concatReadResult(str);
 
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+                return false;
             }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            return true;
+
+        } else {
+            return false;
+
         }
 
     }
 
     public String readLine() {
+        if (client.isConnected()) {
+            readLineResult = "";
+            try {
 
-        readLineResult = "";
-        try {
+                int i = 1;
+                while (i != -1) {
 
-            int i = 1;
-            while (i != -1) {
+                    i = bufferedStream.available();
+                    byte[] buffer = new byte[i];
+                    bufferedStream.read(buffer);
+                    String str = new String(buffer, "UTF-8");
+                    i = concatReadLineResult(str);
 
-                i = bufferedStream.available();
-                byte[] buffer = new byte[i];
-                bufferedStream.read(buffer);
-                String str = new String(buffer, "UTF-8");
-                i = concatReadLineResult(str);
-
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+
+            return readLineResult;
+        } else {
+            return "-1";
         }
 
-        return readLineResult;
     }
 
     /*
@@ -142,15 +167,13 @@ public class Telnet {
      */
 
     public void disconnect() {
-        // Debug
-        // System.out.println("Disconnect");
+
         try {
 
             inputStream.close();
             outStream.close();
             client.disconnect();
-            // Debug
-            // System.out.println(client.isConnected());
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

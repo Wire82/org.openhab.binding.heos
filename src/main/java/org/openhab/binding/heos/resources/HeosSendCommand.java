@@ -23,50 +23,48 @@ public class HeosSendCommand {
     public synchronized boolean send(String command) {
         int sendTryCounter = 0;
         this.command = command;
-        executeSendCommand();
-        while (sendTryCounter < 4) {
-            if (response.getEvent().getResult().equals("fail")) {
-                executeSendCommand();
-                sendTryCounter++;
-            } else if (response.getEvent().getMessagesMap().get("command under process").equals("true")) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    // Debug
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+
+        if (executeSendCommand()) {
+            while (sendTryCounter < 4) {
+                if (response.getEvent().getResult().equals("fail")) {
+                    executeSendCommand();
+                    sendTryCounter++;
+                } else if (response.getEvent().getMessagesMap().get("command under process").equals("true")) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    parser.parseResult(client.readLine());
+                } else {
+                    return true;
                 }
-
-                // Debug
-
-                // try {
-                // Thread.sleep(00);
-                // } catch (InterruptedException e) {
-                // // TODO Auto-generated catch block
-                // e.printStackTrace();
-                // }
-                parser.parseResult(client.readLine());
-            } else {
-                return true;
             }
+            ;
+            return true;
+        } else {
+            return false;
         }
-        ;
-        return false;
+
     }
 
-    public void sendWithoutResponse(String command) {
-        client.send(command);
+    public boolean sendWithoutResponse(String command) {
+        return client.send(command);
         // Debug
         // System.out.println(command);
     }
 
-    private void executeSendCommand() {
-
-        client.send(command);
+    private boolean executeSendCommand() {
         // Debug
         System.out.println("Sending Command: " + command);
-        parser.parseResult(client.readLine());
-        eventController.handleEvent();
+        boolean sendSuccess = client.send(command);
+        if (sendSuccess) {
+            parser.parseResult(client.readLine());
+            eventController.handleEvent();
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
