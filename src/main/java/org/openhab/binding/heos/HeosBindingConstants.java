@@ -32,9 +32,9 @@ public class HeosBindingConstants {
 
     // List off all Channel Types
 
-    public final static ChannelTypeUID CH_TYPE_PLAYER = new ChannelTypeUID(BINDING_ID, "player");
-    public final static ChannelTypeUID CH_TYPE_FAVORIT = new ChannelTypeUID(BINDING_ID, "favorit");
-    public final static ChannelTypeUID CH_TYPE_GROUP = new ChannelTypeUID(BINDING_ID, "group");
+    public final static ChannelTypeUID CH_TYPE_PLAYER = new ChannelTypeUID(BINDING_ID, "ch_player");
+    public final static ChannelTypeUID CH_TYPE_FAVORIT = new ChannelTypeUID(BINDING_ID, "ch_favorit");
+    public final static ChannelTypeUID CH_TYPE_GROUP = new ChannelTypeUID(BINDING_ID, "ch_group");
 
     // List of all Channel ids
     public final static String CH_ID_CONTROL = "Control";
