@@ -11,7 +11,7 @@
 
   <groupId>org.openhab.binding</groupId>
   <artifactId>org.openhab.binding.heos</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
 
   <name>Heos Binding</name>
   <packaging>eclipse-plugin</packaging> 
