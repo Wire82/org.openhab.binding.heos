@@ -22,13 +22,29 @@ Groups are supported by this bindung.
 
 ## Discovery
 
-_Describe the available auto-discovery features here. Mention for what it works and what needs to be kept in mind when using it._
+This binding support full automatic discovery of bridges, players and groups. It is recommended to use the PaperUI to setup the system and add all players and groups.
+The bridge is discovered through UPnP in the local network. Once it is added the players and groups are read via the bridge and placed within the inbox.
+Nethertheless also manual configuration is possible
 
 ## Binding Configuration
 This binding does not require any configuration via a .cfg file. The configuration is done via the Thing definition.
 
 ## Thing Configuration
-It is recommended to configure 
+It is recommended to configure the things via the PaperUI or HABmin
+
+#Bridge Configuration
+The bridge can be added via the PaperUI. After adding the bridge the username and password can set by editing the thing via the PaperUI. For manual configuration the following parameter can be defined. The ipAddress has to be defined. All other fiels are optional.
+````
+Bridge heos:bridge:main "name" [ipAddress="192.168.0.1", name="Default", unserName"xxx", password="123456"]  
+````
+
+#Player Configuration
+Player can be added via the PaperUI. All field are then filld automatically.
+For manual configuration the player is defined as followed:
+````
+Thing heos:player:pid "name" [pid="123456789", name"xxx", model="HEOS 5", ipAdress="192.168.0.xxx"] 
+
+````
 
 _Describe what is needed to manually configure a thing, either through the (Paper) UI or via a thing-file. This should be mainly about its mandatory and optional configuration parameters. A short example entry for a thing file can help!_
 
