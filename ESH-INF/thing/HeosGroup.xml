@@ -4,9 +4,9 @@
         xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
         xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
         
-           <thing-type id="Group">
+           <thing-type id="group">
                <supported-bridge-type-refs>
-                   <bridge-type-ref id="Bridge"/>
+                   <bridge-type-ref id="bridge"/>
                </supported-bridge-type-refs>
                <label>HEOS Group</label>
                <description>A group of HEOS Player</description>

@@ -5,9 +5,9 @@
         xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
     <!-- Heos Player Thing Type -->
-    <thing-type id="Player">
+    <thing-type id="player">
          <supported-bridge-type-refs>
-            <bridge-type-ref id="Bridge" />
+            <bridge-type-ref id="bridge" />
         </supported-bridge-type-refs>    
         <label>Heos Player</label>
         <description>Sample thing for Heos Binding</description>

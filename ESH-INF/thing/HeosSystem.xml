@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
     <!-- Thing Type -->
-    <bridge-type id="Bridge">
+    <bridge-type id="bridge">
         <label>HEOS Bridge</label>
         <description>The HEOS System Bridge</description>    
         
@@ -22,7 +22,7 @@
         
         <config-description>
          <parameter name="name" type="text">
-                <label>Player Type</label>
+               <label>Player Type</label>
                 <description>Player Type of the Bridge.</description>
                 <required>true</required>
             </parameter>

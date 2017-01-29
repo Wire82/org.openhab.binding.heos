@@ -26,9 +26,9 @@ public class HeosBindingConstants {
 
     // List of all Bridge Type UIDs
 
-    public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "Bridge");
-    public final static ThingTypeUID THING_TYPE_PLAYER = new ThingTypeUID(BINDING_ID, "Player");
-    public final static ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "Group");
+    public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "bridge");
+    public final static ThingTypeUID THING_TYPE_PLAYER = new ThingTypeUID(BINDING_ID, "player");
+    public final static ThingTypeUID THING_TYPE_GROUP = new ThingTypeUID(BINDING_ID, "group");
 
     // List off all Channel Types
 
