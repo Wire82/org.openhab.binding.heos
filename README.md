@@ -71,14 +71,14 @@ The channel have different paths if you configure our Things manual or via an UI
 
 ### Player provide the following channels:
 
-Channel Type ID | Item Type | Description
+Channel ID | Item Type | Description
 ----------------|-----------|-------------
-control | Player | Provides: Play / Pause / Next / Previous
-volume | Dimmer | Volume control
-mute | Switch | Mute the Player
-titel | String | Song Title
-interpret | String | Song Interpret
-album | String  | Album Title
+Control | Player | Provides: Play / Pause / Next / Previous
+Volume | Dimmer | Volume control
+Mute | Switch | Mute the Player
+Titel | String | Song Title
+Interpret | String | Song Interpret
+Album | String  | Album Title
 
 ####Example:
 
@@ -88,25 +88,25 @@ Player LivingRoom_Control "Control" {channel="heos:player:main:LivinRoom:Control
 
 ### Groups provide the following channels:
 
-Channel Type ID | Item Type | Description
+Channel ID | Item Type | Description
 ----------------|-----------|-------------
-control | Player | Provides: Play / Pause / Next / Previous
-volume | Dimmer | Volume control
-mute | Switch | Mute the Group
-titel | String | Song Title
-interpret | String | Song Interpret
-album | String  | Album Title
-ungroup | Switch | Ungroup the group
+Control | Player | Provides: Play / Pause / Next / Previous
+Volume | Dimmer | Volume control
+Mute | Switch | Mute the Group
+Titel | String | Song Title
+Interpret | String | Song Interpret
+Album | String  | Album Title
+Ungroup | Switch | Ungroup the group
 
 
 
 ### The Bridge provide the following channels:
 
-Channel Type ID | Item Type | Description
+Channel ID | Item Type | Description
 ----------------|-----------|-------------
-reboot | Switch | Reboot the whole HEOS System. Can be used if you get in trouble with the system
-dynamicGroupHandling | Switch | If this option id activated the system automatically removes groups if they are ungrouped. Only works if the group is added via an UI.
-buildGroup | Switch | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.
+Reboot | Switch | Reboot the whole HEOS System. Can be used if you get in trouble with the system
+DynamicGroupHandling | Switch | If this option id activated the system automatically removes groups if they are ungrouped. Only works if the group is added via an UI.
+BuildGroup | Switch | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.
 
 
 ## **Experimental**
@@ -115,7 +115,7 @@ Also the bridge supports dynamic channels which represent the player of the netw
 
 
 ### Favorite Channels
-Channel Type ID | Item Type | Description
+Channel ID | Item Type | Description
 ----------------|-----------|-------------
  {mid} | Switch | A channel which represents the favorite. Please check via UI how the correct Channel Type looks like. (Experimental)
  
@@ -125,7 +125,7 @@ Channel Type ID | Item Type | Description
  ```
 
 ### Player Channels
-Channel Type ID | Item Type | Description
+Channel ID | Item Type | Description
 ----------------|-----------|-------------
 {player Name} | Switch | A channel which represents the player. Please check via UI how the correct Channel Type looks like. (Experimental)
 
