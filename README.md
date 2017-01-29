@@ -1,8 +1,6 @@
 # org.openhab.binding.heos
 Heos Binding for OpenHab
----
-layout: documentation
----
+
 
 {% include base.html %}
 
