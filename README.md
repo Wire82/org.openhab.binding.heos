@@ -59,7 +59,7 @@ Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", name="Bridge", userNa
 	
 	player Kitchen "Kitchen"[pid="434523813", name="Kitchen"]
 	player LivingRoom "Living Room"[pid="918797451", name="Living Room"]
-  player 813793755 "Bath Room"[pid="813793755", name="Bath Room"]
+  	player 813793755 "Bath Room"[pid="813793755", name="Bath Room"]
 	
 }
 ```
@@ -81,11 +81,24 @@ titel | String | Song Title
 interpret | String | Song Interpret
 album | String  | Album Title
 
-Sample:
+####Example:
 
 ```
 Player LivingRoom_Control "Control" {channel="heos:player:main:LivinRoom:Control"}
 ```
+
+### Groups provide the following channels:
+
+Channel Type ID | Item Type | Description
+----------------|-----------|-------------
+control | Player | Provides: Play / Pause / Next / Previous
+volume | Dimmer | Volume control
+mute | Switch | Mute the Player
+titel | String | Song Title
+interpret | String | Song Interpret
+album | String  | Album Title
+ungroup | Switch | Ungroup the group
+
 
 ### The Bridge provide the following channels:
 
@@ -102,15 +115,22 @@ Channel Type ID | Item Type | Description
 ----------------|-----------|-------------
  {mid} | Switch | A channel which represents the favorite. Please check via UI how the correct Channel Type looks like. (Experimental)
  
- ### Example
+ Example
  ```
- 
+ Switch Favorite_1 "Fav 1 [%s]" {channel="heos:bridge:main:s17492"}
  ```
 
 ### Player Channels
 Channel Type ID | Item Type | Description
 ----------------|-----------|-------------
 {player Name} | Switch | A channel which represents the player. Please check via UI how the correct Channel Type looks like. (Experimental)
+
+Example
+ ```
+ Switch Favorite_1 "Fav 1 [%s]" {channel="heos:bridge:main:LivingRoom"} 
+ ```
+ 
+ **Note: Both functions are experimental. It seems at the moment that the dynamic channels are only work correctly if things are managed via UI.**
 
 ## Full Example
 
