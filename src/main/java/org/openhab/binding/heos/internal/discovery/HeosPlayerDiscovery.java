@@ -114,7 +114,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
                 }
 
             } else {
-                logger.info("No Groups found");
+                logger.info("No HEOS Groups found");
             }
 
         }

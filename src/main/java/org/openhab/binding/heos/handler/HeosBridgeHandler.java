@@ -73,7 +73,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
         Channel channel = this.thing.getChannel(channelUID.getId());
 
-        if (channel.getChannelTypeUID().toString().equals("heos:player")) {
+        if (channel.getChannelTypeUID().toString().equals("heos:ch_player")) {
             if (command.toString().equals("ON")) {
                 playerPID.put(channel.getProperties().get(PID), channelUID.getId());
             } else {
@@ -81,7 +81,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             }
 
         }
-        if (channel.getChannelTypeUID().toString().equals("heos:favorit")) {
+        if (channel.getChannelTypeUID().toString().equals("heos:ch_favorit")) {
             if (command.toString().equals("ON")) {
                 if (!playerPID.isEmpty()) {
                     for (String key : playerPID.keySet()) {
@@ -143,6 +143,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         while (!bridgeIsConnected) {
             heos.closeConnection();
             bridgeIsConnected = heos.establishConnection();
+            logger.error("Could not initialize connection to HEOS system");
         }
 
         api.registerforChangeEvents(this);
@@ -190,6 +191,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         // }
 
         // Debug
+        logger.info("Inizialize child handler for: {}.", childThing.getUID().getId());
         System.out.println("Init ChildHandler");
 
     }
@@ -198,6 +200,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     public void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
         handlerList.remove(childThing.getUID(), childHandler);
         this.removeChannel(CH_TYPE_PLAYER, childThing.getConfiguration().get(PID).toString());
+        logger.info("Dispose child handler for: {}.", childThing.getUID().getId());
         // Debug
         System.out.println("Remove ChildHandler");
 
@@ -248,8 +251,9 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     @Override
     public void thingRemoved(DiscoveryService source, ThingUID thingUID) {
+        logger.info("Removing Thing: {}.", thingUID.getId());
         if (handlerList.get(thingUID) != null) {
-            if (handleGroups) {
+            if (!handleGroups) {
                 handlerList.get(thingUID).handleRemoval();
             } else {
                 if (handlerList.get(thingUID).getClass().equals(HeosGroupHandler.class)) {

@@ -15,8 +15,12 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.jupnp.model.meta.DeviceDetails;
 import org.jupnp.model.meta.ModelDetails;
 import org.jupnp.model.meta.RemoteDevice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
+
+    private Logger logger = LoggerFactory.getLogger(HeosDiscoveryParticipant.class);
 
     @Override
     public Set<ThingTypeUID> getSupportedThingTypeUIDs() {
@@ -33,8 +37,6 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             Map<String, Object> properties = new HashMap<>(2);
             properties.put(HOST, device.getIdentity().getDescriptorURL().getHost());
             properties.put(NAME, device.getDetails().getModelDetails().getModelName());
-            // properties.put(USER_NAME, "");
-            // properties.put(PASSWORD, "");
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(device.getDetails().getFriendlyName()).withRepresentationProperty(PLAYER_TYPE).build();
             // Debug
@@ -47,6 +49,7 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             // System.out.println(device.getIdentity().getUdn().getIdentifierString());
             // System.out.println(device.getType().getType() + "\n");
 
+            logger.info("Found HEOS device with UID: {}", uid.getAsString());
             return result;
         }
 

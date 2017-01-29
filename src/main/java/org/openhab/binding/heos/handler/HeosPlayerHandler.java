@@ -3,25 +3,22 @@ package org.openhab.binding.heos.handler;
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.PlayPauseType;
 import org.eclipse.smarthome.core.library.types.StringType;
-import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
-import org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder;
-import org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder;
-import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
 import org.openhab.binding.heos.resources.HeosEventListener;
 import org.openhab.binding.heos.resources.HeosPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeosPlayerHandler extends BaseThingHandler implements HeosEventListener {
 
@@ -31,48 +28,13 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     private HashMap<String, HeosPlayer> playerMap;
     private HeosPlayer player;
 
+    private Logger logger = LoggerFactory.getLogger(HeosPlayerHandler.class);
+
     public HeosPlayerHandler(Thing thing, HeosSystem heos, HeosAPI api) {
         super(thing);
         this.heos = heos;
         this.api = api;
         pid = thing.getConfiguration().get(PID).toString();
-
-    }
-
-    // Deug...
-
-    protected synchronized void thingStructureChanged() {
-
-        ChannelTypeUID type = new ChannelTypeUID("heos", "mute");
-
-        List<Channel> list = thing.getChannels();
-        System.out.println("List size: " + list.size());
-        for (int i = 0; i < list.size(); i++) {
-            Channel ch = list.get(i);
-
-            System.out.println("channel UID: " + ch.getUID());
-            System.out.println("channel TypeUID: " + ch.getChannelTypeUID());
-            if (ch.getChannelTypeUID().equals("heos:mute")) {
-                // type = ch.getChannelTypeUID();
-            }
-
-        }
-
-        ThingBuilder thingBuilder = editThing();
-
-        Channel channel = ChannelBuilder.create(new ChannelUID(this.getThing().getUID(), "String"), "Switch")
-                .withType(type).build();
-        thingBuilder.withChannel(channel);
-        updateThing(thingBuilder.build());
-
-        list = thing.getChannels();
-        System.out.println("List size: " + list.size());
-        for (int i = 0; i < list.size(); i++) {
-            Channel ch = list.get(i);
-            System.out.println("channel UID: " + ch.getUID());
-            System.out.println("channel TypeUID: " + ch.getChannelTypeUID());
-            System.out.println("Channel is linked: " + ch.getProperties().toString());
-        }
 
     }
 
@@ -134,7 +96,6 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
         api.registerforChangeEvents(this);
         init.run();
-        addFavorits();
         updateStatus(ThingStatus.ONLINE);
 
     }
@@ -142,7 +103,6 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     @Override
     public void dispose() {
         api.unregisterforChangeEvents(this);
-        System.out.println("unregister for changes");
 
     }
 
@@ -186,6 +146,14 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     @Override
     public void playerStateChangeEvent(String pid, String event, String command) {
+
+        if (this.getThing().getStatus().toString().equals(ThingStatus.UNINITIALIZED)) {
+            logger.error("Can't Handle Event. Player {} not initialized. Status is: {}", this.getConfig().get(NAME),
+                    this.getThing().getStatus().toString());
+            return;
+
+        }
+
         if (pid.equals(this.pid)) {
             if (event.equals(STATE)) {
                 switch (command) {
@@ -253,11 +221,6 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     @Override
     public void bridgeChangeEvent(String event, String command) {
         // TODO Auto-generated method stub
-
-    }
-
-    public void addFavorits() {
-        // api.browseSource("1028");
 
     }
 
