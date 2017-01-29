@@ -32,29 +32,85 @@ This binding does not require any configuration via a .cfg file. The configurati
 ## Thing Configuration
 It is recommended to configure the things via the PaperUI or HABmin
 
-#Bridge Configuration
+### Bridge Configuration
 The bridge can be added via the PaperUI. After adding the bridge the username and password can set by editing the thing via the PaperUI. For manual configuration the following parameter can be defined. The ipAddress has to be defined. All other fiels are optional.
 ````
 Bridge heos:bridge:main "name" [ipAddress="192.168.0.1", name="Default", unserName"xxx", password="123456"]  
 ````
 
-#Player Configuration
+### Player Configuration
 Player can be added via the PaperUI. All field are then filld automatically.
 For manual configuration the player is defined as followed:
 ````
-Thing heos:player:pid "name" [pid="123456789", name"xxx", model="HEOS 5", ipAdress="192.168.0.xxx"] 
+Thing heos:player:pid "name" [pid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx"] 
 
 ````
+Pid behind the heos:player:--- should be changed as required. Every name or value can be used. It is recommended to use the player Pid. Within the configuration the pid field is mendetory. The rest is not required.
 
-_Describe what is needed to manually configure a thing, either through the (Paper) UI or via a thing-file. This should be mainly about its mandatory and optional configuration parameters. A short example entry for a thing file can help!_
+### Group Configuration
+TBD
 
-_Note that it is planned to generate some part of this based on the XML files within ```ESH-INF/thing``` of your binding._
+### Defining Bridge and Players together
+
+Defining Player and Bridge together. To ensure that the players and groups are attached to the bridge the definition can be like:
+
+```
+Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", name="Bridge", userName="userName", password="123456"] {
+	
+	player Kitchen "Kitchen"[pid="434523813", name="Kitchen"]
+	player LivingRoom "Living Room"[pid="918797451", name="Living Room"]
+  player 813793755 "Bath Room"[pid="813793755", name="Bath Room"]
+	
+}
+```
 
 ## Channels
 
-_Here you should provide information about available channel types, what their meaning is and how they can be used._
+Note:
+the channel have different paths if you configure our Things manual or via an UI. It is recommended to check the correct path via an UI.
 
-_Note that it is planned to generate some part of this based on the XML files within ```ESH-INF/thing``` of your binding._
+
+### Player provide the following channels:
+
+Channel Type ID | Item Type | Description
+----------------|-----------|-------------
+control | Player | Provides: Play / Pause / Next / Previous
+volume | Dimmer | Volume control
+mute | Switch | Mute the Player
+titel | String | Song Title
+interpret | String | Song Interpret
+album | String  | Album Title
+
+Sample:
+
+```
+Player LivingRoom_Control "Control" {channel="heos:player:main:LivinRoom:Control"}
+```
+
+### The Bridge provide the following channels:
+
+Channel Type ID | Item Type | Description
+----------------|-----------|-------------
+reboot | Switch | Reboot the whole HEOS System. Can be used if you get in trouble with the system
+dynamicGroupHandling | Switch | If this option id activated the system automatically removes groups if they are ungrouped. Only works if the group is added via an UI.
+buildGroup | Switch | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.
+
+Also th bridge supports dynamic channeld which represent the player of the network and the favorites. They are dynamically added if player are found and if favorites are defined within the HEOS Account. To activate Favorites the system has to be signed in to the HEOS Account.
+
+### Favorite Channels
+Channel Type ID | Item Type | Description
+----------------|-----------|-------------
+ {mid} | Switch | A channel which represents the favorite. Please check via UI how the correct Channel Type looks like. (Experimental)
+ 
+ ### Example
+ ```
+ 
+ ```
+
+### Player Channels
+Channel Type ID | Item Type | Description
+----------------|-----------|-------------
+{player Name} | Switch | A channel which represents the player. Please check via UI how the correct Channel Type looks like. (Experimental)
 
 ## Full Example
 
