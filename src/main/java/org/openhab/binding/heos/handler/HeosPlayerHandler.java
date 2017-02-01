@@ -109,22 +109,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     private void initValues() {
 
         this.player = heos.getPlayerInfo(pid);
-        // playerMap = heos.getAllPlayer();
-        // this.player = new HeosPlayer();
-        // // Debug
-        // if (playerMap.containsKey(pid)) {
-        // player = playerMap.get(pid);
-        // } else {
-        // System.out.println("no PID Player");
-        // dddf
-        // }
 
-        // try {
-        // Thread.sleep(0000);
-        // } catch (InterruptedException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
         updateState(CH_ID_VOLUME, PercentType.valueOf(player.getLevel()));
 
         if (player.getMute().equals(ON)) {
