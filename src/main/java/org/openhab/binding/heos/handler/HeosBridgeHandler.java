@@ -208,7 +208,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     public HashMap<String, HeosPlayer> getNewPlayer() {
 
-        return heos.getPlayer();
+        return heos.getAllPlayer();
     }
 
     public HashMap<String, HeosGroup> getNewGroups() {
@@ -402,8 +402,9 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         @Override
         public void run() {
             updateStatus(ThingStatus.OFFLINE);
-            heos.getPlayer();
-            heos.getGroups();
+            // Debug
+            // heos.getPlayer();
+            // heos.getGroups();
             logIn();
             addFavorits();
             heos.startEventListener();
