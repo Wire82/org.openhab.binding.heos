@@ -36,11 +36,11 @@ public class MyEventListener {
         }
     }
 
-    public void fireBridgeEvent(String event, String command) {
+    public void fireBridgeEvent(String event, String result, String command) {
 
         for (int i = 0; i < listenerList.size(); i++) {
 
-            listenerList.get(i).bridgeChangeEvent(event, command);
+            listenerList.get(i).bridgeChangeEvent(event, result, command);
 
         }
     }

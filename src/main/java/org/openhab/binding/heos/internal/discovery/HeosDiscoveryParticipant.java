@@ -37,6 +37,7 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             Map<String, Object> properties = new HashMap<>(2);
             properties.put(HOST, device.getIdentity().getDescriptorURL().getHost());
             properties.put(NAME, device.getDetails().getModelDetails().getModelName());
+            properties.put(HEART_BEAT, HEART_BEAT_DELAY);
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(device.getDetails().getFriendlyName()).withRepresentationProperty(PLAYER_TYPE).build();
             // Debug

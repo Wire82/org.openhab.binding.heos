@@ -1,8 +1,12 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.resources.HeosConstants.PID;
 
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
@@ -40,8 +44,11 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        // Debug
-        // System.out.println(channelUID.getId());
+
+        if (command.toString().equals("REFRESH")) {
+            return;
+        }
+
         if (channelUID.getId().equals(CH_ID_CONTROL)) {
 
             String com = command.toString();
@@ -60,23 +67,29 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                 case "PREVIOUS":
                     api.prevoious(pid);
                     break;
+                case "ON":
+                    api.play(pid);
+                    break;
+                case "OFF":
+                    api.pause(pid);
+                    break;
 
             }
         } else if (channelUID.getId().equals(CH_ID_VOLUME)) {
 
-            if (command.toString().equals("REFRESH")) {
-                api.volume(player.getLevel(), pid);
-            } else {
-                api.volume(command.toString(), pid);
-            }
+            api.volume(command.toString(), pid);
 
-        } else if (channelUID.getId().equals("Mute")) {
+        } else if (channelUID.getId().equals(CH_ID_MUTE)) {
 
             if (command.toString().equals("ON")) {
                 api.muteON(pid);
             } else {
                 api.muteOFF(pid);
             }
+        } else if (channelUID.getId().equals(CH_ID_INPUTS)) {
+
+            api.playInputSource(pid, command.toString());
+
         }
 
     }
@@ -84,19 +97,11 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     @Override
     public void initialize() {
 
-        Runnable init = new Runnable() {
-
-            @Override
-            public void run() {
-                initValues();
-
-            }
-
-        };
-
         api.registerforChangeEvents(this);
-        init.run();
+        ScheduledExecutorService executerPool = Executors.newScheduledThreadPool(1);
+        executerPool.schedule(new InitializationRunnable(), 3, TimeUnit.SECONDS);
         updateStatus(ThingStatus.ONLINE);
+        super.initialize();
 
     }
 
@@ -106,39 +111,8 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     }
 
-    private void initValues() {
-
-        this.player = heos.getPlayerInfo(pid);
-
-        updateState(CH_ID_VOLUME, PercentType.valueOf(player.getLevel()));
-
-        if (player.getMute().equals(ON)) {
-            updateState(CH_ID_MUTE, OnOffType.ON);
-        } else {
-            updateState(CH_ID_MUTE, OnOffType.OFF);
-        }
-
-        if (player.getState().equals(PLAY)) {
-            updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
-        }
-        if (player.getState().equals(PAUSE) || player.getState().equals(STOP)) {
-            updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
-        }
-        updateState(CH_ID_SONG, StringType.valueOf(player.getSong()));
-        updateState(CH_ID_ARTIST, StringType.valueOf(player.getArtist()));
-        updateState(CH_ID_ALBUM, StringType.valueOf(player.getAlbum()));
-
-    }
-
     @Override
     public void playerStateChangeEvent(String pid, String event, String command) {
-
-        if (this.getThing().getStatus().toString().equals(ThingStatus.UNINITIALIZED)) {
-            logger.error("Can't Handle Event. Player {} not initialized. Status is: {}", this.getConfig().get(NAME),
-                    this.getThing().getStatus().toString());
-            return;
-
-        }
 
         if (pid.equals(this.pid)) {
             if (event.equals(STATE)) {
@@ -196,6 +170,9 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                     case ALBUM:
                         updateState(CH_ID_ALBUM, StringType.valueOf(info.get(key)));
                         break;
+                    case IMAGE_URL:
+                        updateState(CH_ID_IMAGE_URL, StringType.valueOf(info.get(key)));
+                        break;
 
                 }
 
@@ -205,9 +182,41 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     }
 
     @Override
-    public void bridgeChangeEvent(String event, String command) {
+    public void bridgeChangeEvent(String event, String result, String command) {
         // TODO Auto-generated method stub
 
     }
 
+    public class InitializationRunnable implements Runnable {
+
+        @Override
+        public void run() {
+
+            player = heos.getPlayerState(pid);
+
+            if (player.getLevel() != null) {
+                updateState(CH_ID_VOLUME, PercentType.valueOf(player.getLevel()));
+            }
+
+            if (player.getMute().equals(ON)) {
+                updateState(CH_ID_MUTE, OnOffType.ON);
+            } else {
+                updateState(CH_ID_MUTE, OnOffType.OFF);
+            }
+
+            if (player.getState().equals(PLAY)) {
+                updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
+            }
+            if (player.getState().equals(PAUSE) || player.getState().equals(STOP)) {
+                updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
+            }
+            updateState(CH_ID_SONG, StringType.valueOf(player.getSong()));
+            updateState(CH_ID_ARTIST, StringType.valueOf(player.getArtist()));
+            updateState(CH_ID_ALBUM, StringType.valueOf(player.getAlbum()));
+            updateState(CH_ID_IMAGE_URL, StringType.valueOf(player.getImage_url()));
+            updateState(CH_ID_INPUTS, StringType.valueOf("NULL"));
+
+        }
+
+    }
 }

@@ -79,6 +79,7 @@ Mute | Switch | Mute the Player
 Titel | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
+Image_URL | String |The URL where the cover can be found 
 
 ####Example:
 
@@ -97,6 +98,7 @@ Titel | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
 Ungroup | Switch | Ungroup the group
+Image_URL | String |The URL where the cover can be found
 
 
 

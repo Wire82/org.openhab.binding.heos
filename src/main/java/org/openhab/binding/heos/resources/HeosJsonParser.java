@@ -23,11 +23,13 @@ public class HeosJsonParser {
 
     }
 
-    public HeosResponse parseResult(String string) {
+    public synchronized HeosResponse parseResult(String receivedMessage) {
         // Debug!!!
-        System.out.println(string);
-        this.eventResponse = gson.fromJson(string, HeosResponseEvent.class);
-        this.payloadResponse = gson.fromJson(string, HeosResponsePayload.class);
+        // System.out.println(receivedMessage);
+        response.setRawResponseMessage(receivedMessage);
+
+        this.eventResponse = gson.fromJson(receivedMessage, HeosResponseEvent.class);
+        this.payloadResponse = gson.fromJson(receivedMessage, HeosResponsePayload.class);
 
         this.response.setEvent(eventResponse);
         this.response.setPayload(payloadResponse);

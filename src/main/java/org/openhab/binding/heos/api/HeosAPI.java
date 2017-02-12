@@ -103,16 +103,20 @@ public class HeosAPI {
         controller.send(controller.command().BrowseSource(sid));
     }
 
+    public void addContainerToQueuePlayNow(String pid, String sid, String cid) {
+        controller.send(controller.command().addContainerToQueuePlayNow(pid, sid, cid));
+    }
+
     public void setHeosConnection(String ip, int port) {
 
         controller.setConnectionIP(ip);
         controller.setConnectionPort(port);
-        controller.establishConnection();
+        controller.establishConnection(false);
 
     }
 
     public void reboot() {
-        controller.send(controller.command().rebootSystem());
+        controller.sendWithoutResponse(controller.command().rebootSystem());
     }
 
     public void logIn(String name, String password) {
@@ -126,6 +130,10 @@ public class HeosAPI {
 
         controller.send(controller.command().playStation(pid, sid, cid, mid, name));
 
+    }
+
+    public void playInputSource(String pid, String source) {
+        controller.send(controller.command().playInputSource(pid, source));
     }
 
     public void setActivePlayer(String playerID) {

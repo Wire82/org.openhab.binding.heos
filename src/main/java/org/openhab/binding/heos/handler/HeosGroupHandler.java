@@ -1,8 +1,12 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.resources.HeosConstants.GID;
 
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
@@ -25,8 +29,8 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     private HeosAPI api;
     private HeosSystem heos;
     private String gid;
-    private HashMap<String, HeosGroup> groupMap;
-    private HeosGroup group;
+
+    private HeosGroup heosGroup;
     private Logger logger = LoggerFactory.getLogger(HeosGroupHandler.class);
 
     public HeosGroupHandler(Thing thing, HeosSystem heos, HeosAPI api) {
@@ -39,6 +43,10 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
+
+        if (command.toString().equals("REFRESH")) {
+            return;
+        }
 
         if (channelUID.getId().equals(CH_ID_CONTROL)) {
 
@@ -58,16 +66,17 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                 case "PREVIOUS":
                     api.prevoious(gid);
                     break;
+                case "ON":
+                    api.play(gid);
+                    break;
+                case "OFF":
+                    api.pause(gid);
+                    break;
 
             }
         } else if (channelUID.getId().equals(CH_ID_VOLUME)) {
 
-            if (command.toString().equals("REFRESH")) {
-                System.out.println("Level: " + group.getLevel());
-                api.volumeGroup(group.getLevel(), gid);
-            } else {
-                api.volumeGroup(command.toString(), gid);
-            }
+            api.volumeGroup(command.toString(), gid);
 
         } else if (channelUID.getId().equals(CH_ID_MUTE)) {
 
@@ -90,21 +99,11 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     @Override
     public void initialize() {
 
-        Runnable init = new Runnable() {
-
-            @Override
-            public void run() {
-                initValues();
-
-            }
-
-        };
-
-        init.run();
-
         api.registerforChangeEvents(this);
-
+        ScheduledExecutorService executerPool = Executors.newScheduledThreadPool(1);
+        executerPool.schedule(new InitializationRunnable(), 4, TimeUnit.SECONDS);
         updateStatus(ThingStatus.ONLINE);
+        updateState(CH_ID_STATUS, StringType.valueOf(ONLINE));
         super.initialize();
 
     }
@@ -112,50 +111,20 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     @Override
     public void dispose() {
         api.unregisterforChangeEvents(this);
-
-    }
-
-    private void initValues() {
-
-        groupMap = heos.getGroups();
-        this.group = new HeosGroup();
-        // Debug
-        if (groupMap.containsKey(gid)) {
-            group = groupMap.get(gid);
-        } else {
-            System.out.println("no GID Group");
-
-        }
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        updateState(CH_ID_UNGROUP, OnOffType.OFF);
-        updateState(CH_ID_VOLUME, PercentType.valueOf(group.getLevel()));
-
-        if (group.getMute().equals(ON)) {
-            updateState(CH_ID_MUTE, OnOffType.ON);
-        } else {
-            updateState(CH_ID_MUTE, OnOffType.OFF);
-        }
-
-        if (group.getState().equals(PLAY)) {
-            updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
-        }
-        if (group.getState().equals(PAUSE) || group.getState().equals(STOP)) {
-            updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
-        }
-        updateState(CH_ID_SONG, StringType.valueOf(group.getSong()));
-        updateState(CH_ID_ARTIST, StringType.valueOf(group.getArtist()));
-        updateState(CH_ID_ALBUM, StringType.valueOf(group.getAlbum()));
+        super.dispose();
 
     }
 
     @Override
     public void playerStateChangeEvent(String pid, String event, String command) {
+
+        if (this.getThing().getStatus().toString().equals(ThingStatus.UNINITIALIZED)) {
+            logger.error("Can't Handle Event. Group {} not initialized. Status is: {}", this.getConfig().get(NAME),
+                    this.getThing().getStatus().toString());
+            return;
+
+        }
+
         if (pid.equals(this.gid)) {
             if (event.equals(STATE)) {
                 switch (command) {
@@ -181,7 +150,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
 
                 switch (command) {
                     case ON:
-                        updateState(CH_ID_MUTE, OnOffType.ON);
+                        this.updateState(CH_ID_MUTE, OnOffType.ON);
                         break;
                     case OFF:
                         updateState(CH_ID_MUTE, OnOffType.OFF);
@@ -211,6 +180,9 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                     case ALBUM:
                         updateState(CH_ID_ALBUM, StringType.valueOf(info.get(key)));
                         break;
+                    case IMAGE_URL:
+                        updateState(CH_ID_IMAGE_URL, StringType.valueOf(info.get(key)));
+                        break;
 
                 }
 
@@ -220,14 +192,64 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     }
 
     @Override
-    public void bridgeChangeEvent(String event, String command) {
+    public void bridgeChangeEvent(String event, String result, String command) {
         // TODO Auto-generated method stub
 
     }
 
     public void setStatusOffline() {
-
+        api.unregisterforChangeEvents(this);
+        updateState(CH_ID_STATUS, StringType.valueOf(OFFLINE));
         updateStatus(ThingStatus.OFFLINE);
+    }
+
+    public class InitializationRunnable implements Runnable {
+
+        @Override
+        public void run() {
+
+            heosGroup = heos.getGroupState(gid);
+
+            HeosBridgeHandler bridge = (HeosBridgeHandler) getBridge().getHandler();
+
+            if (!thing.getConfiguration().get(NAME_HASH).equals(heosGroup.getNameHash())) {
+                updateStatus(ThingStatus.OFFLINE);
+                setStatusOffline();
+                bridge.thingStatusOffline(thing.getUID());
+                updateState(CH_ID_STATUS, StringType.valueOf(OFFLINE));
+                return;
+            }
+
+            // informs the System about the existing group
+
+            bridge.thingStatusOnline(thing.getUID());
+            HashMap<String, HeosGroup> usedToFillOldGroupMap = new HashMap<>();
+            usedToFillOldGroupMap.put(heosGroup.getNameHash(), heosGroup);
+            heos.addHeosGroupToOldGroupMap(usedToFillOldGroupMap);
+
+            updateState(CH_ID_UNGROUP, OnOffType.OFF);
+            updateState(CH_ID_VOLUME, PercentType.valueOf(heosGroup.getLevel()));
+
+            if (heosGroup.getMute().equals(ON)) {
+                updateState(CH_ID_MUTE, OnOffType.ON);
+            } else {
+                updateState(CH_ID_MUTE, OnOffType.OFF);
+            }
+
+            if (heosGroup.getState().equals(PLAY)) {
+                updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
+            }
+            if (heosGroup.getState().equals(PAUSE) || heosGroup.getState().equals(STOP)) {
+                updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
+            }
+            updateState(CH_ID_SONG, StringType.valueOf(heosGroup.getSong()));
+            updateState(CH_ID_ARTIST, StringType.valueOf(heosGroup.getArtist()));
+            updateState(CH_ID_ALBUM, StringType.valueOf(heosGroup.getAlbum()));
+            updateState(CH_ID_IMAGE_URL, StringType.valueOf(heosGroup.getImage_url()));
+            updateState(CH_ID_STATUS, StringType.valueOf(ONLINE));
+
+        }
+
     }
 
 }

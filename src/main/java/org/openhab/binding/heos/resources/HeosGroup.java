@@ -1,6 +1,9 @@
 package org.openhab.binding.heos.resources;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class HeosGroup extends HeosMediaObject {
 
@@ -9,16 +12,27 @@ public class HeosGroup extends HeosMediaObject {
 
     private HashMap<String, String> groupInfo;
     private HashMap<String, String> groupState;
+    private List<HashMap<String, String>> playerList;
 
     // Group Infos Variables
     private String name;
     private String gid;
     private String leader;
+    private String nameHash;
+    private String groupMembersHash;
 
     // Group State Variables
     private String state;
     private String level;
     private String mute;
+
+    private final static String PID = "pid";
+    private final static String GID = "gid";
+    private final static String NAME = "name";
+    private final static String LEADER = "leader";
+    private final static String STATE = "state";
+    private final static String LEVEL = "level";
+    private final static String MUTE = "mute";
 
     public HeosGroup() {
 
@@ -29,13 +43,19 @@ public class HeosGroup extends HeosMediaObject {
 
         groupInfo = values;
         for (String key : values.keySet()) {
-            if (key.equals("name")) {
+            if (key.equals(NAME)) {
                 name = values.get(key);
+                if (values.get(key) != null) {
+                    nameHash = Integer.toUnsignedString(values.get(key).hashCode());
+                } else {
+                    nameHash = "";
+                }
+
             }
-            if (key.equals("leader")) {
+            if (key.equals(LEADER)) {
                 leader = values.get(key);
             }
-            if (key.equals("gid")) {
+            if (key.equals(GID)) {
                 gid = values.get(key);
             }
         }
@@ -46,13 +66,13 @@ public class HeosGroup extends HeosMediaObject {
 
         groupState = values;
         for (String key : values.keySet()) {
-            if (key.equals("state")) {
+            if (key.equals(STATE)) {
                 state = values.get(key);
             }
-            if (key.equals("level")) {
+            if (key.equals(LEVEL)) {
                 level = values.get(key);
             }
-            if (key.equals("mute")) {
+            if (key.equals(MUTE)) {
                 mute = values.get(key);
             }
 
@@ -60,10 +80,32 @@ public class HeosGroup extends HeosMediaObject {
 
     }
 
+    /**
+     * Updates the group members.
+     *
+     * Generates the {@code groupMembersHash} from the group member PIDs
+     *
+     * @param playerList The List of the Player (player as: HashMap<String,String>)
+     */
+
+    public void updateGroupPlayers(List<HashMap<String, String>> playerList) {
+        this.playerList = playerList;
+        List<String> groupMemberPidList = new ArrayList<String>(10);
+        for (int i = 0; i < this.playerList.size(); i++) {
+            HashMap<String, String> player = playerList.get(i);
+            groupMemberPidList.add(player.get(PID));
+
+        }
+        Collections.sort(groupMemberPidList);
+        groupMembersHash = Integer.toUnsignedString(groupMemberPidList.hashCode());
+
+    }
+
     private void initGroup() {
 
         groupInfo = new HashMap<>(8);
         groupState = new HashMap<>(5);
+        playerList = new ArrayList<>(5);
 
         for (String key : supportedGroupInfo) {
             groupInfo.put(key, null);
@@ -154,6 +196,14 @@ public class HeosGroup extends HeosMediaObject {
 
     public String[] getSupportedGroupStates() {
         return supportedGroupStates;
+    }
+
+    public String getNameHash() {
+        return nameHash;
+    }
+
+    public String getGroupMenberHash() {
+        return groupMembersHash;
     }
 
 }

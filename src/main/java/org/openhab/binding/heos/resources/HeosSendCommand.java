@@ -1,6 +1,12 @@
 package org.openhab.binding.heos.resources;
 
+import static org.openhab.binding.heos.resources.HeosConstants.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.openhab.binding.heos.api.HeosEventController;
+import org.openhab.binding.heos.resources.Telnet.ReadException;
 
 public class HeosSendCommand {
 
@@ -20,47 +26,85 @@ public class HeosSendCommand {
         this.eventController = eventController;
     }
 
-    public synchronized boolean send(String command) {
+    public synchronized boolean send(String command) throws ReadException, IOException {
+        if (!isConnected()) {
+            return false;
+        }
+
         int sendTryCounter = 0;
         this.command = command;
 
         if (executeSendCommand()) {
-            while (sendTryCounter < 4) {
-                if (response.getEvent().getResult().equals("fail")) {
+            while (sendTryCounter < 1) {
+                if (response.getEvent().getResult().equals(FAIL)) {
                     executeSendCommand();
-                    sendTryCounter++;
-                } else if (response.getEvent().getMessagesMap().get("command under process").equals("true")) {
+                    ++sendTryCounter;
+                } else if (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(TRUE)) {
+
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    parser.parseResult(client.readLine());
+                    ArrayList<String> readResultList = client.readLine(15000);
+
+                    for (int i = 0; i < readResultList.size(); i++) {
+                        parser.parseResult(readResultList.get(i));
+                        eventController.handleEvent(0); // Important don't remove it. Costs you some live time... ;)
+                    }
+
                 } else {
                     return true;
                 }
             }
-            ;
             return true;
         } else {
+
             return false;
         }
 
     }
+
+    /**
+     * This method shall only be used if no response from network
+     * is expected. Else the read buffer is not cleared
+     *
+     * @param command
+     * @return true if send was successful
+     */
 
     public boolean sendWithoutResponse(String command) {
-        return client.send(command);
-        // Debug
-        // System.out.println(command);
+        try {
+            return client.send(command);
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            return false;
+        }
+
     }
 
-    private boolean executeSendCommand() {
+    /*
+     * It seems to be that sometime a command is still
+     * in the reading line without being read out. This
+     * shall be prevented with an Map which reads until no
+     * End of line is detected.
+     */
+
+    private boolean executeSendCommand() throws ReadException, IOException {
         // Debug
-        System.out.println("Sending Command: " + command);
+        // System.out.println("Sending Command: " + command);
         boolean sendSuccess = client.send(command);
         if (sendSuccess) {
-            parser.parseResult(client.readLine());
-            eventController.handleEvent();
+
+            ArrayList<String> readResultList = client.readLine();
+
+            for (int i = 0; i < readResultList.size(); i++) {
+
+                parser.parseResult(readResultList.get(i));
+                eventController.handleEvent(0);
+            }
+
             return true;
         } else {
             return false;
@@ -68,8 +112,22 @@ public class HeosSendCommand {
 
     }
 
-    public void setTelnetClient(Telnet client) {
+    public boolean setTelnetClient(Telnet client) {
         this.client = client;
+        return true;
+    }
+
+    public Telnet getTelnetClient() {
+        return client;
+    }
+
+    public boolean isConnected() {
+
+        return client.isConnected();
+    }
+
+    public boolean isConnectionAlive() {
+        return client.isConnectionAlive();
     }
 
 }

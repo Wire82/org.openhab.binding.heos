@@ -1,0 +1,6 @@
+org.openhab.binding.heos
+org.openhab.binding.heos.api
+org.openhab.binding.heos.handler
+org.openhab.binding.heos.internal
+org.openhab.binding.heos.internal.discovery
+org.openhab.binding.heos.resources

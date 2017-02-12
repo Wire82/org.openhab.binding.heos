@@ -2,78 +2,148 @@ package org.openhab.binding.heos.resources;
 
 import java.util.HashMap;
 
+/**
+ * This class
+ *
+ * @author Johannes Einig
+ *
+ */
+
 public class HeosResponseEvent {
-	//RAW Values filled by Gson not decoded more or less for information
-	private String command = null;	
-	private String result = null;
-	private String message = null; 
-	
-	//Values evaluated from Gson filled Values
-	private String commandType = null;
-	private String eventType = null;
-	private HashMap<String,String> messagesMap = null;
-	
-	@Override
-	public String toString() {
-		return commandType;
-	}
-	
-	public void getInfos () {
-		System.out.println( "\n\nEvent Type: " + eventType + "\nCommand: "+ commandType);
-		if (message != null) {
-			for (String key : messagesMap.keySet()) {
-			System.out.println(key + ": " + messagesMap.get(key));
-			}
-		}
-	}
-	
+    // RAW Values filled by Gson not decoded more or less for information
+    private String command = null;
+    private String result = null;
+    private String message = null;
 
-	public String getCommand() {
-		return command;
-	}
+    // Values evaluated from Gson filled Values
+    private String commandType = null;
+    private String eventType = null;
+    private HashMap<String, String> messagesMap = null;
 
-	public String getResult() {
-		return result;
-	}
+    // Error values
+    private String errorCode = null;
+    private String errorMessage = null;
 
-	public String getMessage() {
-		return message;
-	}
+    @Override
+    public String toString() {
+        return commandType;
+    }
 
-	public String getCommandType() {
-		return commandType;
-	}
+    public void getInfos() {
+        System.out.println("\n\nEvent Type: " + eventType + "\nCommand: " + commandType);
+        if (message != null) {
+            for (String key : messagesMap.keySet()) {
+                System.out.println(key + ": " + messagesMap.get(key));
+            }
+        }
+    }
 
-	public String getEventType() {
-		return eventType;
-	}
+    /**
+     * Returns the raw message received by the
+     * HEOS system.
+     *
+     * @return the un-decoded command from the HOES system
+     */
+    public String getCommand() {
+        return command;
+    }
 
-	public HashMap<String, String> getMessagesMap() {
-		return messagesMap;
-	}
+    /**
+     * Returns the result information of the HEOS message
+     *
+     * @return either "success" or "fail"
+     */
+    public String getResult() {
+        return result;
+    }
 
-	public void setCommand(String command) {
-		this.command = command;
-	}
+    /**
+     * Returns the not decoded message of the JSON response
+     * from the HEOS system
+     *
+     * @return the un-decoded message from the HEOS message
+     */
+    public String getMessage() {
+        return message;
+    }
 
-	public void setResult(String result) {
-		this.result = result;
-	}
+    /**
+     *
+     * @return the command type of the HEOS message
+     */
+    public String getCommandType() {
+        return commandType;
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    /**
+     *
+     * @return the event type of the HEOS message
+     */
 
-	public void setCommandType(String commandType) {
-		this.commandType = commandType;
-	}
+    public String getEventType() {
+        return eventType;
+    }
 
-	public void setEventType(String eventType) {
-		this.eventType = eventType;
-	}
+    /**
+     * This returns a HashMap which contains all encoded messages
+     * received by the HEOS JSON response.
+     * Each command can be called by its key
+     *
+     * @return a map with all messages
+     */
 
-	public void setMessagesMap(HashMap<String, String> messagesMap) {
-		this.messagesMap = messagesMap;
-	}	
+    public HashMap<String, String> getMessagesMap() {
+        return messagesMap;
+    }
+
+    /**
+     *
+     * @return the HOES system error code
+     */
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    /**
+     *
+     * @return the HEOS system error message
+     */
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setCommandType(String commandType) {
+        this.commandType = commandType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public void setMessagesMap(HashMap<String, String> messagesMap) {
+        this.messagesMap = messagesMap;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 
 }

@@ -1,6 +1,7 @@
 package org.openhab.binding.heos.internal.discovery;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.resources.HeosConstants.*;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -78,6 +79,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
                 properties.put(PID, player.getPid());
                 properties.put(PLAYER_TYPE, player.getModel());
                 properties.put(HOST, player.getIp());
+                properties.put(TYPE, PLAYER);
                 DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(player.getName())
                         .withProperties(properties).withBridge(bridgeUID).build();
                 thingDiscovered(result);
@@ -103,11 +105,21 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
                 for (String groupGID : groupMap.keySet()) {
                     HeosGroup group = groupMap.get(groupGID);
-                    ThingUID uid = new ThingUID(THING_TYPE_GROUP, groupMap.get(groupGID).getGid());
+                    // ThingUID uid = new ThingUID(THING_TYPE_GROUP, groupMap.get(groupGID).getGid());
+
+                    // uses an unsigned hashCode from the group name to identify the group and generates the Thing UID.
+                    // Only the name does not work because it can consists non allowed characters. This also making it
+                    // possible to add player to a group. Keeping the Name lets the binding still identifying the group
+                    // as known
+
+                    ThingUID uid = new ThingUID(THING_TYPE_GROUP, group.getNameHash());
                     HashMap<String, Object> properties = new HashMap<String, Object>();
                     properties.put(NAME, group.getName());
                     properties.put(GID, group.getGid());
                     properties.put(LEADER, group.getLeader());
+                    properties.put(TYPE, GROUP);
+                    properties.put(NAME_HASH, group.getNameHash());
+                    properties.put(GROUP_MEMBER_HASH, group.getGroupMenberHash());
                     DiscoveryResult result = DiscoveryResultBuilder.create(uid).withLabel(group.getName())
                             .withProperties(properties).withBridge(bridgeUID).build();
                     thingDiscovered(result);
@@ -128,8 +140,11 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         removedGroupMap = bridge.getRemovedGroups();
         if (!removedGroupMap.isEmpty()) {
             for (String key : removedGroupMap.keySet()) {
-                ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getGid());
-                System.out.println("Removed Group: " + uid);
+                // ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getGid());
+
+                // The same as above!
+                ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getNameHash());
+                logger.info("Removed HEOS Group: " + uid);
                 thingRemoved(uid);
             }
 

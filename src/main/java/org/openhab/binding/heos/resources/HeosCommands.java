@@ -60,6 +60,7 @@ public class HeosCommands {
     private String browseSource = "heos://browse/browse?sid=";
     private String playStation = "heos://browse/play_stream?pid=";
     private String addToQueue = "heos://browse/add_to_queue?pid=";
+    private String playInputSource = "heos://browse/play_input?pid=";
 
     // private Sring playAuxIn = "heos://"
 
@@ -81,11 +82,11 @@ public class HeosCommands {
     }
 
     public String registerChangeEventOn() {
-        return registerChangeEventOn + "\r\n";
+        return registerChangeEventOn;
     }
 
     public String registerChangeEventOFF() {
-        return registerChangeEventOFF + "\r\n";
+        return registerChangeEventOFF;
     }
 
     public String heosAccountCheck() {
@@ -192,6 +193,10 @@ public class HeosCommands {
         return addToQueue + pid;
     }
 
+    public String addContainerToQueuePlayNow(String pid, String sid, String cid) {
+        return addToQueue + pid + "&sid=" + sid + "&cid=" + cid + "&aid=1";
+    }
+
     public String clearQueue(String pid) {
         return clearQueue + pid;
     }
@@ -220,6 +225,11 @@ public class HeosCommands {
         }
         return newCommand;
 
+    }
+
+    public String playInputSource(String pid, String source) {
+
+        return playInputSource + pid + "&input=inputs/" + source;
     }
 
     public void setUsernamePwassword(String username, String password) {

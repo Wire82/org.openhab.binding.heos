@@ -8,11 +8,16 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
+import static org.openhab.binding.heos.resources.HeosConstants.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.smarthome.config.discovery.DiscoveryListener;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
@@ -48,15 +53,26 @@ import org.slf4j.LoggerFactory;
  */
 public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventListener, DiscoveryListener {
 
+    private List<String> heosPlaylists = new ArrayList<String>();
+
     private HashMap<ThingUID, ThingHandler> handlerList = new HashMap<>();
-    private InitProcedure init;
+    private HashMap<String, String> selectedPlayer = new HashMap<String, String>();
+    private HashMap<ThingUID, ThingStatus> thingOnlineState = new HashMap();
+
+    private ScheduledExecutorService initPhase;
+    private InitProcedure initPhaseRunnable = new InitProcedure();
+
     private HeosPlayerDiscovery playerDiscovery;
     private HeosSystem heos;
     private HeosAPI api;
+
+    private int heartBeatPulse = 0;
+
+    private boolean isRegisteredForChangeEvents = false;
     private boolean bridgeIsConnected = false;
-    private HashMap<String, String> playerPID = new HashMap<String, String>();
     private boolean handleGroups = false;
-    private boolean logedIn = false;
+    private boolean loggedIn = false;
+    private boolean connectionDelay = false;
 
     private Logger logger = LoggerFactory.getLogger(HeosBridgeHandler.class);
 
@@ -64,7 +80,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         super(thing);
         this.heos = heos;
         this.api = api;
-        this.init = new InitProcedure();
 
     }
 
@@ -75,42 +90,54 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
         if (channel.getChannelTypeUID().toString().equals("heos:ch_player")) {
             if (command.toString().equals("ON")) {
-                playerPID.put(channel.getProperties().get(PID), channelUID.getId());
+                selectedPlayer.put(channel.getProperties().get(PID), channelUID.getId());
             } else {
-                playerPID.remove(channel.getProperties().get(PID));
+                selectedPlayer.remove(channel.getProperties().get(PID));
             }
 
         }
         if (channel.getChannelTypeUID().toString().equals("heos:ch_favorit")) {
             if (command.toString().equals("ON")) {
-                if (!playerPID.isEmpty()) {
-                    for (String key : playerPID.keySet()) {
+                if (!selectedPlayer.isEmpty()) {
+                    for (String key : selectedPlayer.keySet()) {
                         String pid = key;
                         String mid = channelUID.getId();
                         api.playStation(pid, FAVORIT_SID, null, mid, null);
                         updateState(channelUID, OnOffType.OFF);
                     }
                 }
-                playerPID.clear();
+                selectedPlayer.clear();
             }
+        }
+
+        if (channelUID.getId().equals(CH_ID_PLAYLISTS)) {
+            logger.debug("Start Playlist with {}", command.toString());
+            if (!selectedPlayer.isEmpty()) {
+                for (String key : selectedPlayer.keySet()) {
+                    String pid = key;
+                    String cid = heosPlaylists.get(Integer.valueOf(command.toString()));
+                    api.addContainerToQueuePlayNow(pid, PLAYLISTS_SID, cid);
+                }
+            }
+            selectedPlayer.clear();
         }
 
         if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
             if (command.toString().equals("ON")) {
-                if (!playerPID.isEmpty()) {
-                    String[] player = new String[playerPID.size()];
+                if (!selectedPlayer.isEmpty()) {
+                    String[] player = new String[selectedPlayer.size()];
                     int i = 0;
-                    for (String key : playerPID.keySet()) {
+                    for (String key : selectedPlayer.keySet()) {
                         player[i] = key;
                         ++i;
                     }
 
                     api.groupPlayer(player);
 
-                    for (String key : playerPID.keySet()) {
-                        updateState(playerPID.get(key), OnOffType.OFF);
+                    for (String key : selectedPlayer.keySet()) {
+                        updateState(selectedPlayer.get(key), OnOffType.OFF);
                     }
-                    playerPID.clear();
+                    selectedPlayer.clear();
                     updateState(CH_ID_BUILDGROUP, OnOffType.OFF);
                 }
 
@@ -133,92 +160,111 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     @Override
     public synchronized void initialize() {
+        if (bridgeIsConnected == true) {
+            return;
+        }
+        loggedIn = false;
 
         logger.info("Initit Brige '{}' with IP '{}'", thing.getConfiguration().get(NAME),
                 thing.getConfiguration().get(HOST));
 
+        heartBeatPulse = Integer.valueOf(thing.getConfiguration().get(HEART_BEAT).toString());
         heos.setConnectionIP(thing.getConfiguration().get(HOST).toString());
         heos.setConnectionPort(1255);
-        bridgeIsConnected = heos.establishConnection();
+        bridgeIsConnected = heos.establishConnection(connectionDelay); // the connectionDelay gives the HEOS time to
+                                                                       // recover after a restart
         while (!bridgeIsConnected) {
-            heos.closeConnection();
-            bridgeIsConnected = heos.establishConnection();
+            try {
+                heos.closeConnection();
+            } catch (IOException | InterruptedException e) {
+                logger.error("Unable to close connection to HEOS System. Message: {}", e.getMessage());
+                e.printStackTrace();
+            }
+            bridgeIsConnected = heos.establishConnection(connectionDelay);
             logger.error("Could not initialize connection to HEOS system");
         }
 
-        api.registerforChangeEvents(this);
-        init.run();
+        if (!isRegisteredForChangeEvents) {
+            api.registerforChangeEvents(this);
+            isRegisteredForChangeEvents = true;
+        }
+
+        scheduledStartUp();
+        updateStatus(ThingStatus.ONLINE);
+        logger.info("HEOS Bridge Online");
+        connectionDelay = false; // sets default to false again
 
     }
 
     @Override
     public void dispose() {
+
+        logger.info("HEOS bridge remobed from change notifications");
+        api.unregisterforChangeEvents(this);
+        isRegisteredForChangeEvents = false;
+        loggedIn = false;
         logger.info("Dispose Brige '{}'", thing.getConfiguration().get(NAME));
-        heos.closeConnection();
-
-    }
-
-    private void logIn() {
-        if (thing.getConfiguration().containsKey(USER_NAME) && thing.getConfiguration().containsKey(PASSWORD)) {
-
-            // Debug
-            logger.info("Logging in to HEOS account.");
-            String name = this.thing.getConfiguration().get(USER_NAME).toString();
-            String password = this.thing.getConfiguration().get(PASSWORD).toString();
-            api.logIn(name, password);
-            logedIn = true;
-
-        } else {
-            logger.error("Can not log in. Username and Password not set");
+        try {
+            heos.closeConnection();
+            bridgeIsConnected = false;
+        } catch (IOException | InterruptedException e) {
+            logger.error("Unable to close connection to HEOS System. Message: {}", e.getMessage());
+            e.printStackTrace();
         }
 
     }
 
+    /**
+     * Manages the adding of thecChildHandler to the handlerList and sets the Status
+     * of the thing to ThingStatus.ONLINE.
+     * Add also the player or group channel to the bridge.
+     */
+
     @Override
     public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
         handlerList.put(childThing.getUID(), childHandler);
+        thingOnlineState.put(childThing.getUID(), ThingStatus.ONLINE);
         this.addPlayerChannel(childThing);
 
-        // Debug
-        // List<Channel> list = thing.getChannels();
-        // list = thing.getChannels();
-        // System.out.println("List size: " + list.size());
-        // for (int i = 0; i < list.size(); i++) {
-        // Channel ch = list.get(i);
-        // System.out.println("channel UID: " + ch.getUID());
-        // System.out.println("channel TypeUID: " + ch.getChannelTypeUID());
-        // System.out.println("Channel is linked: " + ch.getProperties().toString());
-        // }
-
-        // Debug
         logger.info("Inizialize child handler for: {}.", childThing.getUID().getId());
-        System.out.println("Init ChildHandler");
 
     }
+
+    /**
+     * Manages the removal of the childHandler from the handlerList and sets the Status
+     * of the thing to ThingsStatus.REMOVED
+     * Removes also the channel of the player or group from the bridge.
+     */
 
     @Override
     public void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
+
+        if (this.getThing().getStatus().equals(ThingStatus.OFFLINE)) { // Prevents to change channels if bridge is
+                                                                       // offline.
+            return;
+        }
+
+        if (childThing.getConfiguration().get(TYPE).equals(PLAYER)) {
+            String channelIdentifyer = "P" + childThing.getConfiguration().get(PID).toString();
+            this.removeChannel(CH_TYPE_PLAYER, channelIdentifyer);
+
+        } else {
+            String channelIdentifyer = "G" + childThing.getConfiguration().get(GID).toString();
+            this.removeChannel(CH_TYPE_PLAYER, channelIdentifyer);
+        }
+
         handlerList.remove(childThing.getUID(), childHandler);
-        this.removeChannel(CH_TYPE_PLAYER, childThing.getConfiguration().get(PID).toString());
+        thingOnlineState.put(childThing.getUID(), ThingStatus.REMOVED);
         logger.info("Dispose child handler for: {}.", childThing.getUID().getId());
-        // Debug
-        System.out.println("Remove ChildHandler");
 
     }
 
-    public HashMap<String, HeosPlayer> getNewPlayer() {
-
-        return heos.getAllPlayer();
+    public void thingStatusOffline(ThingUID uid) {
+        thingOnlineState.put(uid, ThingStatus.OFFLINE);
     }
 
-    public HashMap<String, HeosGroup> getNewGroups() {
-
-        return heos.getGroups();
-    }
-
-    public HashMap<String, HeosGroup> getRemovedGroups() {
-
-        return heos.getGroupsRemoved();
+    public void thingStatusOnline(ThingUID uid) {
+        thingOnlineState.put(uid, ThingStatus.ONLINE);
     }
 
     public void setHeosPlayerDiscovery(HeosPlayerDiscovery discover) {
@@ -238,16 +284,68 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     }
 
     @Override
-    public void bridgeChangeEvent(String event, String command) {
-        playerDiscovery.scanForNewPlayers();
+    public void bridgeChangeEvent(String event, String result, String command) {
+        if (event.equals(EVENTTYPE_EVENT)) {
+            if (command.equals(PLAYERS_CHANGED)) {
+                playerDiscovery.scanForNewPlayers();
+
+            } else if (command.equals(GROUPS_CHANGED)) {
+                playerDiscovery.scanForNewPlayers();
+
+            } else if (command.equals(CONNECTION_LOST)) {
+                updateStatus(ThingStatus.OFFLINE);
+                bridgeIsConnected = false;
+                logger.warn("Heos Bridge OFFLINE");
+
+            } else if (command.equals(CONNECTION_RESTORED)) {
+                connectionDelay = true;
+                initialize();
+            }
+        }
+        if (event.equals(EVENTTYPE_SYSTEM)) {
+            if (command.equals(COM_SING_IN)) {
+                if (result.equals(SUCCESS)) {
+                    loggedIn = true;
+                    addFavorits();
+                    addPlaylists();
+                }
+            } else if (command.equals(COM_USER_CHANGED)) {
+                if (!loggedIn) {
+                    loggedIn = true;
+                    addFavorits();
+                    addPlaylists();
+                }
+            }
+        }
 
     }
+
+    /**
+     * If a thing is discovered, the method checks if the thing is already known
+     * and the state is only temporary set to OFFLINE. If so initialize() of the
+     * thing is called.
+     */
 
     @Override
     public void thingDiscovered(DiscoveryService source, DiscoveryResult result) {
-        // TODO Auto-generated method stub
+        if (handlerList.containsKey(result.getThingUID())) {
+            if (thingOnlineState.containsKey(result.getThingUID())) {
+                if (thingOnlineState.get(result.getThingUID()).equals(ThingStatus.OFFLINE)) {
+                    handlerList.get(result.getThingUID()).initialize();
+                }
+            }
+
+        }
 
     }
+
+    /**
+     * If handleGroups is activated, the HEOS group is not removed as things.
+     * Only the status is set to offline and the information is stored within
+     * the thingOnlineState HashMap as ThingStatus.OFFLINE.
+     * If handleGroups is not active the thing is completely removed. The handler
+     * is removed from the handler list via childHandlerDisposed()
+     */
 
     @Override
     public void thingRemoved(DiscoveryService source, ThingUID thingUID) {
@@ -258,7 +356,9 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             } else {
                 if (handlerList.get(thingUID).getClass().equals(HeosGroupHandler.class)) {
                     HeosGroupHandler handler = (HeosGroupHandler) handlerList.get(thingUID);
+                    thingOnlineState.put(thingUID, ThingStatus.OFFLINE);
                     handler.setStatusOffline();
+
                 }
 
             }
@@ -274,8 +374,17 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         return null;
     }
 
-    public void addFavorits() {
-        if (logedIn) {
+    public void addPlaylists() {
+        if (loggedIn) {
+            heosPlaylists.clear();
+            heosPlaylists = heos.getPlaylists();
+
+        }
+
+    }
+
+    public synchronized void addFavorits() {
+        if (loggedIn) {
             removeChannels(CH_TYPE_FAVORIT);
 
             List<HashMap<String, String>> favList = new ArrayList<HashMap<String, String>>();
@@ -283,8 +392,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             favList = heos.getFavorits();
             int favCount = favList.size();
             ArrayList<Channel> favoritChannels = new ArrayList<Channel>(favCount);
-            // Debug
-            System.out.println("Favorite Count " + favCount);
+
             if (favCount != 0) {
                 for (int i = 0; i < favCount; i++) {
                     for (String key : favList.get(i).keySet()) {
@@ -299,8 +407,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                         }
 
                     }
-                    // Debug
-                    System.out.println("Add Channel: " + favorits.get(NAME));
+
+                    logger.info("Add Favorite Channel: {}", favorits.get(NAME));
 
                     favoritChannels.add(createFavoritChannel(favorits));
                 }
@@ -313,13 +421,24 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     }
 
     private void addPlayerChannel(Thing childThing) {
+        String channelIdentifyer = "";
+        String pid = "";
+
+        if (childThing.getConfiguration().get(TYPE).equals(PLAYER)) {
+            channelIdentifyer = "P" + childThing.getConfiguration().get(PID).toString();
+            pid = childThing.getConfiguration().get(PID).toString();
+        } else if (childThing.getConfiguration().get(TYPE).equals(GROUP)) {
+            channelIdentifyer = "G" + childThing.getConfiguration().get(GID).toString();
+            pid = childThing.getConfiguration().get(GID).toString();
+        }
 
         String playerName = childThing.getConfiguration().get(NAME).toString();
-        ChannelUID channelUID = new ChannelUID(this.getThing().getUID(), playerName);
+
+        ChannelUID channelUID = new ChannelUID(this.getThing().getUID(), channelIdentifyer);
         if (!hasChannel(channelUID)) {
             HashMap<String, String> properties = new HashMap<String, String>(2);
             properties.put(NAME, childThing.getConfiguration().get(NAME).toString());
-            properties.put(PID, childThing.getConfiguration().get(PID).toString());
+            properties.put(PID, pid);
 
             Channel channel = ChannelBuilder.create(channelUID, "Switch").withLabel(playerName).withType(CH_TYPE_PLAYER)
                     .withProperties(properties).build();
@@ -327,9 +446,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             ArrayList<Channel> newChannelList = new ArrayList<>(1);
             newChannelList.add(channel);
             addChannel(newChannelList);
-            // ThingBuilder thingBuilder = editThing();
-            // thingBuilder.withChannel(channel);
-            // updateThing(thingBuilder.build());
+
         }
 
     }
@@ -372,12 +489,13 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         updateThing(thingBuilder.build());
     }
 
-    private void removeChannel(ChannelTypeUID channelType, String name) {
+    private void removeChannel(ChannelTypeUID channelType, String channelIdentifyer) {
+        ChannelUID channelUID = new ChannelUID(this.thing.getUID(), channelIdentifyer);
         List<Channel> channelList = thing.getChannels();
         ArrayList<Channel> mutableChannelList = new ArrayList<Channel>();
         mutableChannelList.addAll(channelList);
         for (int i = 0; i < mutableChannelList.size(); i++) {
-            if (channelList.get(i).getChannelTypeUID().equals(channelType)) {
+            if (mutableChannelList.get(i).getUID().equals(channelUID)) {
                 mutableChannelList.remove(i);
             }
 
@@ -397,19 +515,46 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         return false;
     }
 
+    public HashMap<String, HeosPlayer> getNewPlayer() {
+
+        return heos.getAllPlayer();
+    }
+
+    public HashMap<String, HeosGroup> getNewGroups() {
+
+        return heos.getGroups();
+    }
+
+    public HashMap<String, HeosGroup> getRemovedGroups() {
+
+        return heos.getGroupsRemoved();
+    }
+
+    public void scheduledStartUp() {
+        initPhase = Executors.newScheduledThreadPool(1);
+        initPhaseRunnable = new InitProcedure();
+
+        initPhase.schedule(this.initPhaseRunnable, 10, TimeUnit.SECONDS);
+    }
+
     public class InitProcedure implements Runnable {
 
         @Override
         public void run() {
-            updateStatus(ThingStatus.OFFLINE);
-            // Debug
-            // heos.getPlayer();
-            // heos.getGroups();
-            logIn();
-            addFavorits();
-            heos.startEventListener();
-            updateStatus(ThingStatus.ONLINE);
 
+            heos.startEventListener();
+            heos.startHeartBeat(heartBeatPulse);
+            logger.info("HEOS System heart beat startet. Pulse time is {}s", heartBeatPulse);
+
+            if (thing.getConfiguration().containsKey(USER_NAME) && thing.getConfiguration().containsKey(PASSWORD)) {
+                logger.info("Logging in to HEOS account.");
+                String name = thing.getConfiguration().get(USER_NAME).toString();
+                String password = thing.getConfiguration().get(PASSWORD).toString();
+                api.logIn(name, password);
+
+            } else {
+                logger.error("Can not log in. Username and Password not set");
+            }
         }
     }
 

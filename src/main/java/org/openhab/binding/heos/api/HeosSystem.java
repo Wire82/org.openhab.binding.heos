@@ -1,7 +1,12 @@
 package org.openhab.binding.heos.api;
 
+import static org.openhab.binding.heos.resources.HeosConstants.*;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -16,6 +21,7 @@ import org.openhab.binding.heos.resources.HeosPlayer;
 import org.openhab.binding.heos.resources.HeosResponse;
 import org.openhab.binding.heos.resources.HeosSendCommand;
 import org.openhab.binding.heos.resources.Telnet;
+import org.openhab.binding.heos.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,29 +46,110 @@ public class HeosSystem {
 
     private Logger logger = LoggerFactory.getLogger(HeosSystem.class);
 
-    private final ScheduledExecutorService keepAlive = Executors.newScheduledThreadPool(1);
+    boolean sendSuccess = false;
+
+    private ScheduledExecutorService keepAlive;
+    private KeepALiveRunnable keepAliveRunnable = new KeepALiveRunnable();
+
+    private final int START_DELAY = 30;
+
+    private final int WAIT_TIME_AFTER_RECONNECT = 15000;
 
     public HeosSystem() {
 
     }
 
-    public boolean send(String command) {
+    /**
+     * Method to be used to send a command to the HEOS system.
+     *
+     * If a ReadException is detected during reading the response
+     * to the send command the method tries to send the command
+     * a second time.
+     * Method returns true if sending and reading the response was
+     * successful. It returns false if either the client is not connected
+     * or a failure during reading the response occurs.
+     * A response reading failure is returned after a timeout during the
+     * read command was detected. (catch by a ReadException)
+     *
+     * @param command the command to be send
+     * @return true if sending and reading successful
+     */
 
-        if (sendCommand.send(command)) {
+    public synchronized boolean send(String command) {
+
+        logger.debug("Sending Command: {}", command);
+
+        try {
+            if (sendCommand.send(command)) {
+                return true;
+            } else {
+                logger.error("Could not send message. Client is not connected");
+                return false;
+            }
+        } catch (ReadException e) {
+            logger.error("HEOS System read failure during response. Message: {}", e.getMessage());
+            logger.error("HEOS failed command: {}", command);
+            logger.error("HEOS System trys to send command again....");
+
+            try {
+                if (sendCommand.send(command)) {
+                    return true;
+                } else {
+                    logger.error("Could not send message. Client is not connected");
+                    return false;
+                }
+            } catch (ReadException | IOException e1) {
+                logger.error("HEOS System second try sending command not successful");
+                e1.printStackTrace();
+            }
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+
+        }
+
+    }
+
+    /**
+     * This method shall only be used if no response from network
+     * is expected. Else the read buffer is not cleared
+     *
+     * @param command
+     * @return true if send was successful
+     */
+
+    public boolean sendWithoutResponse(String command) {
+        if (sendCommand.sendWithoutResponse(command)) {
             return true;
         } else {
             logger.error("Could not send message. Client is not connected");
             return false;
         }
-
     }
+
+    /**
+     * This method returns a class from type HeosCommands. Within this class all
+     * possible commands to control the HEOS network are defined.
+     *
+     * @return a class with all HEOS Commands
+     */
 
     public HeosCommands command() {
 
         return heosCommand;
     }
 
-    public boolean establishConnection() {
+    /**
+     * Establishes the connection to the HEOS-Network if IP and Port is
+     * set.
+     *
+     * @param connectionDelay if set to true system waits for 10 seconds before connecting to event line
+     *
+     * @return {@code true} if connection is established else returns {@code false}
+     */
+
+    public boolean establishConnection(boolean connectionDelay) {
         this.playerMapNew = new HashMap<String, HeosPlayer>();
         this.groupMapNew = new HashMap<String, HeosGroup>();
         this.playerMapOld = new HashMap<String, HeosPlayer>();
@@ -71,23 +158,54 @@ public class HeosSystem {
         this.commandLine = new Telnet();
         this.eventLine = new Telnet();
 
-        if (commandLine.connect(connectionIP, connectionPort)) {
+        boolean connected = false;
+
+        try {
+            connected = commandLine.connect(connectionIP, connectionPort);
+        } catch (SocketException e) {
+            e.getMessage().equals("Connection timed out: connect");
+            retryEstablishConnection();
+        } catch (IOException e) {
+            System.out.println("IOException trouble connection trouble " + e.getMessage());
+        }
+
+        if (connected) {
             logger.info("HEOS command line connected at IP {} @ port {}", connectionIP, connectionPort);
         } else {
             logger.error("Could not connect HEOS command line at IP {} @ port {}", connectionIP, connectionPort);
         }
 
         sendCommand.setTelnetClient(commandLine);
-        send(command().registerChangeEventOFF());
+        sendSuccess = send(command().registerChangeEventOFF()); // should be their to clean up starting procedure
 
-        if (eventLine.connect(connectionIP, connectionPort)) {
+        try {
+            connected = eventLine.connect(connectionIP, connectionPort);
+
+        } catch (SocketException e) {
+            e.getMessage().equals("Connection timed out: connect");
+            retryEstablishConnection();
+        } catch (IOException e) {
+            logger.warn("IOException rouble connection trouble " + e.getMessage());
+
+        }
+
+        if (connectionDelay) { // Allows the Heos system to find all need things internally...
+            try {
+                Thread.sleep(WAIT_TIME_AFTER_RECONNECT);
+            } catch (InterruptedException e) {
+                logger.debug("Thread.sleep interrupt during waiting time for HEOS Network");
+            }
+        }
+
+        if (connected) {
             logger.info("HEOS event line connected at IP {} @ port {}", connectionIP, connectionPort);
         } else {
             logger.error("Could not connect HEOS event line at IP {} @ port {}", connectionIP, connectionPort);
         }
 
-        keepConnectionAlive();
-        logger.info("Heos heart Beat startet");
+        sendCommand.setTelnetClient(eventLine);
+        sendSuccess = send(command().registerChangeEventOFF());
+        sendCommand.setTelnetClient(commandLine);
 
         if (commandLine.isConnected() && eventLine.isConnected()) {
             return true;
@@ -96,76 +214,147 @@ public class HeosSystem {
         return false;
     }
 
-    // Keeps the connection alive even if no data is transmitted
+    private void retryEstablishConnection() {
 
-    private void keepConnectionAlive() {
-        final Runnable keepAliveRunnable = new Runnable() {
+        logger.error("Connection to HEOS-System timed out. Trying again....");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-            @Override
-            public void run() {
-                send(command().heartBeat());
-                logger.info("Sending Heos heart Beat");
-
-            }
-        };
-
-        final ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleAtFixedRate(keepAliveRunnable, 300, 300,
-                TimeUnit.SECONDS);
+        establishConnection(true);
 
     }
 
-    public void startEventListener() {
-        sendCommand.setTelnetClient(eventLine);
-        send(command().registerChangeEventOn());
-        eventLine.startInputListener();
+    /**
+     * Starts the HEOS Heart Beat. This held the connection open even
+     * if no data is transmitted. If the connection to the HEOS system
+     * is lost, the method reconnects to the HEOS system by calling the
+     * {@code establishConnection()} method. If the connection is lost or
+     * reconnect the method fires a bridgeEvent via the {@code HeosEvenController.class}
+     *
+     * @see establishConnection()
+     * @see HeosEvenController.class
+     *
+     */
+
+    public void startHeartBeat(int heartBeatPulse) {
+
+        keepAlive = Executors.newScheduledThreadPool(1);
+        keepAliveRunnable = new KeepALiveRunnable();
+
+        ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleAtFixedRate(this.keepAliveRunnable, START_DELAY,
+                heartBeatPulse, TimeUnit.SECONDS);
+
+    }
+
+    public synchronized void startEventListener() {
+
+        logger.info("HEOS System Event Listener is booting....");
+
+        if (sendCommand.setTelnetClient(eventLine)) {
+            sendSuccess = send(command().registerChangeEventOn());
+            logger.info("HEOS System Event Listener is starting....");
+            eventLine.startInputListener();
+        }
+
         sendCommand.setTelnetClient(commandLine);
+        logger.info("HEOS System Event Listener succsessfully started");
+
         eventLine.getReadResultListener().addPropertyChangeListener(new PropertyChangeListener() {
 
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 parser.parseResult((String) evt.getNewValue());
-                eventController.handleEvent();
+                eventController.handleEvent(1);
 
             }
         });
     }
 
-    public void closeConnection() {
+    public synchronized void closeConnection() throws IOException, InterruptedException {
+        logger.info("Shutting down HEOS Heart Beat");
+        keepAlive.shutdown();
+        if (eventLine.isConnected()) {
 
-        eventLine.stopInputListener();
-        sendCommand.setTelnetClient(eventLine);
-        send(command().registerChangeEventOFF());
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            if (eventLine.isConnectionAlive()) {
+                logger.info("Stopping HEOS event line listener");
+                eventLine.stopInputListener();
+                sendCommand.setTelnetClient(eventLine);
+                send(command().registerChangeEventOFF());
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                    e.printStackTrace();
+                }
+                sendCommand.setTelnetClient(commandLine);
+                logger.info("Disconnecting HEOS event line");
+                eventLine.disconnect();
+                logger.info("Disconnecting HEOS command line");
+                commandLine.disconnect();
+            }
+
+            logger.info("Connection to HEOS system closed");
         }
-        sendCommand.setTelnetClient(commandLine);
-        eventLine.disconnect();
-        commandLine.disconnect();
-        logger.info("Connection to HEOS system closed");
 
     }
 
-    public HashMap<String, HeosPlayer> getPlayer() {
+    /**
+     * This method update the current state of the HEOS Player
+     * like the play state title and so on. This method updates all
+     * states and shall be used for initialization only. For ongoing
+     * updates use the eventListener
+     *
+     * @param pid Player PID from the player
+     * @return a HEOS Player with the updated states
+     *
+     */
 
-        boolean resultEmpty = true;
+    public synchronized HeosPlayer getPlayerState(String pid) {
+        send(command().getPlayerInfo(pid));
+        while (response.getEvent().getResult().equals(FAIL)) {
+            try {
+                logger.warn("HEOS System waiting for player with PID: '{}' to be available", pid);
+                Thread.sleep(3000);
+                send(command().getPlayerInfo(pid));
 
-        while (resultEmpty) {
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        HeosPlayer heosPlayer = new HeosPlayer();
+        heosPlayer.updatePlayerInfo(response.getPayload().getPayloadList().get(0));
+        heosPlayer = updatePlayerState(heosPlayer);
+        return heosPlayer;
+    }
+
+    /**
+     * This method returns a {@codeHashMap<String pid, HeosPlayer heosPlayer>} with
+     * all player found on the network after an connection to the system is
+     * established via a bridge.
+     *
+     * @return a HashMap with all HEOS Player in the network
+     */
+
+    public synchronized HashMap<String, HeosPlayer> getAllPlayer() {
+
+        send(command().getPlayers());
+        boolean resultIsEmpty = response.getPayload().getPayloadList().isEmpty();
+
+        while (resultIsEmpty) {
             send(command().getPlayers());
-            resultEmpty = response.getPayload().getPayloadList().isEmpty();
-            // Debug
-            System.out.println("Is EMPTY!!!!");
+            resultIsEmpty = response.getPayload().getPayloadList().isEmpty();
+            logger.warn("HEOS System found no players.");
         }
 
         List<HashMap<String, String>> playerList = response.getPayload().getPayloadList();
 
         for (HashMap<String, String> player : playerList) {
-            HeosPlayer tempPlay = new HeosPlayer();
-            tempPlay.updatePlayerInfo(player);
-            tempPlay = updatePlayerState(tempPlay);
-            playerMapNew.put(tempPlay.getPid(), tempPlay);
+            HeosPlayer heosPlayer = new HeosPlayer();
+            heosPlayer.updatePlayerInfo(player);
+            playerMapNew.put(heosPlayer.getPid(), heosPlayer);
 
         }
 
@@ -173,84 +362,128 @@ public class HeosSystem {
 
     }
 
-    private HeosPlayer updatePlayerState(HeosPlayer player) {
+    private synchronized HeosPlayer updatePlayerState(HeosPlayer heosPlayer) {
 
-        String pid = player.getPid();
+        String pid = heosPlayer.getPid();
         send(command().getPlayState(pid));
-        player.setState(response.getEvent().getMessagesMap().get("state"));
+        heosPlayer.setState(response.getEvent().getMessagesMap().get("state"));
         send(command().getMute(pid));
-        player.setMute(response.getEvent().getMessagesMap().get("state"));
+        heosPlayer.setMute(response.getEvent().getMessagesMap().get("state"));
         send(command().getVolume(pid));
-        player.setLevel(response.getEvent().getMessagesMap().get("level"));
+        heosPlayer.setLevel(response.getEvent().getMessagesMap().get("level"));
         send(command().getNowPlayingMedia(pid));
-        player.updateMediaInfo(response.getPayload().getPayloadList().get(0));
+        heosPlayer.updateMediaInfo(response.getPayload().getPayloadList().get(0));
 
-        return player;
+        return heosPlayer;
     }
 
-    public HashMap<String, HeosGroup> getGroups() {
+    /**
+     * This method searches for all groups which are on the HEOS network
+     * and returns a {@code HashMap<String gid, HeosGroup heosGroup>}.
+     * Before calling this method a connection via a bridge has to be
+     * established
+     *
+     * @return a HashMap with all HEOS groups
+     */
+
+    public synchronized HashMap<String, HeosGroup> getGroups() {
+        groupMapNew.clear();
 
         send(command().getGroups());
-        logger.info("Found: {} Player in Group", response.getPayload().getPlayerList().size());
+
         if (response.getPayload().getPayloadList().isEmpty()) {
             groupMapNew.clear();
             removedGroupMap = compareMaps(groupMapNew, groupMapOld);
             groupMapOld.putAll(groupMapNew);
-            // for (String key : groupMapNew.keySet()) {
-            // groupMapOld.put(key, groupMapNew.get(key));
-            // }
             return groupMapNew;
         }
 
         List<HashMap<String, String>> groupList = response.getPayload().getPayloadList();
+        int groupCounter = 0;
 
         for (HashMap<String, String> group : groupList) {
-            HeosGroup tempGroup = new HeosGroup();
-            tempGroup.updateGroupInfo(group);
-            tempGroup = updateGroupState(tempGroup);
-            groupMapNew.put(tempGroup.getGid(), tempGroup);
+            HeosGroup heosGroup = new HeosGroup();
+            heosGroup.updateGroupInfo(group);
+            heosGroup.updateGroupPlayers(response.getPayload().getPlayerList().get(groupCounter));
+
+            logger.info("Found: Group {} with {} Players", heosGroup.getName(),
+                    response.getPayload().getPlayerList().get(groupCounter).size());
+
+            int playerCount = response.getPayload().getPlayerList().get(groupCounter).size();
+
+            // Defining the Group leader
+
+            for (int i = 0; i < playerCount; i++) {
+                HashMap<String, String> playerMap = new HashMap<>();
+                playerMap = response.getPayload().getPlayerList().get(groupCounter).get(i);
+                for (String key : playerMap.keySet()) {
+                    if (key.equals("role")) {
+                        if (playerMap.get(key).equals("leader")) {
+                            String leader = playerMap.get("pid");
+                            heosGroup.setLeader(leader);
+                        }
+                    }
+                }
+            }
+
+            // groupMapNew.put(heosGroup.getGid(), heosGroup);
+            // Switched to NameHash value
+            // System.out.println(heosGroup.getNameHash());
+            groupMapNew.put(heosGroup.getNameHash(), heosGroup);
             removedGroupMap = compareMaps(groupMapNew, groupMapOld);
+            groupMapOld.clear(); // clear the old map so that only the currently available groups are added in the next
+                                 // step.
             groupMapOld.putAll(groupMapNew);
-            // for (String key : groupMapNew.keySet()) {
-            // groupMapOld.put(key, groupMapNew.get(key));
-            // }
+            groupCounter++;
+
         }
 
         return groupMapNew;
 
     }
 
-    private HeosGroup updateGroupState(HeosGroup group) {
+    /**
+     * This method update the current state of the HEOS Group
+     * like the play state title and so on. This method updates all
+     * states and shall be used for initialization only. For ongoing
+     * updates use the eventListener
+     *
+     * @param gid Group GID from the group
+     * @return a HEOS group with the updated states
+     *
+     */
 
-        String gid = group.getGid();
+    public synchronized HeosGroup getGroupState(String gid) {
+
+        HeosGroup heosGroup = new HeosGroup();
         send(command().getGroupInfo(gid));
-        int playerCount = response.getPayload().getPlayerList().size();
 
-        // Defining the Group leader
+        // During start up sometimes the system has not collected all information
+        // and sends a failure.
 
-        for (int i = 0; i < playerCount; i++) {
-            HashMap<String, String> player = new HashMap<>();
-            player = response.getPayload().getPlayerList().get(i);
-            for (String key : player.keySet()) {
-                if (key.equals("role")) {
-                    if (player.get(key).equals("leader")) {
-                        String leader = player.get("pid");
-                        group.setLeader(leader);
-                    }
-                }
+        while (response.getEvent().getResult().equals(FAIL)) {
+            try {
+                logger.warn("HEOS System waiting for group with PID: '{}' to be available", gid);
+                Thread.sleep(3000);
+                send(command().getGroupInfo(gid));
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
-        send(command().getPlayState(group.getLeader()));
-        group.setState(response.getEvent().getMessagesMap().get("state"));
+        heosGroup.updateGroupInfo(response.getPayload().getPayloadList().get(0));
+        heosGroup.updateGroupPlayers((response.getPayload().getPlayerList().get(0)));
+        send(command().getPlayState(gid));
+        heosGroup.setState(response.getEvent().getMessagesMap().get("state"));
         send(command().getGroupMute(gid));
-        group.setMute(response.getEvent().getMessagesMap().get("state"));
+        heosGroup.setMute(response.getEvent().getMessagesMap().get("state"));
         send(command().getGroupVolume(gid));
-        group.setLevel(response.getEvent().getMessagesMap().get("level"));
+        heosGroup.setLevel(response.getEvent().getMessagesMap().get("level"));
         send(command().getNowPlayingMedia(gid));
-        group.updateMediaInfo(response.getPayload().getPayloadList().get(0));
+        heosGroup.updateMediaInfo(response.getPayload().getPayloadList().get(0));
 
-        return group;
+        return heosGroup;
     }
 
     private HashMap<String, HeosGroup> compareMaps(HashMap<String, HeosGroup> mapNew,
@@ -260,6 +493,7 @@ public class HeosSystem {
         for (String key : mapOld.keySet()) {
             if (!mapNew.containsKey(key)) {
                 removedItems.put(key, mapOld.get(key));
+
             }
 
         }
@@ -267,10 +501,34 @@ public class HeosSystem {
         return removedItems;
     }
 
+    /**
+     * Can be used to fill the map which contains old Groups at startup
+     * with existing HEOS groups.
+     *
+     *
+     * @param map a HashMap with {@code heosGroup.getNameHash(), heosGroup}
+     */
+
+    public void addHeosGroupToOldGroupMap(HashMap<String, HeosGroup> map) {
+        groupMapOld.putAll(map);
+
+    }
+
     public List<HashMap<String, String>> getFavorits() {
-        // HashMap<String, String> favorits = new HashMap<String, String>();
-        send(command().BrowseSource("1028"));
+
+        send(command().BrowseSource(FAVORIT_SID));
         return response.getPayload().getPayloadList();
+
+    }
+
+    public List<String> getPlaylists() {
+        List<String> playlistsList = new ArrayList<String>();
+        send(command().BrowseSource(PLAYLISTS_SID));
+        List<HashMap<String, String>> payload = response.getPayload().getPayloadList();
+        for (int i = 0; i < payload.size(); i++) {
+            playlistsList.add(payload.get(i).get(CID));
+        }
+        return playlistsList;
 
     }
 
@@ -304,6 +562,64 @@ public class HeosSystem {
 
     public HashMap<String, HeosGroup> getGroupsRemoved() {
         return removedGroupMap;
+    }
+
+    /**
+     * A class which provides a runnable for the HEOS Heart Beat
+     *
+     * @author Johannes
+     *
+     */
+
+    public class KeepALiveRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+
+                if (sendCommand.isConnectionAlive()) {
+                    logger.debug("Sending Heos Heart Beat");
+                    if (!sendCommand.send(command().heartBeat())) {
+                        logger.error("Connection to HEOS Network lost!");
+                        restartConnection();
+                    }
+                } else {
+                    logger.error("Connection to HEOS Network lost!");
+                    restartConnection();
+                }
+
+                // catches a failure during a heart beat send message if connection was
+                // getting lost between last Heart Beat but Bridge is online again and not
+                // detected by isConnectionAlive()
+
+            } catch (ReadException | IOException e) {
+                logger.error("Failure during HEOS Heart Beat command with message: {}", e.getMessage());
+                e.printStackTrace();
+                restartConnection();
+            }
+
+        }
+
+        private void restartConnection() {
+            try {
+                closeConnection();
+                eventController.connectionToSystemLost();
+
+                while (!sendCommand.isConnectionAlive()) {
+                    logger.error("Trying to reconnect to HEOS Network...");
+                    Thread.sleep(5000);
+                }
+                logger.error("Reconnecting to Bridge with IP {} @ port {}", connectionIP, connectionPort);
+                Thread.sleep(15000); // Waiting time is needed because System needs some time to start up
+                eventController.connectionToSystemRestored();
+
+            } catch (IOException | InterruptedException e) {
+                logger.error("Failure during HEOS Heart Beat command with message: {}", e.getMessage());
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
 }

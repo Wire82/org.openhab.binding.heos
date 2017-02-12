@@ -10,9 +10,10 @@
         <description>The HEOS System Bridge</description>    
         
          <channels>
-            <channel typeId="reboot" id="Reboot"></channel>    
-            <channel typeId="dynamicGroupHandling" id="DynamicGroupHandling"></channel>  
-            <channel typeId="buildGroup" id="BuildGroup"></channel> 
+            <channel typeId="reboot"                id="Reboot"></channel>    
+            <channel typeId="dynamicGroupHandling"  id="DynamicGroupHandling"></channel>  
+            <channel typeId="buildGroup"            id="BuildGroup"></channel> 
+            <channel typeId="playlists"             id="Playlists"></channel>
                
         </channels>
         
@@ -43,7 +44,13 @@
                 <label>Password</label>
                 <description>Password to register at the HEOS Service</description>
                 <required>false</required>
-            </parameter>            
+            </parameter>
+              <parameter name="heartBeat" type="text">
+                <context>String</context>
+                <label>Heart Beat</label>
+                <description>The time in seconds for the HEOS heart beat (default = 360s)</description>
+                <required>false</required>
+            </parameter>              
         </config-description>
 
     </bridge-type>

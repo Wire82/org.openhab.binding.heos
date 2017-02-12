@@ -35,6 +35,10 @@
       <channel-type id="album">
         <item-type>String</item-type>
         <label>Album</label>
+     </channel-type>
+      <channel-type id="image_url" advanced="true">
+        <item-type>String</item-type>
+        <label>Cover</label>
      </channel-type>   
       <channel-type id="player">
         <item-type>Switch</item-type>
@@ -46,15 +50,27 @@
      </channel-type>
       <channel-type id="dynamicGroupHandling">
         <item-type>Switch</item-type>
-        <label>Dynamic Group Managment</label>
+        <label>Keep Groups</label>
      </channel-type>
          <channel-type id="favorit">
         <item-type>Switch</item-type>
-        <label>Favorit</label>
+        <label>Favorites</label>
+     </channel-type>
+         <channel-type id="playlists" advanced="true">
+        <item-type>String</item-type>
+        <label>Playlists</label>
      </channel-type>       
          <channel-type id="reboot">
         <item-type>Switch</item-type>
         <label>Reboot</label>
+     </channel-type>       
+         <channel-type id="input">
+        <item-type>String</item-type>
+        <label>Input Source</label>
+     </channel-type>
+     <channel-type id="onlineStatus" advanced="true">
+        <item-type>String</item-type>
+        <label>Thing Status</label>
      </channel-type>
      
     

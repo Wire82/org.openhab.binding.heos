@@ -48,17 +48,26 @@ public class HeosBindingConstants {
     public final static String CH_ID_BUILDGROUP = "BuildGroup";
     public final static String CH_ID_DYNGROUPSHAND = "DynamicGroupHandling";
     public final static String CH_ID_REBOOT = "Reboot";
+    public final static String CH_ID_IMAGE_URL = "Image_URL";
+    public final static String CH_ID_PLAYLISTS = "Playlists";
+    public final static String CH_ID_INPUTS = "Inputs";
+    public final static String CH_ID_STATUS = "OnlineStatus";
 
     public final static String HOST = "ipAddress";
     public final static String PLAYER_TYPE = "model";
     public final static String NAME = "name";
     public final static String USER_NAME = "userName";
     public final static String PASSWORD = "password";
-    public final static String PID = "pid";
-    public final static String GID = "gid";
+    public final static String HEART_BEAT = "heartBeat";
+
     public final static String LEADER = "leader";
-    public final static String FAVORIT_SID = "1028";
-    public final static String MID = "mid";
+
+    public final static String PLAYER = "Player";
+    public final static String GROUP = "Group";
+    public final static String TYPE = "type";
+
+    public final static String ONLINE = "ONLINE";
+    public final static String OFFLINE = "OFFLINE";
 
     public final static String STATE = "state";
     public final static String PLAY = "play";
@@ -71,6 +80,13 @@ public class HeosBindingConstants {
     public final static String SONG = "song";
     public final static String ALBUM = "album";
     public final static String ARTIST = "artist";
+    public final static String IMAGE_URL = "image_url";
+
+    public final static String NAME_HASH = "nameHash";
+    public final static String GROUP_MEMBER_HASH = "groupMemberHash";
+
+    // Time Constants
+    public final static String HEART_BEAT_DELAY = "80";
 
     public static Set<ThingTypeUID> supportedThingTypes() {
 
