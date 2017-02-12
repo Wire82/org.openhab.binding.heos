@@ -199,7 +199,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     @Override
     public void dispose() {
 
-        logger.info("HEOS bridge remobed from change notifications");
+        logger.info("HEOS bridge removed from change notifications");
         api.unregisterforChangeEvents(this);
         isRegisteredForChangeEvents = false;
         loggedIn = false;
@@ -311,9 +311,9 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 }
             } else if (command.equals(COM_USER_CHANGED)) {
                 if (!loggedIn) {
-                    loggedIn = true;
-                    addFavorits();
-                    addPlaylists();
+                    // loggedIn = true;
+                    // addFavorits();
+                    // addPlaylists();
                 }
             }
         }
@@ -385,7 +385,10 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     public synchronized void addFavorits() {
         if (loggedIn) {
+
+            logger.info("Adding HEOS Favorite Channels");
             removeChannels(CH_TYPE_FAVORIT);
+            logger.info("Old Favorite Channels removed");
 
             List<HashMap<String, String>> favList = new ArrayList<HashMap<String, String>>();
             HashMap<String, String> favorits = new HashMap<String, String>(4);
