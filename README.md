@@ -39,7 +39,7 @@ Bridge heos:bridge:main "name" [ipAddress="192.168.0.1", name="Default", unserNa
 ````
 
 ### Player Configuration
-Player can be added via the PaperUI. All field are then filled automatically.
+Player can be added via the PaperUI. All fields are then filled automatically.
 For manual configuration the player is defined as followed:
 ````
 Thing heos:player:pid "name" [pid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx"] 
@@ -47,7 +47,7 @@ Thing heos:player:pid "name" [pid="123456789", name="name", model="modelName", i
 Pid behind the heos:player:--- should be changed as required. Every name or value can be used. It is recommended to use the player Pid. Within the configuration the pid field is mandatory. The rest is not required.
 
 ### Group Configuration
-TBD
+Same as for the Heos Player
 
 ### Defining Bridge and Players together
 
@@ -73,13 +73,15 @@ The channel have different paths if you configure our Things manual or via an UI
 
 Channel ID | Item Type | Description
 ----------------|-----------|-------------
-Control | Player | Provides: Play / Pause / Next / Previous
+Control | Player | Play (also ON) / Pause (also OFF) / Next / Previous
 Volume | Dimmer | Volume control
 Mute | Switch | Mute the Player
 Titel | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
 Image_URL | String |The URL where the cover can be found 
+Inputs | String | The input to be switched to. Input values from HEOS protocol.
+
 
 ####Example:
 
@@ -87,11 +89,51 @@ Image_URL | String |The URL where the cover can be found
 Player LivingRoom_Control "Control" {channel="heos:player:main:LivinRoom:Control"}
 ```
 
+
+Inputs depending on Player type (Date 12.02.2017):
+
+Input name |
+----------------|
+aux_in_1
+aux_in_2
+aux_in_3
+aux_in_4
+aux1
+aux2
+aux3
+aux4
+aux5
+aux6
+aux7
+line_in_1
+line_in_2
+line_in_3
+line_in_4
+coax_in_1
+coax_in_2
+optical_in_1
+optical_in_2
+hdmi_in_1
+hdmi_arc_1
+cable_sat
+dvd
+bluray
+game
+mediaplayer
+cd
+tuner
+hdradio
+tvaudio
+phono
+
+
+
+
 ### Groups provide the following channels:
 
 Channel ID | Item Type | Description
 ----------------|-----------|-------------
-Control | Player | Provides: Play / Pause / Next / Previous
+Control | Player | Play (also ON) / Pause (also OFF) / Next / Previous
 Volume | Dimmer | Volume control
 Mute | Switch | Mute the Group
 Titel | String | Song Title
@@ -99,6 +141,7 @@ Interpret | String | Song Interpret
 Album | String  | Album Title
 Ungroup | Switch | Ungroup the group
 Image_URL | String |The URL where the cover can be found
+OnlineStatus | String | Indicates the status ONLINE or OFFLINE
 
 
 
@@ -109,6 +152,7 @@ Channel ID | Item Type | Description
 Reboot | Switch | Reboot the whole HEOS System. Can be used if you get in trouble with the system
 DynamicGroupHandling | Switch | If this option id activated the system automatically removes groups if they are ungrouped. Only works if the group is added via an UI.
 BuildGroup | Switch | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.
+Playlists | String | Plays a Playlist on the prior selected Player Channel (see below) Playlists are identified by numbers. List can be found in the HEOS App
 
 
 ## **Experimental**
