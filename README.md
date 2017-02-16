@@ -80,7 +80,7 @@ Titel | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
 Image_URL | String |The URL where the cover can be found 
-Inputs | String | The input to be switched to. Input values from HEOS protocol.
+Inputs | String | The input to be switched to. Input values from HEOS protocol
 
 
 ####Example:
@@ -92,39 +92,39 @@ Player LivingRoom_Control "Control" {channel="heos:player:main:LivinRoom:Control
 
 Inputs depending on Player type (Date 12.02.2017):
 
-Input name |
+Input names |
 ----------------|
-aux_in_1
-aux_in_2
-aux_in_3
-aux_in_4
-aux1
-aux2
-aux3
-aux4
-aux5
-aux6
-aux7
-line_in_1
-line_in_2
-line_in_3
-line_in_4
-coax_in_1
-coax_in_2
-optical_in_1
-optical_in_2
-hdmi_in_1
-hdmi_arc_1
-cable_sat
-dvd
-bluray
-game
-mediaplayer
-cd
-tuner
-hdradio
-tvaudio
-phono
+aux_in_1 /
+aux_in_2 /
+aux_in_3 /
+aux_in_4 /
+aux1 /
+aux2 /
+aux3 /
+aux4 /
+aux5 /
+aux6 /
+aux7 /
+line_in_1 /
+line_in_2 /
+line_in_3 /
+line_in_4 /
+coax_in_1 /
+coax_in_2 /
+optical_in_1 /
+optical_in_2 /
+hdmi_in_1 /
+hdmi_arc_1 /
+cable_sat /
+dvd /
+bluray /
+game /
+mediaplayer /
+cd /
+tuner /
+hdradio /
+tvaudio /
+phono /
 
 
 
