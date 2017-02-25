@@ -62,8 +62,6 @@ public class HeosCommands {
     private String addToQueue = "heos://browse/add_to_queue?pid=";
     private String playInputSource = "heos://browse/play_input?pid=";
 
-    // private Sring playAuxIn = "heos://"
-
     public HeosCommands() {
 
     }
@@ -227,9 +225,9 @@ public class HeosCommands {
 
     }
 
-    public String playInputSource(String pid, String source) {
+    public String playInputSource(String des_pid, String source_pid, String input) {
 
-        return playInputSource + pid + "&input=inputs/" + source;
+        return playInputSource + des_pid + "&spid=" + source_pid + "&input=inputs/" + input;
     }
 
     public void setUsernamePwassword(String username, String password) {
