@@ -4,10 +4,13 @@ import java.util.HashMap;
 
 public class HeosMediaObject {
 
-    private final String[] supportedMediaItems = { "song", "album", "artist", "image_url", "qid", "mid", "album_id" };
+    private final String[] supportedMediaItems = { "type", "station", "song", "album", "artist", "image_url", "qid",
+            "mid", "album_id" };
 
     private HashMap<String, String> mediaInfo;
 
+    private String type;
+    private String station;
     private String song;
     private String album;
     private String artist;
@@ -51,14 +54,21 @@ public class HeosMediaObject {
                 case "album_id":
                     this.album_id = this.mediaInfo.get(key);
                     break;
-
+                case "type":
+                    this.type = this.getMediaInfo().get(key);
+                    if (type.equals("station")) {
+                        this.station = this.getMediaInfo().get("station");
+                    } else {
+                        this.station = "No Station";
+                    }
+                    break;
             }
         }
 
     }
 
     private void initObject() {
-        mediaInfo = new HashMap<String, String>(7);
+        mediaInfo = new HashMap<String, String>(9);
 
         for (String key : supportedMediaItems) {
             mediaInfo.put(key, null);
@@ -68,6 +78,22 @@ public class HeosMediaObject {
 
     public HashMap<String, String> getMediaInfo() {
         return mediaInfo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStation() {
+        return station;
+    }
+
+    public void setStation(String station) {
+        this.station = station;
     }
 
     public String getSong() {
