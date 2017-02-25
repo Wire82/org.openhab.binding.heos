@@ -41,7 +41,7 @@ public class HeosBindingConstants {
     public final static String CH_ID_VOLUME = "Volume";
     public final static String CH_ID_MUTE = "Mute";
     public final static String CH_ID_UNGROUP = "Ungroup";
-    public final static String CH_ID_SONG = "Titel";
+    public final static String CH_ID_SONG = "Title";
     public final static String CH_ID_ARTIST = "Interpret";
     public final static String CH_ID_ALBUM = "Album";
     public final static String CH_ID_PLAYER = "Player";
@@ -52,6 +52,11 @@ public class HeosBindingConstants {
     public final static String CH_ID_PLAYLISTS = "Playlists";
     public final static String CH_ID_INPUTS = "Inputs";
     public final static String CH_ID_STATUS = "OnlineStatus";
+    public final static String CH_ID_CUR_POS = "CurrentPosition";
+    public final static String CH_ID_DURATION = "Duration";
+    public final static String CH_ID_STATION = "Station";
+    public final static String CH_ID_RAW_COMMAND = "RawCommand";
+    public final static String CH_ID_TYPE = "Type";
 
     public final static String HOST = "ipAddress";
     public final static String PLAYER_TYPE = "model";
@@ -80,7 +85,11 @@ public class HeosBindingConstants {
     public final static String SONG = "song";
     public final static String ALBUM = "album";
     public final static String ARTIST = "artist";
+    public final static String STATION = "station";
     public final static String IMAGE_URL = "image_url";
+    public final static String CUR_POS = "curPos";
+    public final static String DURATION = "duration";
+    public final static String RAW_COMMAND = "rawCommand";
 
     public final static String NAME_HASH = "nameHash";
     public final static String GROUP_MEMBER_HASH = "groupMemberHash";
