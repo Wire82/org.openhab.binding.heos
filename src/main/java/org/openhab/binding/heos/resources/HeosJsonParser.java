@@ -39,10 +39,11 @@ public class HeosJsonParser {
         // Setting the pid to 0 can be used to check of message failed during further investigation
 
         if (eventResponse.getMessagesMap().containsKey("pid")) {
-            if (eventResponse.getMessagesMap().get("pid").length() > 15) {
-                response.setPid("0");
-                return response;
-            }
+            // Debug. Removed if no longer needed. Not all PID are only 9 digits long
+            // if (eventResponse.getMessagesMap().get("pid").length() > 15) {
+            // response.setPid("0");
+            // return response;
+            // }
             response.setPid((eventResponse.getMessagesMap().get("pid")));
         }
 
