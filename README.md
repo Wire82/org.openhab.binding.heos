@@ -365,5 +365,5 @@ Switch item=HeosKitchen_Playlist  	mappings=[0="San Glaser", 1="Classic", 2="Bea
 
 
 ## Note
-This is a very early state of the binding. It was stated as a private project for using at home and never for publishing. But hopefully it will reach a state where it can be included into OpenHab.
-At the moment it may work by some functions are not well tested an can cause trouble. But enjoy testing and feel free to give feedback.
+This is a very early state of the binding. It was started as a private project for using at home and never for publishing. But hopefully it will reach a state where it can be included into OpenHab.
+At the moment it may work by some functions are not well tested and can cause trouble. But enjoy testing and feel free to give feedback.
