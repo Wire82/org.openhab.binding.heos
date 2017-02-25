@@ -73,6 +73,7 @@ public class HeosEventController extends MyEventListener {
         switch (eventCommand) {
 
             case "player_now_playing_progress":
+                playerProgressChanged();
                 break;
             case "players_changed":
                 fireBridgeEvent("event", null, eventCommand);
@@ -159,6 +160,16 @@ public class HeosEventController extends MyEventListener {
         fireStateEvent(pid, event, command);
     }
 
+    private void playerProgressChanged() {
+        String pos = response.getEvent().getMessagesMap().get("cur_pos");
+        String duration = response.getEvent().getMessagesMap().get("duration");
+        String pid = response.getPid();
+
+        fireStateEvent(pid, "curPos", pos);
+        fireStateEvent(pid, "duration", duration);
+
+    }
+
     private void volumeChanged() {
         String pid = response.getPid();
         String event = "volume";
@@ -180,20 +191,20 @@ public class HeosEventController extends MyEventListener {
     private void signIn() {
 
         if (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(FALSE)) {
-            fireBridgeEvent(EVENTTYPE_SYSTEM, SUCCESS, COM_SING_IN);
+            fireBridgeEvent(EVENT_SYSTEM, SUCCESS, COM_SING_IN);
         }
     }
 
     private void userChanged() {
-        fireBridgeEvent(EVENTTYPE_SYSTEM, SUCCESS, COM_USER_CHANGED);
+        fireBridgeEvent(EVENT_SYSTEM, SUCCESS, COM_USER_CHANGED);
     }
 
     public void connectionToSystemLost() {
-        fireBridgeEvent(EVENTTYPE_EVENT, FAIL, CONNECTION_LOST);
+        fireBridgeEvent(EVENT_EVENT, FAIL, CONNECTION_LOST);
     }
 
     public void connectionToSystemRestored() {
-        fireBridgeEvent(EVENTTYPE_EVENT, SUCCESS, CONNECTION_RESTORED);
+        fireBridgeEvent(EVENT_EVENT, SUCCESS, CONNECTION_RESTORED);
     }
 
 }
