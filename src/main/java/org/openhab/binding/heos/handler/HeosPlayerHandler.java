@@ -1,7 +1,7 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
-import static org.openhab.binding.heos.resources.HeosConstants.PID;
+import static org.openhab.binding.heos.resources.HeosConstants.*;
 
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -31,6 +31,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     private String pid;
     private HashMap<String, HeosPlayer> playerMap;
     private HeosPlayer player;
+    private HeosBridgeHandler bridge;
 
     private Logger logger = LoggerFactory.getLogger(HeosPlayerHandler.class);
 
@@ -86,9 +87,23 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
             } else {
                 api.muteOFF(pid);
             }
-        } else if (channelUID.getId().equals(CH_ID_INPUTS)) {
 
-            api.playInputSource(pid, command.toString());
+            // Allows playing external sources like Aux In
+            // If no player on bridge is selected play input from this this player
+            // Only one source can be selected
+        } else if (channelUID.getId().equals(CH_ID_INPUTS)) {
+            if (bridge.getSelectedPlayer().isEmpty()) {
+                api.playInputSource(pid, null, command.toString());
+            } else if (bridge.getSelectedPlayer().size() > 1) {
+                logger.warn("Only one source can be selected for HEOS Input. Selected amount of sources: {} ",
+                        bridge.getSelectedPlayer().size());
+                bridge.getSelectedPlayer().clear();
+            } else {
+                for (String source_pid : bridge.getSelectedPlayer().keySet()) {
+                    api.playInputSource(pid, source_pid, command.toString());
+                    bridge.getSelectedPlayer().clear();
+                }
+            }
 
         }
 
@@ -148,6 +163,12 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                 }
 
             }
+            if (event.equals(CUR_POS)) {
+                this.updateState(CH_ID_CUR_POS, StringType.valueOf(command));
+            }
+            if (event.equals(DURATION)) {
+                this.updateState(CH_ID_DURATION, StringType.valueOf(command));
+            }
 
         }
 
@@ -173,7 +194,21 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                     case IMAGE_URL:
                         updateState(CH_ID_IMAGE_URL, StringType.valueOf(info.get(key)));
                         break;
+                    case STATION:
+                        if (info.get(SID).equals(INPUT_SID)) {
+                            updateState(CH_ID_INPUTS, StringType.valueOf(info.get(STATION)));
+                        }
+                        updateState(CH_ID_STATION, StringType.valueOf(info.get(key)));
+                        break;
+                    case TYPE:
+                        updateState(CH_ID_TYPE, StringType.valueOf(info.get(key)));
+                        if (info.get(key).equals(STATION)) {
+                            updateState(CH_ID_STATION, StringType.valueOf(info.get(STATION)));
+                        } else {
+                            updateState(CH_ID_STATION, StringType.valueOf("No Station"));
+                        }
 
+                        break;
                 }
 
             }
@@ -187,12 +222,28 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     }
 
+    public void setStatusOffline() {
+        api.unregisterforChangeEvents(this);
+        updateState(CH_ID_STATUS, StringType.valueOf(OFFLINE));
+        updateStatus(ThingStatus.OFFLINE);
+    }
+
     public class InitializationRunnable implements Runnable {
 
         @Override
         public void run() {
 
+            bridge = (HeosBridgeHandler) getBridge().getHandler();
+
             player = heos.getPlayerState(pid);
+
+            if (!player.isOnline()) {
+                setStatusOffline();
+                bridge.thingStatusOffline(thing.getUID());
+                return;
+            }
+
+            bridge.thingStatusOnline(thing.getUID());
 
             if (player.getLevel() != null) {
                 updateState(CH_ID_VOLUME, PercentType.valueOf(player.getLevel()));
@@ -214,6 +265,11 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
             updateState(CH_ID_ARTIST, StringType.valueOf(player.getArtist()));
             updateState(CH_ID_ALBUM, StringType.valueOf(player.getAlbum()));
             updateState(CH_ID_IMAGE_URL, StringType.valueOf(player.getImage_url()));
+            updateState(CH_ID_STATUS, StringType.valueOf(ONLINE));
+            updateState(CH_ID_STATION, StringType.valueOf(player.getStation()));
+            updateState(CH_ID_TYPE, StringType.valueOf(player.getType()));
+            updateState(CH_ID_CUR_POS, StringType.valueOf("0"));
+            updateState(CH_ID_DURATION, StringType.valueOf("0"));
             updateState(CH_ID_INPUTS, StringType.valueOf("NULL"));
 
         }

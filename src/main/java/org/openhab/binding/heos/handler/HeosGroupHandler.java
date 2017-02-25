@@ -1,7 +1,7 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
-import static org.openhab.binding.heos.resources.HeosConstants.GID;
+import static org.openhab.binding.heos.resources.HeosConstants.*;
 
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -29,8 +29,9 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     private HeosAPI api;
     private HeosSystem heos;
     private String gid;
-
     private HeosGroup heosGroup;
+    private HeosBridgeHandler bridge;
+
     private Logger logger = LoggerFactory.getLogger(HeosGroupHandler.class);
 
     public HeosGroupHandler(Thing thing, HeosSystem heos, HeosAPI api) {
@@ -92,9 +93,28 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                 api.ungroupGroup(gid);
 
             }
-        }
+        } else if (channelUID.getId().equals(CH_ID_INPUTS)) { // See player handler for description
 
+            if (bridge.getSelectedPlayer().isEmpty()) {
+                api.playInputSource(gid, null, command.toString());
+            } else if (bridge.getSelectedPlayer().size() > 1) {
+                logger.warn("Only one source can be selected for HEOS Input. Selected amount of sources: {} ",
+                        bridge.getSelectedPlayer().size());
+                bridge.getSelectedPlayer().clear();
+            } else {
+                for (String source_pid : bridge.getSelectedPlayer().keySet()) {
+                    api.playInputSource(gid, source_pid, command.toString());
+                    bridge.getSelectedPlayer().clear();
+                }
+            }
+        }
     }
+
+    /**
+     * Init the HEOS group. Starts an extra thread to avoid blocking
+     * during start up phase. Gathering all information can take longer
+     * than 5 seconds which can throw an error within the openhab system.
+     */
 
     @Override
     public void initialize() {
@@ -158,6 +178,12 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                 }
 
             }
+            if (event.equals(CUR_POS)) {
+                this.updateState(CH_ID_CUR_POS, StringType.valueOf(command));
+            }
+            if (event.equals(DURATION)) {
+                this.updateState(CH_ID_DURATION, StringType.valueOf(command));
+            }
 
         }
 
@@ -183,12 +209,23 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                     case IMAGE_URL:
                         updateState(CH_ID_IMAGE_URL, StringType.valueOf(info.get(key)));
                         break;
-
+                    case STATION:
+                        if (info.get(SID).equals(INPUT_SID)) {
+                            updateState(CH_ID_INPUTS, StringType.valueOf(info.get(STATION)));
+                        }
+                        updateState(CH_ID_STATION, StringType.valueOf(info.get(key)));
+                        break;
+                    case TYPE:
+                        updateState(CH_ID_TYPE, StringType.valueOf(info.get(key)));
+                        if (info.get(key).equals(STATION)) {
+                            updateState(CH_ID_STATION, StringType.valueOf(info.get(STATION)));
+                        } else {
+                            updateState(CH_ID_STATION, StringType.valueOf("No Station"));
+                        }
+                        break;
                 }
-
             }
         }
-
     }
 
     @Override
@@ -208,21 +245,19 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
         @Override
         public void run() {
 
+            bridge = (HeosBridgeHandler) getBridge().getHandler();
+
             heosGroup = heos.getGroupState(gid);
 
-            HeosBridgeHandler bridge = (HeosBridgeHandler) getBridge().getHandler();
+            if (heosGroup.isOnline() || !thing.getConfiguration().get(NAME_HASH).equals(heosGroup.getNameHash())) {
 
-            if (!thing.getConfiguration().get(NAME_HASH).equals(heosGroup.getNameHash())) {
-                updateStatus(ThingStatus.OFFLINE);
                 setStatusOffline();
                 bridge.thingStatusOffline(thing.getUID());
-                updateState(CH_ID_STATUS, StringType.valueOf(OFFLINE));
                 return;
             }
 
-            // informs the System about the existing group
+            bridge.thingStatusOnline(thing.getUID()); // informs the System about the existing group
 
-            bridge.thingStatusOnline(thing.getUID());
             HashMap<String, HeosGroup> usedToFillOldGroupMap = new HashMap<>();
             usedToFillOldGroupMap.put(heosGroup.getNameHash(), heosGroup);
             heos.addHeosGroupToOldGroupMap(usedToFillOldGroupMap);
@@ -246,6 +281,11 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
             updateState(CH_ID_ARTIST, StringType.valueOf(heosGroup.getArtist()));
             updateState(CH_ID_ALBUM, StringType.valueOf(heosGroup.getAlbum()));
             updateState(CH_ID_IMAGE_URL, StringType.valueOf(heosGroup.getImage_url()));
+            updateState(CH_ID_STATION, StringType.valueOf(heosGroup.getStation()));
+            updateState(CH_ID_TYPE, StringType.valueOf(heosGroup.getType()));
+            updateState(CH_ID_CUR_POS, StringType.valueOf("0"));
+            updateState(CH_ID_DURATION, StringType.valueOf("0"));
+
             updateState(CH_ID_STATUS, StringType.valueOf(ONLINE));
 
         }
