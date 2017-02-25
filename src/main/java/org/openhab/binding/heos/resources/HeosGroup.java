@@ -20,6 +20,8 @@ public class HeosGroup extends HeosMediaObject {
     private String leader;
     private String nameHash;
     private String groupMembersHash;
+    private String groupUIDHash;
+    private boolean online;
 
     // Group State Variables
     private String state;
@@ -99,6 +101,18 @@ public class HeosGroup extends HeosMediaObject {
         Collections.sort(groupMemberPidList);
         groupMembersHash = Integer.toUnsignedString(groupMemberPidList.hashCode());
 
+    }
+
+    public String generateGroupUID() {
+
+        List<String> groupUIDHashList = new ArrayList<String>();
+        groupUIDHashList.add(name);
+        groupUIDHashList.add(gid);
+        groupUIDHashList.add(leader);
+        groupUIDHashList.add(groupMembersHash);
+        groupUIDHash = Integer.toUnsignedString(groupUIDHashList.hashCode());
+
+        return groupUIDHash;
     }
 
     private void initGroup() {
@@ -204,6 +218,18 @@ public class HeosGroup extends HeosMediaObject {
 
     public String getGroupMenberHash() {
         return groupMembersHash;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public String getGroupUIDHash() {
+        return groupUIDHash;
     }
 
 }
