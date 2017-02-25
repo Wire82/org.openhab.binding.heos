@@ -19,9 +19,9 @@ public class HeosConstants {
     public final static String COM_UNDER_PROCESS = "command under process";
 
     // Event Types
-    public final static String EVENTTYPE_SYSTEM = "system";
-    public final static String EVENTTYPE_EVENT = "event";
-    public final static String EVENTTYPE_THING = "thing";
+    public final static String EVENT_SYSTEM = "system";
+    public final static String EVENT_EVENT = "event";
+    public final static String EVENT_THING = "thing";
 
     // Event Commands
     public final static String COM_SING_IN = "sign_in";
@@ -31,6 +31,7 @@ public class HeosConstants {
 
     public final static String FAVORIT_SID = "1028";
     public final static String PLAYLISTS_SID = "1025";
+    public final static String INPUT_SID = "1027";
 
     public final static String CID = "cid";
     public final static String MID = "mid";
