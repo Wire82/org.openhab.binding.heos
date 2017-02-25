@@ -132,8 +132,24 @@ public class HeosAPI {
 
     }
 
-    public void playInputSource(String pid, String source) {
-        controller.send(controller.command().playInputSource(pid, source));
+    /**
+     * Plays a specified input source on the player.
+     * Set {@code source_pid} to null if destination and source is the same
+     * Input name as per specified in HEOS CLI Protocol
+     *
+     * @param des_pid the PID where the source shall be played
+     * @param source_pid the PID where the source is located. NULL if destination and source are the same
+     * @param input the input name
+     */
+
+    public void playInputSource(String des_pid, String source_pid, String input) {
+
+        if (source_pid == null) {
+            controller.send(controller.command().playInputSource(des_pid, des_pid, input));
+        } else {
+            controller.send(controller.command().playInputSource(des_pid, source_pid, input));
+        }
+
     }
 
     public void setActivePlayer(String playerID) {
