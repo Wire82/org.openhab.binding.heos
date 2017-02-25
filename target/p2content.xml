@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<units size='1'>
+  <unit id='org.openhab.binding.heos' version='0.1.4.201702231856'>
+    <update id='org.openhab.binding.heos' range='[0.0.0,0.1.4.201702231856)' severity='0'/>
+    <properties size='5'>
+      <property name='org.eclipse.equinox.p2.name' value='Heos Binding'/>
+      <property name='org.eclipse.equinox.p2.provider' value='openHAB'/>
+      <property name='maven-groupId' value='org.openhab.binding'/>
+      <property name='maven-artifactId' value='org.openhab.binding.heos'/>
+      <property name='maven-version' value='0.1.4-SNAPSHOT'/>
+    </properties>
+    <provides size='5'>
+      <provided namespace='org.eclipse.equinox.p2.iu' name='org.openhab.binding.heos' version='0.1.4.201702231856'/>
+      <provided namespace='osgi.bundle' name='org.openhab.binding.heos' version='0.1.4.201702231856'/>
+      <provided namespace='java.package' name='org.openhab.binding.heos' version='0.0.0'/>
+      <provided namespace='java.package' name='org.openhab.binding.heos.handler' version='0.0.0'/>
+      <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+    </provides>
+    <requires size='16'>
+      <required namespace='osgi.bundle' name='org.apache.commons.net' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.smarthome.config.discovery' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.jupnp' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.osgi' range='0.0.0'/>
+      <required namespace='java.package' name='com.google.common.collect' range='0.0.0'/>
+      <required namespace='java.package' name='com.google.gson' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.config.core' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.core.library.types' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.core.thing' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.core.thing.binding' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.core.thing.binding.builder' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.core.thing.type' range='0.0.0'/>
+      <required namespace='java.package' name='org.eclipse.smarthome.core.types' range='0.0.0'/>
+      <required namespace='java.package' name='org.openhab.binding.heos' range='0.0.0'/>
+      <required namespace='java.package' name='org.openhab.binding.heos.handler' range='0.0.0'/>
+      <required namespace='java.package' name='org.slf4j' range='0.0.0'/>
+    </requires>
+    <artifacts size='1'>
+      <artifact classifier='osgi.bundle' id='org.openhab.binding.heos' version='0.1.4.201702231856'/>
+    </artifacts>
+    <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+    <touchpointData size='1'>
+      <instructions size='1'>
+        <instruction key='manifest'>
+          Bundle-SymbolicName: org.openhab.binding.heos;singleton:=true&#xA;Bundle-Version: 0.1.4.201702231856&#xA;
+        </instruction>
+      </instructions>
+    </touchpointData>
+  </unit>
+</units>
