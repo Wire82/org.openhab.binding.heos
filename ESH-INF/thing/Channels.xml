@@ -24,7 +24,7 @@
         <item-type>Switch</item-type>
         <label>Ungroup</label>
      </channel-type>
-     <channel-type id="titel">
+     <channel-type id="title">
         <item-type>String </item-type>
         <label>Song</label>
      </channel-type>
@@ -64,13 +64,33 @@
         <item-type>Switch</item-type>
         <label>Reboot</label>
      </channel-type>       
-         <channel-type id="input">
+         <channel-type id="input" advanced="true">
         <item-type>String</item-type>
         <label>Input Source</label>
      </channel-type>
      <channel-type id="onlineStatus" advanced="true">
         <item-type>String</item-type>
         <label>Thing Status</label>
+     </channel-type>
+        <channel-type id="currentPosition" advanced="true">
+        <item-type>String</item-type>
+        <label>Current track position</label>
+     </channel-type>
+        <channel-type id="duration" advanced="true">
+        <item-type>String</item-type>
+        <label>Track duration</label>
+     </channel-type>
+        <channel-type id="rawCommand" advanced="true">
+        <item-type>String</item-type>
+        <label>Sending a HEOS command as specified within the HEOS CLI protocol</label>
+     </channel-type>
+       <channel-type id="type" advanced="true">
+        <item-type>String</item-type>
+        <label>The media currently played type (station, song, ...)</label>
+     </channel-type>
+       <channel-type id="station" advanced="true">
+        <item-type>String</item-type>
+        <label>The station name</label>
      </channel-type>
      
     
