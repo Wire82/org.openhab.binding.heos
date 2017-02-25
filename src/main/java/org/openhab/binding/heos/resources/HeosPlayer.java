@@ -19,6 +19,7 @@ public class HeosPlayer extends HeosMediaObject {
     private String network;
     private String lineout;
     private String gid;
+    private boolean online;
 
     // Player State Variables
     private String state;
@@ -240,6 +241,14 @@ public class HeosPlayer extends HeosMediaObject {
 
     public HashMap<String, String> getPlayerState() {
         return playerState;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 
 }
