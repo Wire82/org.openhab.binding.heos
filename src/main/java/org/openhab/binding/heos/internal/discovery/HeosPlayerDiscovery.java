@@ -105,7 +105,6 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
                 for (String groupGID : groupMap.keySet()) {
                     HeosGroup group = groupMap.get(groupGID);
-                    // ThingUID uid = new ThingUID(THING_TYPE_GROUP, groupMap.get(groupGID).getGid());
 
                     // uses an unsigned hashCode from the group name to identify the group and generates the Thing UID.
                     // Only the name does not work because it can consists non allowed characters. This also making it
@@ -131,20 +130,38 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
         }
 
+        removedPlayers();
         removedGroups();
 
     }
+
+    // Informs the system of removed groups by using the thingRemoved method.
 
     private void removedGroups() {
         HashMap<String, HeosGroup> removedGroupMap = new HashMap<>();
         removedGroupMap = bridge.getRemovedGroups();
         if (!removedGroupMap.isEmpty()) {
             for (String key : removedGroupMap.keySet()) {
-                // ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getGid());
-
                 // The same as above!
                 ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getNameHash());
                 logger.info("Removed HEOS Group: " + uid);
+                thingRemoved(uid);
+            }
+
+        }
+
+    }
+
+    // Informs the system of removed players by using the thingRemoved method.
+
+    private void removedPlayers() {
+        HashMap<String, HeosPlayer> removedPlayerMap = new HashMap<>();
+        removedPlayerMap = bridge.getRemovedPlayer();
+        if (!removedPlayerMap.isEmpty()) {
+            for (String key : removedPlayerMap.keySet()) {
+                // The same as above!
+                ThingUID uid = new ThingUID(THING_TYPE_PLAYER, removedPlayerMap.get(key).getPid());
+                logger.info("Removed HEOS Player: " + uid);
                 thingRemoved(uid);
             }
 
