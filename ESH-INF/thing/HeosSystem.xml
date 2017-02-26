@@ -51,6 +51,7 @@
                 <context>String</context>
                 <label>Heart Beat</label>
                 <description>The time in seconds for the HEOS heart beat (default = 360s)</description>
+                <default>360</default>
                 <required>false</required>
             </parameter>              
         </config-description>
