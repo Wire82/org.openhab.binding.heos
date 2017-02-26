@@ -37,7 +37,7 @@ This binding does not require any configuration via a .cfg file. The configurati
 ### Bridge Configuration
 The bridge can be added via the PaperUI. After adding the bridge the username and password can set by editing the thing via the PaperUI. For manual configuration the following parameter can be defined. The ipAddress has to be defined. All other fields are optional.
 ````
-Bridge heos:bridge:main "name" [ipAddress="192.168.0.1", name="Default", unserName"xxx", password="123456"]  
+Bridge heos:bridge:main "name" [ipAddress="192.168.0.1", name="Default", unserName="xxx", password="123456"]  
 ````
 
 ### Player Configuration
