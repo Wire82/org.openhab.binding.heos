@@ -51,12 +51,14 @@ Pid behind the heos:player:--- should be changed as required. Every name or valu
 *If player is configured by PaperUI the UID of the player is equal to the player ID (PID) from the HEOS system*
 
 ### Group Configuration
+
 ```
-Thing heos:group:pid "name" [gid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx", type="Group"] 
+Thing heos:group:nameHash "name" [gid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx", type="Group", nameHash="123456789"] 
 ```
 
-*If group is configured by PaperUI the groud UID is calcualted by the Hash value of the group name*
+*If group is configured by PaperUI the group UID is calculated by the Hash value of the group name*
 
+Required fields are the GID which is the PID of the group leading player and the nameHash which is also be used for defining the group UID.  
 
 ### Defining Bridge and Players together
 
