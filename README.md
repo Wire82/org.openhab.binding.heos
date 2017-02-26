@@ -65,9 +65,9 @@ Defining Player and Bridge together. To ensure that the players and groups are a
 ```
 Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", name="Bridge", userName="userName", password="123456"] {
 	
-	player Kitchen "Kitchen"[pid="434523813", name="Kitchen"]
-	player LivingRoom "Living Room"[pid="918797451", name="Living Room"]
-  	player 813793755 "Bath Room"[pid="813793755", name="Bath Room"]
+	player Kitchen "Kitchen"[pid="434523813", name="Kitchen", type="Player"]
+	player LivingRoom "Living Room"[pid="918797451", name="Living Room", type="Player"]
+  	player 813793755 "Bath Room"[pid="813793755", name="Bath Room", type="Player"]
 	
 }
 ```
@@ -218,9 +218,9 @@ Example
 ```
 Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", name="Bridge", userName="userName", password="123456"] {
 	
-	player Kitchen "Kitchen"[pid="434523813", name="Kitchen"]
-	player LivingRoom "Living Room"[pid="918797451", name="Living Room"]
-  	player 813793755 "Bath Room"[pid="813793755", name="Bath Room"]
+	player Kitchen "Kitchen"[pid="434523813", name="Kitchen", type="Player"]
+	player LivingRoom "Living Room"[pid="918797451", name="Living Room", type="Player"]
+  	player 813793755 "Bath Room"[pid="813793755", name="Bath Room", type="Player"]
 	
 }
 ```
