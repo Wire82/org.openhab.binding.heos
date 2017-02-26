@@ -94,9 +94,6 @@ public class HeosBindingConstants {
     public final static String NAME_HASH = "nameHash";
     public final static String GROUP_MEMBER_HASH = "groupMemberHash";
 
-    // Time Constants
-    public final static String HEART_BEAT_DELAY = "80";
-
     public static Set<ThingTypeUID> supportedThingTypes() {
 
         Set<ThingTypeUID> supportedThings = Sets.newHashSet(THING_TYPE_BRIDGE, THING_TYPE_GROUP, THING_TYPE_PLAYER);
