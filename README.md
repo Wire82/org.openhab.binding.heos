@@ -87,7 +87,7 @@ Channel ID | Item Type | Description
 Control | Player | Play (also ON) / Pause (also OFF) / Next / Previous
 Volume | Dimmer | Volume control
 Mute | Switch | Mute the Player
-Titel | String | Song Title
+Title | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
 Image_URL | String |The URL where the cover can be found 
@@ -112,7 +112,7 @@ Channel ID | Item Type | Description
 Control | Player | Play (also ON) / Pause (also OFF) / Next / Previous
 Volume | Dimmer | Volume control
 Mute | Switch | Mute the Group
-Titel | String | Song Title
+Title | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
 Ungroup | Switch | Ungroup the group
@@ -233,7 +233,7 @@ Bridge heos:bridge:main "Bridge" [ipAddress="192.168.0.1", name="Bridge", userNa
 Player LivingRoom_Control "Control" {channel="heos:player:main:LivingRoom:Control"}
 Switch LivingRoom_Mute "Mute"{channel="heos:player:main:LivingRoom:Mute"}
 Dimmer LivingRoom_Volume "Volume" {channel="heos:player:main:LivingRoom:Volume"}
-String LivingRoom_Title "Title [%s]" {channel="heos:player:main:LivingRoom:Titel"}
+String LivingRoom_Title "Title [%s]" {channel="heos:player:main:LivingRoom:Title"}
 String LivingRoom_Interpret "Interpret [%s]" {channel="heos:player:main:LivingRoom:Interpret"}
 String LivingRoom_Album "Album [%s]" {channel="heos:player:main:LivingRoom:Album"}
 
