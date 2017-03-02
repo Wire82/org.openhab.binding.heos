@@ -211,7 +211,8 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                         break;
                     case STATION:
                         if (info.get(SID).equals(INPUT_SID)) {
-                            updateState(CH_ID_INPUTS, StringType.valueOf(info.get(STATION)));
+                            String inputName = info.get(MID).substring(info.get(MID).indexOf("/") + 1);
+                            updateState(CH_ID_INPUTS, StringType.valueOf(inputName));
                         }
                         updateState(CH_ID_STATION, StringType.valueOf(info.get(key)));
                         break;
