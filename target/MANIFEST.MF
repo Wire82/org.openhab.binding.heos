@@ -3,18 +3,18 @@ Bundle-SymbolicName: org.openhab.binding.heos;singleton:=true
 Export-Package: org.openhab.binding.heos,org.openhab.binding.heos.hand
  ler
 Bundle-Name: Heos Binding
-Bundle-Version: 0.1.4.201702231856
+Bundle-Version: 0.1.6.201703121717
 Bundle-ClassPath: .
-Require-Bundle: org.apache.commons.net,org.eclipse.smarthome.config.di
- scovery,org.jupnp,org.eclipse.osgi
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: openHAB
-Import-Package: com.google.common.collect,com.google.gson,org.eclipse.
- smarthome.config.core,org.eclipse.smarthome.core.library.types,org.ec
- lipse.smarthome.core.thing,org.eclipse.smarthome.core.thing.binding,o
- rg.eclipse.smarthome.core.thing.binding.builder,org.eclipse.smarthome
- .core.thing.type,org.eclipse.smarthome.core.types,org.openhab.binding
- .heos,org.openhab.binding.heos.handler,org.slf4j
+Import-Package: com.google.common.collect,com.google.gson,org.apache.c
+ ommons.net,org.apache.commons.net.telnet,org.eclipse.smarthome.config
+ .core,org.eclipse.smarthome.config.discovery,org.eclipse.smarthome.co
+ re.library.types,org.eclipse.smarthome.core.thing,org.eclipse.smartho
+ me.core.thing.binding,org.eclipse.smarthome.core.thing.binding.builde
+ r,org.eclipse.smarthome.core.thing.type,org.eclipse.smarthome.core.ty
+ pes,org.jupnp.model.meta,org.jupnp.model.types,org.openhab.binding.he
+ os,org.openhab.binding.heos.handler,org.osgi.framework,org.slf4j
 Service-Component: OSGI-INF/*.xml
 
