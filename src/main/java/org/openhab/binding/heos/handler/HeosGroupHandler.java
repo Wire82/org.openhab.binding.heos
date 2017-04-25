@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
@@ -24,6 +31,12 @@ import org.openhab.binding.heos.resources.HeosGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The {@link HeosGroupHandler} handles the actions for a HEOS group.
+ * Channel commands are received and send to the dedicated channels
+ *
+ * @author Johannes Einig - Initial contribution
+ */
 public class HeosGroupHandler extends BaseThingHandler implements HeosEventListener {
 
     private HeosAPI api;

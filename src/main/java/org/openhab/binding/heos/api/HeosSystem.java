@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.heos.api;
 
 import static org.openhab.binding.heos.resources.HeosConstants.*;
@@ -24,6 +31,13 @@ import org.openhab.binding.heos.resources.Telnet;
 import org.openhab.binding.heos.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+/**
+ * The {@link HeosSystem} is handling the main commands, which are
+ * send and received by the HEOS system.
+ *
+ * @author Johannes Einig - Initial contribution
+ */
 
 public class HeosSystem {
 

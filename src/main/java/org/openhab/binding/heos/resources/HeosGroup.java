@@ -1,9 +1,23 @@
+/**
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.heos.resources;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+/**
+ * The {@link HeosGroup} represents the group within the
+ * HEOS network
+ *
+ * @author Johannes Einig - Initial contribution
+ */
 
 public class HeosGroup extends HeosMediaObject {
 
