@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2014-2016 by the respective copyright holders.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.heos.resources;
 
 import java.lang.reflect.Type;
@@ -12,6 +19,13 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+
+/**
+ * The {@link HeosDeserializePayload} decodes the payload part of the
+ * JSON message received from the HEOS bridge
+ *
+ * @author Johannes Einig - Initial contribution
+ */
 
 public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePayload> {
 
@@ -99,6 +113,7 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
                 } else {
 
                     payload.put(entry.getKey(), entry.getValue().getAsString());
+                    // Debug
                     // System.out.println(entry.getKey()+ ": " + entry.getValue());
                 }
 
