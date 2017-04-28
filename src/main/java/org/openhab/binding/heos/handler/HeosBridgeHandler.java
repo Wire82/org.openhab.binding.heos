@@ -433,6 +433,13 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     }
 
+    /**
+     * Create a channel for the childThing. Depending if it is a HEOS Group
+     * or a player an identification prefix is added
+     *
+     * @param childThing the thing the channel is created for
+     */
+
     private void addPlayerChannel(Thing childThing) {
         String channelIdentifyer = "";
         String pid = "";
