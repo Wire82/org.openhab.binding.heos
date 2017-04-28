@@ -22,7 +22,7 @@
      </channel-type>
      <channel-type id="ungroup">
         <item-type>Switch</item-type>
-        <label>Ungroup</label>
+        <label>Group</label>
      </channel-type>
      <channel-type id="title">
         <item-type>String </item-type>

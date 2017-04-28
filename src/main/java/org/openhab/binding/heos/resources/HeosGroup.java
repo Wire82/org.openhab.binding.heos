@@ -27,6 +27,8 @@ public class HeosGroup extends HeosMediaObject {
     private HashMap<String, String> groupInfo;
     private HashMap<String, String> groupState;
     private List<HashMap<String, String>> playerList;
+    private List<String> groupMemberPidList;
+    private List<String> groupMemberPidListSorted;
 
     // Group Infos Variables
     private String name;
@@ -106,14 +108,18 @@ public class HeosGroup extends HeosMediaObject {
 
     public void updateGroupPlayers(List<HashMap<String, String>> playerList) {
         this.playerList = playerList;
-        List<String> groupMemberPidList = new ArrayList<String>(10);
+        groupMemberPidList = new ArrayList<String>(playerList.size());
         for (int i = 0; i < this.playerList.size(); i++) {
             HashMap<String, String> player = playerList.get(i);
             groupMemberPidList.add(player.get(PID));
 
         }
-        Collections.sort(groupMemberPidList);
-        groupMembersHash = Integer.toUnsignedString(groupMemberPidList.hashCode());
+        // Generating a dedicated sorted and un-sorted list for different purposes
+        groupMemberPidListSorted = new ArrayList<String>(playerList.size());
+        groupMemberPidListSorted.addAll(groupMemberPidList);
+        Collections.reverse(groupMemberPidList); // List has to be reversed so that leader is at the beginning
+        Collections.sort(groupMemberPidListSorted);
+        groupMembersHash = Integer.toUnsignedString(groupMemberPidListSorted.hashCode());
 
     }
 
@@ -230,7 +236,7 @@ public class HeosGroup extends HeosMediaObject {
         return nameHash;
     }
 
-    public String getGroupMenberHash() {
+    public String getGroupMemberHash() {
         return groupMembersHash;
     }
 
@@ -244,6 +250,10 @@ public class HeosGroup extends HeosMediaObject {
 
     public String getGroupUIDHash() {
         return groupUIDHash;
+    }
+
+    public List<String> getGroupMemberPidList() {
+        return groupMemberPidList;
     }
 
 }

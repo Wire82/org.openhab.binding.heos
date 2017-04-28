@@ -102,10 +102,13 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
             }
         } else if (channelUID.getId().equals(CH_ID_UNGROUP)) {
 
-            if (command.toString().equals("ON")) {
+            if (command.toString().equals("OFF")) {
                 api.ungroupGroup(gid);
-
+            } else if (command.toString().equals("ON")) {
+                String[] playerArray = heosGroup.getGroupMemberPidList().toArray(new String[0]);
+                api.groupPlayer(playerArray);
             }
+
         } else if (channelUID.getId().equals(CH_ID_INPUTS)) { // See player handler for description
 
             if (bridge.getSelectedPlayer().isEmpty()) {
@@ -276,7 +279,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
             usedToFillOldGroupMap.put(heosGroup.getNameHash(), heosGroup);
             heos.addHeosGroupToOldGroupMap(usedToFillOldGroupMap);
 
-            updateState(CH_ID_UNGROUP, OnOffType.OFF);
+            updateState(CH_ID_UNGROUP, OnOffType.ON);
             updateState(CH_ID_VOLUME, PercentType.valueOf(heosGroup.getLevel()));
 
             if (heosGroup.getMute().equals(ON)) {
