@@ -219,7 +219,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
      */
 
     @Override
-    public void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
+    public synchronized void childHandlerInitialized(ThingHandler childHandler, Thing childThing) {
         handlerList.put(childThing.getUID(), childHandler);
         thingOnlineState.put(childThing.getUID(), ThingStatus.ONLINE);
         this.addPlayerChannel(childThing);
@@ -235,7 +235,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
      */
 
     @Override
-    public void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
+    public synchronized void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
 
         if (this.getThing().getStatus().equals(ThingStatus.OFFLINE)) { // Prevents to change channels if bridge is
                                                                        // offline.
