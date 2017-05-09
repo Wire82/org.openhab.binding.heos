@@ -58,7 +58,7 @@ Thing heos:group:nameHash "name" [gid="123456789", name="name", model="modelName
 
 *If group is configured by PaperUI the group UID is calculated by the Hash value of the group name*
 
-Required fields are the GID which is the PID of the group leading player and the nameHash which is also be used for defining the group UID.  
+Required fields are the GID which is the PID of the group leading player and the type which is Group here.  
 
 ### Defining Bridge and Players together
 
