@@ -52,7 +52,7 @@
                 <parameter name="nameHash" type="text" readOnly="true">
                     <label>Group name Hash Value</label>
                     <description> The Hash value calculated by the Group Name</description>
-                    <required>true</required>
+                    <required>false</required>
                 </parameter> 
                 <parameter name="groupMemberHash" type="text" readOnly="true">
                     <label>Group member Hash Value</label>
