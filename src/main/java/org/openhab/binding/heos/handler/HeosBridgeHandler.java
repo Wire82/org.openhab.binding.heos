@@ -92,6 +92,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         Channel channel = this.thing.getChannel(channelUID.getId());
         if (channel == null) {
             logger.error("Channel {} not found", channelUID.toString());
+            return;
         }
         if (channel.getChannelTypeUID().toString().equals("heos:ch_player")) {
             if (command.toString().equals("ON")) {
