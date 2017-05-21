@@ -20,6 +20,7 @@ import org.eclipse.smarthome.config.discovery.UpnpDiscoveryParticipant;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.jupnp.model.meta.DeviceDetails;
+import org.jupnp.model.meta.ManufacturerDetails;
 import org.jupnp.model.meta.ModelDetails;
 import org.jupnp.model.meta.RemoteDevice;
 import org.slf4j.Logger;
@@ -59,7 +60,6 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             // System.out.println(device.getDetails().getManufacturerDetails().getManufacturer());
             // System.out.println(device.getDetails().getModelDetails().getModelName());
             // System.out.println(device.getIdentity().getDescriptorURL().getHost().toString());
-            // System.out.println(device.getIdentity().getInterfaceMacAddress().toString());
             // System.out.println(device.getIdentity().getUdn().getIdentifierString());
             // System.out.println(device.getType().getType() + "\n");
 
@@ -75,15 +75,20 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
         DeviceDetails details = device.getDetails();
         if (details != null) {
             ModelDetails modelDetails = details.getModelDetails();
-            if (modelDetails != null) {
+            ManufacturerDetails modelManufacturerDetails = details.getManufacturerDetails();
+            if (modelDetails != null && modelManufacturerDetails != null) {
                 String modelName = modelDetails.getModelName();
-                if (modelName != null) {
-                    if (modelName.startsWith("HEOS")) {
-                        if (device.getType().getType().startsWith("ACT")) {
-                            return new ThingUID(THING_TYPE_BRIDGE, device.getIdentity().getUdn().getIdentifierString());
-
+                String modelManufacturer = modelManufacturerDetails.getManufacturer();
+                if (modelName != null && modelManufacturer != null) {
+                    if (modelManufacturer.equals("Denon")) {
+                        if (modelName.startsWith("HEOS") || modelName.endsWith("H")) {
+                            if (device.getType().getType().startsWith("ACT")) {
+                                return new ThingUID(THING_TYPE_BRIDGE,
+                                        device.getIdentity().getUdn().getIdentifierString());
+                            }
                         }
                     }
+
                 }
             }
 
