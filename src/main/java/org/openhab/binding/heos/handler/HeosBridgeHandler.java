@@ -56,6 +56,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     private HashMap<ThingUID, ThingHandler> handlerList = new HashMap<>();
     private HashMap<String, String> selectedPlayer = new HashMap<String, String>();
+    private ArrayList<String[]> selectedPlayerList = new ArrayList<String[]>();
     private HashMap<ThingUID, ThingStatus> thingOnlineState = new HashMap<ThingUID, ThingStatus>();
 
     private ScheduledExecutorService initPhase;
@@ -96,54 +97,66 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         }
         if (channel.getChannelTypeUID().toString().equals("heos:ch_player")) {
             if (command.toString().equals("ON")) {
-                selectedPlayer.put(channel.getProperties().get(PID), channelUID.getId());
+                String[] selectedPlayerInfo = new String[2];
+                selectedPlayerInfo[0] = channel.getProperties().get(PID);
+                selectedPlayerInfo[1] = channelUID.getId();
+                selectedPlayerList.add(selectedPlayerInfo);
+
             } else {
-                selectedPlayer.remove(channel.getProperties().get(PID));
+
+                int indexPlayerChannel = -1;
+                for (int i = 0; i < selectedPlayerList.size(); i++) {
+                    String localPID = selectedPlayerList.get(i)[0];
+                    if (localPID == channel.getProperties().get(PID)) {
+                        indexPlayerChannel = i;
+                    }
+                }
+
+                selectedPlayerList.remove(indexPlayerChannel);
+
             }
 
         }
         if (channel.getChannelTypeUID().toString().equals("heos:ch_favorit")) {
             if (command.toString().equals("ON")) {
-                if (!selectedPlayer.isEmpty()) {
-                    for (String key : selectedPlayer.keySet()) {
-                        String pid = key;
-                        String mid = channelUID.getId();
+                if (!selectedPlayerList.isEmpty()) {
+                    for (int i = 0; i < selectedPlayerList.size(); i++) {
+                        String pid = selectedPlayerList.get(i)[0];
+                        String mid = selectedPlayerList.get(i)[1];
                         api.playStation(pid, FAVORIT_SID, null, mid, null);
                         updateState(channelUID, OnOffType.OFF);
                     }
                 }
-                selectedPlayer.clear();
+                selectedPlayerList.clear();
             }
         }
 
         if (channelUID.getId().equals(CH_ID_PLAYLISTS)) {
             logger.debug("Start Playlist with {}", command.toString());
-            if (!selectedPlayer.isEmpty()) {
-                for (String key : selectedPlayer.keySet()) {
-                    String pid = key;
+            if (!selectedPlayerList.isEmpty()) {
+                for (int i = 0; i < selectedPlayerList.size(); i++) {
+                    String pid = selectedPlayerList.get(i)[0];
                     String cid = heosPlaylists.get(Integer.valueOf(command.toString()));
                     api.addContainerToQueuePlayNow(pid, PLAYLISTS_SID, cid);
                 }
             }
-            selectedPlayer.clear();
+            selectedPlayerList.clear();
         }
 
         if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
             if (command.toString().equals("ON")) {
-                if (!selectedPlayer.isEmpty()) {
-                    String[] player = new String[selectedPlayer.size()];
-                    int i = 0;
-                    for (String key : selectedPlayer.keySet()) {
-                        player[i] = key;
-                        ++i;
+                if (!selectedPlayerList.isEmpty()) {
+                    String[] player = new String[selectedPlayerList.size()];
+                    for (int i = 0; i < selectedPlayerList.size(); i++) {
+                        player[i] = selectedPlayerList.get(i)[0];
                     }
 
                     api.groupPlayer(player);
 
-                    for (String key : selectedPlayer.keySet()) {
-                        updateState(selectedPlayer.get(key), OnOffType.OFF);
+                    for (int i = 0; i < selectedPlayerList.size(); i++) {
+                        updateState(selectedPlayerList.get(i)[1], OnOffType.OFF);
                     }
-                    selectedPlayer.clear();
+                    selectedPlayerList.clear();
                     updateState(CH_ID_BUILDGROUP, OnOffType.OFF);
                 }
 
@@ -559,10 +572,14 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     /**
      * The list with the currently selected player
      *
-     * @return a list which the currently selected player
+     * @return a HashMap which the currently selected player
      */
 
     public HashMap<String, String> getSelectedPlayer() {
+        selectedPlayer.clear();
+        for (int i = 0; i < selectedPlayerList.size(); i++) {
+            selectedPlayer.put(selectedPlayerList.get(i)[0], selectedPlayerList.get(i)[1]);
+        }
         return selectedPlayer;
     }
 
