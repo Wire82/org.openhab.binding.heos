@@ -135,6 +135,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     @Override
     public void initialize() {
 
+        this.gid = this.thing.getConfiguration().get(GID).toString();
         api.registerforChangeEvents(this);
         ScheduledExecutorService executerPool = Executors.newScheduledThreadPool(1);
         executerPool.schedule(new InitializationRunnable(), 4, TimeUnit.SECONDS);
@@ -254,6 +255,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     public void setStatusOffline() {
         api.unregisterforChangeEvents(this);
         updateState(CH_ID_STATUS, StringType.valueOf(OFFLINE));
+        updateState(CH_ID_UNGROUP, OnOffType.OFF);
         updateStatus(ThingStatus.OFFLINE);
     }
 
