@@ -117,7 +117,7 @@ public class HeosGroup extends HeosMediaObject {
         // Generating a dedicated sorted and un-sorted list for different purposes
         groupMemberPidListSorted = new ArrayList<String>(playerList.size());
         groupMemberPidListSorted.addAll(groupMemberPidList);
-        Collections.reverse(groupMemberPidList); // List has to be reversed so that leader is at the beginning
+        // Collections.reverse(groupMemberPidList); // List has to be reversed so that leader is at the beginning
         Collections.sort(groupMemberPidListSorted);
         groupMembersHash = Integer.toUnsignedString(groupMemberPidListSorted.hashCode());
 
