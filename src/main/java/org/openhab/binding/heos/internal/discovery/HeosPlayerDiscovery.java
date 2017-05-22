@@ -125,7 +125,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
                     // possible to add player to a group. Keeping the Name lets the binding still identifying the group
                     // as known
 
-                    ThingUID uid = new ThingUID(THING_TYPE_GROUP, group.getNameHash());
+                    ThingUID uid = new ThingUID(THING_TYPE_GROUP, group.getGroupMemberHash());
                     HashMap<String, Object> properties = new HashMap<String, Object>();
                     properties.put(NAME, group.getName());
                     properties.put(GID, group.getGid());
