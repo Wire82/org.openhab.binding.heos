@@ -268,7 +268,8 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
 
             heosGroup = heos.getGroupState(gid);
 
-            if (heosGroup.isOnline() || !thing.getConfiguration().get(NAME_HASH).equals(heosGroup.getNameHash())) {
+            if (heosGroup.isOnline()
+                    || !thing.getConfiguration().get(GROUP_MEMBER_HASH).equals(heosGroup.getGroupMemberHash())) {
 
                 setStatusOffline();
                 bridge.thingStatusOffline(thing.getUID());
@@ -304,7 +305,6 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
             updateState(CH_ID_TYPE, StringType.valueOf(heosGroup.getType()));
             updateState(CH_ID_CUR_POS, StringType.valueOf("0"));
             updateState(CH_ID_DURATION, StringType.valueOf("0"));
-
             updateState(CH_ID_STATUS, StringType.valueOf(ONLINE));
 
         }
