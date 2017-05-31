@@ -157,7 +157,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         if (!removedGroupMap.isEmpty()) {
             for (String key : removedGroupMap.keySet()) {
                 // The same as above!
-                ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getNameHash());
+                ThingUID uid = new ThingUID(THING_TYPE_GROUP, removedGroupMap.get(key).getGroupMemberHash());
                 logger.info("Removed HEOS Group: " + uid);
                 thingRemoved(uid);
             }
