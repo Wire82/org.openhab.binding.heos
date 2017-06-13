@@ -46,17 +46,17 @@ For manual configuration the player is defined as followed:
 ````
 Thing heos:player:pid "name" [pid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx", type="Player"] 
 ````
-Pid behind the heos:player:--- should be changed as required. Every name or value can be used. It is recommended to use the player Pid. Within the configuration the pid as well as the type field is mandatory. The rest is not required.
+PID behind the heos:player:--- should be changed as required. Every name or value can be used. It is recommended to use the player PID. Within the configuration the PID as well as the type field is mandatory. The rest is not required.
 
 *If player is configured by PaperUI the UID of the player is equal to the player ID (PID) from the HEOS system*
 
 ### Group Configuration
 
 ```
-Thing heos:group:nameHash "name" [gid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx", type="Group", nameHash="123456789"] 
+Thing heos:group:memberHash "name" [gid="123456789", name="name", model="modelName", ipAdress="192.168.0.xxx", type="Group", memberHash="123456789"] 
 ```
 
-*If group is configured by PaperUI the group UID is calculated by the Hash value of the group name*
+*If group is configured by PaperUI the group UID is calculated by the Hash value of the group members*
 
 Required fields are the GID which is the PID of the group leading player and the type which is Group here.  
 
@@ -115,10 +115,10 @@ Mute | Switch | Mute the Group
 Title | String | Song Title
 Interpret | String | Song Interpret
 Album | String  | Album Title
-Ungroup | Switch | Ungroup the group
+Ungroup | Switch | Deletes the group (OFF) or generate the group again (ON) 
 Image_URL | String |The URL where the cover can be found
 OnlineStatus | String | Indicates the status ONLINE or OFFLINE
-CurrentPosition | String | Shows the current trakc position in milliseconds
+CurrentPosition | String | Shows the current track position in milliseconds
 Duration | String | The overall track duration in milliseconds
 Type | String | The type of the played media. Station or song for example
 Station | String | The station name if it is a station (Spotify shows track name....)
