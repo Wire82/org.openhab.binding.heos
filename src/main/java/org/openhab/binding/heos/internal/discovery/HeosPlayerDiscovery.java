@@ -78,7 +78,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
         if (playerMap == null) {
             // Debug
-            System.out.println("Debug: Player Map = Null");
+            // System.out.println("Debug: Player Map = Null");
 
         } else {
 
@@ -109,7 +109,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
 
         if (playerMap == null) {
             // Debug
-            System.out.println("Debug: Player Map = Null");
+            // System.out.println("Debug: Player Map = Null");
 
         } else {
 
@@ -195,7 +195,7 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         logger.trace("scanningJob active");
 
         // Debug
-        System.out.println("start background discover");
+        // System.out.println("start background discover");
 
     }
 
