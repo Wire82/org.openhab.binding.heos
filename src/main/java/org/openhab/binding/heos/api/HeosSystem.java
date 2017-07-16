@@ -7,7 +7,7 @@
  */
 package org.openhab.binding.heos.api;
 
-import static org.openhab.binding.heos.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -21,14 +21,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.openhab.binding.heos.resources.HeosCommands;
-import org.openhab.binding.heos.resources.HeosGroup;
-import org.openhab.binding.heos.resources.HeosJsonParser;
-import org.openhab.binding.heos.resources.HeosPlayer;
-import org.openhab.binding.heos.resources.HeosResponse;
-import org.openhab.binding.heos.resources.HeosSendCommand;
-import org.openhab.binding.heos.resources.Telnet;
-import org.openhab.binding.heos.resources.Telnet.ReadException;
+import org.openhab.binding.heos.internal.resources.HeosCommands;
+import org.openhab.binding.heos.internal.resources.HeosGroup;
+import org.openhab.binding.heos.internal.resources.HeosJsonParser;
+import org.openhab.binding.heos.internal.resources.HeosPlayer;
+import org.openhab.binding.heos.internal.resources.HeosResponse;
+import org.openhab.binding.heos.internal.resources.HeosSendCommand;
+import org.openhab.binding.heos.internal.resources.Telnet;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -303,7 +303,8 @@ public class HeosSystem {
         });
     }
 
-    public synchronized void closeConnection() {
+    // Debug: Synchronized removed
+    public void closeConnection() {
         logger.info("Shutting down HEOS Heart Beat");
         keepAlive.shutdown();
         logger.info("Stopping HEOS event line listener");
