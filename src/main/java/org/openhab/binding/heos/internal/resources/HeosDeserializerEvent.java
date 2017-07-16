@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.resources;
+package org.openhab.binding.heos.internal.resources;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -42,8 +42,15 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
     public HeosResponseEvent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
 
-        final JsonObject jsonObject = json.getAsJsonObject();
-        final JsonObject jsonHeos = jsonObject.get("heos").getAsJsonObject();
+        final JsonObject jsonObject;
+        final JsonObject jsonHeos;
+
+        if (json.isJsonObject()) {
+            jsonObject = json.getAsJsonObject();
+            jsonHeos = jsonObject.get("heos").getAsJsonObject();
+        } else {
+            return null;
+        }
 
         // sets the Basic command String and decodes it afterwards to eventType and commandType
         this.rawCommand = jsonHeos.get("command").getAsString();
