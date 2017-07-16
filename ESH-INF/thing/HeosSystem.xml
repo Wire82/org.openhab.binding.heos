@@ -27,7 +27,7 @@
          <parameter name="name" type="text">
                <label>Player Type</label>
                 <description>Player Type of the Bridge.</description>
-                <required>true</required>
+                <required>false</required>
             </parameter>
             <parameter name="ipAddress" type="text">
                 <context>network_address</context>
