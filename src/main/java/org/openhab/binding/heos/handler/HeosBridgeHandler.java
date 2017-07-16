@@ -217,6 +217,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     @Override
     public void dispose() {
 
+        updateStatus(ThingStatus.OFFLINE);
         logger.info("HEOS bridge removed from change notifications");
         api.unregisterforChangeEvents(this);
         isRegisteredForChangeEvents = false;
@@ -225,6 +226,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         heos.closeConnection();
         initPhase.shutdownNow(); // Prevents doubled execution if openhab doubles intit of bridge
         bridgeIsConnected = false;
+
     }
 
     /**
@@ -252,12 +254,16 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     @Override
     public synchronized void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
 
-        if (this.getThing().getStatus().equals(ThingStatus.OFFLINE)) { // Prevents to change channels if bridge is
+        logger.error(this.getThing().getStatus().toString());
+
+        if (!this.getThing().getStatus().equals(ThingStatus.ONLINE)) { // Prevents to change channels if bridge is
                                                                        // offline.
+            logger.error("Not online");
             return;
         }
 
         if (childThing.getConfiguration().get(TYPE).equals(PLAYER)) {
+            logger.error("Remove Player");
             String channelIdentifyer = "P" + childThing.getConfiguration().get(PID).toString();
             this.removeChannel(CH_TYPE_PLAYER, channelIdentifyer);
 
