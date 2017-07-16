@@ -8,7 +8,7 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
-import static org.openhab.binding.heos.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +38,9 @@ import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
 import org.openhab.binding.heos.internal.discovery.HeosPlayerDiscovery;
-import org.openhab.binding.heos.resources.HeosEventListener;
-import org.openhab.binding.heos.resources.HeosGroup;
-import org.openhab.binding.heos.resources.HeosPlayer;
+import org.openhab.binding.heos.internal.resources.HeosEventListener;
+import org.openhab.binding.heos.internal.resources.HeosGroup;
+import org.openhab.binding.heos.internal.resources.HeosPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,6 +223,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         loggedIn = false;
         logger.info("Dispose Brige '{}'", thing.getConfiguration().get(NAME));
         heos.closeConnection();
+        initPhase.shutdownNow(); // Prevents doubled execution if openhab doubles intit of bridge
         bridgeIsConnected = false;
     }
 

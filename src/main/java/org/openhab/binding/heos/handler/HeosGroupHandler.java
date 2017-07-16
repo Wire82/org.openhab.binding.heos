@@ -8,7 +8,7 @@
 package org.openhab.binding.heos.handler;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
-import static org.openhab.binding.heos.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -26,8 +26,8 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.api.HeosAPI;
 import org.openhab.binding.heos.api.HeosSystem;
-import org.openhab.binding.heos.resources.HeosEventListener;
-import org.openhab.binding.heos.resources.HeosGroup;
+import org.openhab.binding.heos.internal.resources.HeosEventListener;
+import org.openhab.binding.heos.internal.resources.HeosGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -7,7 +7,7 @@
  */
 package org.openhab.binding.heos.api;
 
-import org.openhab.binding.heos.resources.HeosEventListener;
+import org.openhab.binding.heos.internal.resources.HeosEventListener;
 
 /**
  * The {@link HeosAPI} is the interface for handling commands, which are

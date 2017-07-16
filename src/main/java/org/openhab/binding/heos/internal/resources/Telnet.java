@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.resources;
+package org.openhab.binding.heos.internal.resources;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;

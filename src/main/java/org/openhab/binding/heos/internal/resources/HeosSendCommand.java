@@ -5,15 +5,15 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.resources;
+package org.openhab.binding.heos.internal.resources;
 
-import static org.openhab.binding.heos.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.openhab.binding.heos.api.HeosEventController;
-import org.openhab.binding.heos.resources.Telnet.ReadException;
+import org.openhab.binding.heos.internal.resources.Telnet.ReadException;
 
 /**
  * The {@link HeosSendCommand} is responsibel to send a command

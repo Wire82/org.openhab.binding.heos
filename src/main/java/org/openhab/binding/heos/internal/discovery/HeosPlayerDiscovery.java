@@ -8,7 +8,7 @@
 package org.openhab.binding.heos.internal.discovery;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
-import static org.openhab.binding.heos.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -21,8 +21,8 @@ import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
-import org.openhab.binding.heos.resources.HeosGroup;
-import org.openhab.binding.heos.resources.HeosPlayer;
+import org.openhab.binding.heos.internal.resources.HeosGroup;
+import org.openhab.binding.heos.internal.resources.HeosPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

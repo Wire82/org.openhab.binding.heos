@@ -7,12 +7,12 @@
  */
 package org.openhab.binding.heos.api;
 
-import static org.openhab.binding.heos.resources.HeosConstants.*;
+import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
-import org.openhab.binding.heos.resources.HeosCommands;
-import org.openhab.binding.heos.resources.HeosResponse;
-import org.openhab.binding.heos.resources.MyEventListener;
+import org.openhab.binding.heos.internal.resources.HeosCommands;
+import org.openhab.binding.heos.internal.resources.HeosResponse;
+import org.openhab.binding.heos.internal.resources.MyEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
