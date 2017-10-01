@@ -45,6 +45,7 @@ public class HeosCommands {
     private String playPrevious = "heos://player/play_previous?pid=";
     private String playQueueItem = "heos://player/play_queue?pid=";
     private String clearQueue = "heos://player/clear_queue?pid=";
+    private String deleteQueueItem = "heos://player/remove_from_queue?pid=";
     // private String saveQueueToPlayList = ""
 
     // Group Commands Control
@@ -75,6 +76,7 @@ public class HeosCommands {
     private String playStation = "heos://browse/play_stream?pid=";
     private String addToQueue = "heos://browse/add_to_queue?pid=";
     private String playInputSource = "heos://browse/play_input?pid=";
+    private String playURL = "heos://browse/play_stream?pid=";
 
     public HeosCommands() {
 
@@ -189,8 +191,12 @@ public class HeosCommands {
         return getQueue + pid;
     }
 
-    public String playQueueItem(String pid) {
-        return playQueueItem + pid;
+    public String playQueueItem(String pid, String qid) {
+        return playQueueItem + pid + "&qid=" + qid;
+    }
+
+    public String deleteQueueItem(String pid, String qid) {
+        return deleteQueueItem + pid + "&qid=" + qid;
     }
 
     public String BrowseSource(String sid) {
@@ -248,6 +254,11 @@ public class HeosCommands {
         this.username = username;
         this.password = password;
         signIn = "heos://system/sign_in?un=" + this.username + "&pw=" + this.password;
+    }
+
+    public String playURL(String pid, String url) {
+
+        return playURL + pid + "&url=" + url;
     }
 
     public String signIn() {
