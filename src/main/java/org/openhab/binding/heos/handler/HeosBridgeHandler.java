@@ -123,7 +123,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 if (!selectedPlayerList.isEmpty()) {
                     for (int i = 0; i < selectedPlayerList.size(); i++) {
                         String pid = selectedPlayerList.get(i)[0];
-                        String mid = channel.getProperties().get(MID);
+                        String mid = channelUID.getId(); // the channel ID represents the MID of the favorite
                         api.playStation(pid, FAVORIT_SID, null, mid, null);
                         updateState(channelUID, OnOffType.OFF);
                     }
