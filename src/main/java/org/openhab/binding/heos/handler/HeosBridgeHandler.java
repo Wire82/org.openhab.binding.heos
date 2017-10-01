@@ -104,16 +104,16 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 selectedPlayerList.add(selectedPlayerInfo);
 
             } else {
-
-                int indexPlayerChannel = -1;
-                for (int i = 0; i < selectedPlayerList.size(); i++) {
-                    String localPID = selectedPlayerList.get(i)[0];
-                    if (localPID == channel.getProperties().get(PID)) {
-                        indexPlayerChannel = i;
+                if (!selectedPlayerList.isEmpty()) {
+                    int indexPlayerChannel = -1;
+                    for (int i = 0; i < selectedPlayerList.size(); i++) {
+                        String localPID = selectedPlayerList.get(i)[0];
+                        if (localPID == channel.getProperties().get(PID)) {
+                            indexPlayerChannel = i;
+                        }
                     }
+                    selectedPlayerList.remove(indexPlayerChannel);
                 }
-
-                selectedPlayerList.remove(indexPlayerChannel);
 
             }
 
@@ -123,7 +123,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 if (!selectedPlayerList.isEmpty()) {
                     for (int i = 0; i < selectedPlayerList.size(); i++) {
                         String pid = selectedPlayerList.get(i)[0];
-                        String mid = selectedPlayerList.get(i)[1];
+                        String mid = channel.getProperties().get(MID);
                         api.playStation(pid, FAVORIT_SID, null, mid, null);
                         updateState(channelUID, OnOffType.OFF);
                     }
