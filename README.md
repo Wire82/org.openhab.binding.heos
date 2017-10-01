@@ -101,7 +101,7 @@ CurrentPosition | String | Shows the current trakc position in milliseconds
 Duration | String | The overall track duration in milliseconds
 Type | String | The type of the played media. Station or song for example
 Station | String | The station name if it is a station (Spotify shows track name....)
-Play URL | String | Plays a media file located at the URL
+PlayURL | String | Plays a media file located at the URL
 
 
 ####Example:
@@ -128,7 +128,7 @@ Duration | String | The overall track duration in milliseconds
 Type | String | The type of the played media. Station or song for example
 Station | String | The station name if it is a station (Spotify shows track name....)
 Inputs | String | The input to be switched to. Input values from HEOS protocol
-Play URL | String | Plays a media file located at the URL
+PlayURL | String | Plays a media file located at the URL
 
 #### Inputs depending on Player type (Date 12.02.2017):
 
@@ -177,7 +177,7 @@ DynamicGroupHandling | Switch | If this option id activated the system automatic
 BuildGroup | Switch | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.
 Playlists | String | Plays a playlist on the prior selected Player Channel (see below) Playlists are identified by numbers. List can be found in the HEOS App
 RawCommand | String | A channel where every HEOS CLI command can be send to.
-Play URL | String | Plays a media file located at the URL. First select the player channel where the stram shall be played. Then send the stream via the Play URL channel.
+PlayURL | String | Plays a media file located at the URL. First select the player channel where the stram shall be played. Then send the stream via the Play URL channel.
 
 #### RawCommand example
 
