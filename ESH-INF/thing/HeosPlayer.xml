@@ -18,14 +18,15 @@
             <channel id="Mute"              typeId="mute" /> 
             <channel id="Inputs"            typeId="input" />
             <channel id="OnlineStatus"      typeId="onlineStatus"/>
+            <channel typeId="title"         id="Title"></channel> 
+            <channel typeId="interpret"     id="Interpret"></channel>   
+            <channel typeId="album"         id="Album"></channel>  
+            <channel typeId="image_url"     id="Image_URL"></channel>
             <channel id="CurrentPosition"   typeId="currentPosition" />
             <channel id="Duration"          typeId="duration" />
-            <channel id="Type"            typeId ="type" />
-            <channel id="Station"         typeId ="station"/>  
-            <channel typeId="title"     id="Title"></channel> 
-            <channel typeId="interpret" id="Interpret"></channel>   
-            <channel typeId="album"     id="Album"></channel>  
-            <channel typeId="image_url" id="Image_URL"></channel>    
+            <channel id="Type"              typeId ="type" />
+            <channel id="Station"           typeId ="station"/>            
+            <channel typeId="play_URL"      id="PlayURL"></channel>    
         </channels>   
         
         <config-description>

@@ -15,6 +15,7 @@
             <channel typeId="buildGroup"            id="BuildGroup"></channel> 
             <channel typeId="playlists"             id="Playlists"></channel>
             <channel typeId="rawCommand"            id="RawCommand"></channel>
+            <channel typeId="play_URL"              id="PlayURL"></channel>
              
                
         </channels>
@@ -53,7 +54,8 @@
                 <description>The time in seconds for the HEOS heart beat (default = 60s)</description>
                 <default>60</default>
                 <required>false</required>
-            </parameter>              
+            </parameter>
+                          
         </config-description>
 
     </bridge-type>
