@@ -36,7 +36,7 @@ public class HeosBindingConstants {
     public final static ChannelTypeUID CH_TYPE_FAVORIT = new ChannelTypeUID(BINDING_ID, "ch_favorit");
     public final static ChannelTypeUID CH_TYPE_GROUP = new ChannelTypeUID(BINDING_ID, "ch_group");
 
-    // List of all Channel ids
+    // List of all Channel IDs
     public final static String CH_ID_CONTROL = "Control";
     public final static String CH_ID_VOLUME = "Volume";
     public final static String CH_ID_MUTE = "Mute";
@@ -57,6 +57,7 @@ public class HeosBindingConstants {
     public final static String CH_ID_STATION = "Station";
     public final static String CH_ID_RAW_COMMAND = "RawCommand";
     public final static String CH_ID_TYPE = "Type";
+    public final static String CH_ID_PLAY_URL = "PlayURL";
 
     public final static String HOST = "ipAddress";
     public final static String PLAYER_TYPE = "model";
@@ -90,6 +91,7 @@ public class HeosBindingConstants {
     public final static String CUR_POS = "curPos";
     public final static String DURATION = "duration";
     public final static String RAW_COMMAND = "rawCommand";
+    public final static String PLAY_URL = "play_stream";
 
     public final static String NAME_HASH = "nameHash";
     public final static String GROUP_MEMBER_HASH = "groupMemberHash";
