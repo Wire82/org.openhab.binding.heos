@@ -120,6 +120,7 @@ public class HeosEventController extends MyEventListener {
         switch (eventCommand) {
 
             case "get_now_playing_media":
+                getMediaState();
                 break;
             case "get_player_info":
                 break;
@@ -198,6 +199,12 @@ public class HeosEventController extends MyEventListener {
     private void mediaStateChanged() {
         String pid = response.getPid();
         system.send(command.getNowPlayingMedia(pid));
+        fireMediaEvent(pid, response.getPayload().getPayloadList().get(0));
+
+    }
+
+    private void getMediaState() {
+        String pid = response.getPid();
         fireMediaEvent(pid, response.getPayload().getPayloadList().get(0));
 
     }
