@@ -59,7 +59,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     private ArrayList<String[]> selectedPlayerList = new ArrayList<String[]>();
     private HashMap<ThingUID, ThingStatus> thingOnlineState = new HashMap<ThingUID, ThingStatus>();
 
-    private ScheduledExecutorService initPhase;
+    private ScheduledExecutorService initPhaseExecutor;
     private InitProcedure initPhaseRunnable = new InitProcedure();
 
     private HeosPlayerDiscovery playerDiscovery;
@@ -73,6 +73,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     private boolean handleGroups = true;
     private boolean loggedIn = false;
     private boolean connectionDelay = false;
+    private boolean bridgeHandlerdisposalOngoing = false;
 
     private Logger logger = LoggerFactory.getLogger(HeosBridgeHandler.class);
 
@@ -140,7 +141,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                     api.addContainerToQueuePlayNow(pid, PLAYLISTS_SID, cid);
                 }
             }
-            selectedPlayerList.clear();
+            resetPlayerList(CH_ID_PLAYLISTS);
         }
 
         if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
@@ -150,14 +151,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                     for (int i = 0; i < selectedPlayerList.size(); i++) {
                         player[i] = selectedPlayerList.get(i)[0];
                     }
-
                     api.groupPlayer(player);
-
-                    for (int i = 0; i < selectedPlayerList.size(); i++) {
-                        updateState(selectedPlayerList.get(i)[1], OnOffType.OFF);
-                    }
-                    selectedPlayerList.clear();
-                    updateState(CH_ID_BUILDGROUP, OnOffType.OFF);
+                    resetPlayerList(CH_ID_BUILDGROUP);
                 }
 
             }
@@ -178,6 +173,24 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         if (channelUID.getId().equals(CH_ID_RAW_COMMAND)) {
             heos.send(command.toString());
         }
+        if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
+            if (!selectedPlayerList.isEmpty()) {
+                for (int i = 0; i < selectedPlayerList.size(); i++) {
+                    String pid = selectedPlayerList.get(i)[0];
+                    String url = command.toString();
+                    api.playURL(pid, url);
+                }
+            }
+            resetPlayerList(CH_ID_PLAY_URL);
+        }
+    }
+
+    public void resetPlayerList(String channelUID) {
+        for (int i = 0; i < selectedPlayerList.size(); i++) {
+            updateState(selectedPlayerList.get(i)[1], OnOffType.OFF);
+        }
+        selectedPlayerList.clear();
+        updateState(channelUID, OnOffType.OFF);
     }
 
     @Override
@@ -216,16 +229,17 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     @Override
     public void dispose() {
-
-        updateStatus(ThingStatus.OFFLINE);
-        logger.info("HEOS bridge removed from change notifications");
+        bridgeHandlerdisposalOngoing = true; // Flag to prevent the handler from being updated during disposal
         api.unregisterforChangeEvents(this);
+        logger.info("HEOS bridge removed from change notifications");
         isRegisteredForChangeEvents = false;
         loggedIn = false;
         logger.info("Dispose Brige '{}'", thing.getConfiguration().get(NAME));
         heos.closeConnection();
-        initPhase.shutdownNow(); // Prevents doubled execution if openhab doubles intit of bridge
         bridgeIsConnected = false;
+        initPhaseExecutor.shutdownNow(); // Prevents doubled execution if OpenHab doubles initialization of the
+                                         // bridge
+        updateStatus(ThingStatus.OFFLINE);
 
     }
 
@@ -254,16 +268,17 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     @Override
     public synchronized void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
 
-        logger.error(this.getThing().getStatus().toString());
-
-        if (!this.getThing().getStatus().equals(ThingStatus.ONLINE)) { // Prevents to change channels if bridge is
-                                                                       // offline.
-            logger.error("Not online");
-            return;
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
         }
 
-        if (childThing.getConfiguration().get(TYPE).equals(PLAYER)) {
-            logger.error("Remove Player");
+        if (bridgeHandlerdisposalOngoing) { // Checks if bridgeHandler is going to disposed (by stopping the binding or
+                                            // OpenHab for example) and prevents it from being updated which stops the
+                                            // disposal process.
+            return;
+        } else if (childThing.getConfiguration().get(TYPE).equals(PLAYER)) {
             String channelIdentifyer = "P" + childThing.getConfiguration().get(PID).toString();
             this.removeChannel(CH_TYPE_PLAYER, channelIdentifyer);
 
@@ -275,6 +290,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         handlerList.remove(childThing.getUID(), childHandler);
         thingOnlineState.put(childThing.getUID(), ThingStatus.REMOVED);
         logger.info("Dispose child handler for: {}.", childThing.getUID().getId());
+        return;
 
     }
 
@@ -325,8 +341,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             if (command.equals(COM_SING_IN)) {
                 if (result.equals(SUCCESS)) {
                     if (!loggedIn) {
-                        // Debug
-                        System.out.println("Logging in via Singed In");
                         loggedIn = true;
                         addFavorits();
                         addPlaylists();
@@ -335,9 +349,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 }
             } else if (command.equals(COM_USER_CHANGED)) {
                 if (!loggedIn) {
-                    // Debug
-                    System.out.println("Logging in via User Changed");
-
                     loggedIn = true;
                     addFavorits();
                     addPlaylists();
@@ -594,17 +605,17 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         this.selectedPlayer = selectedPlayer;
     }
 
-    public void scheduledStartUp() {
-        initPhase = Executors.newScheduledThreadPool(1);
+    private void scheduledStartUp() {
+        initPhaseExecutor = Executors.newScheduledThreadPool(1);
         initPhaseRunnable = new InitProcedure();
-
-        initPhase.schedule(this.initPhaseRunnable, 10, TimeUnit.SECONDS);
+        initPhaseExecutor.schedule(this.initPhaseRunnable, 10, TimeUnit.SECONDS);
     }
 
     public class InitProcedure implements Runnable {
 
         @Override
         public void run() {
+            bridgeHandlerdisposalOngoing = false;
 
             heos.startEventListener();
             heos.startHeartBeat(heartBeatPulse);
@@ -622,5 +633,4 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             }
         }
     }
-
 }
