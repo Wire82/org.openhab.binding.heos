@@ -10,8 +10,8 @@ package org.openhab.binding.heos.internal.resources;
 import java.util.HashMap;
 
 /**
- * The {@link HeosMediaObjekt } represents a Media Objekt within
- * the HEOS network.
+ * The {@link HeosMediaObjekt } represents a Media object within
+ * the HEOS network. Information about the an media object are stored here
  *
  * @author Johannes Einig - Initial contribution
  */
