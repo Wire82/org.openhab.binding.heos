@@ -50,5 +50,6 @@ public class HeosConstants {
     public final static String CID = "cid";
     public final static String MID = "mid";
     public final static String SID = "sid";
+    public final static String QID = "qid";
 
 }
