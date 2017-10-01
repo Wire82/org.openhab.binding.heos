@@ -1,5 +1,5 @@
 # org.openhab.binding.heos
-Heos Binding for OpenHab
+HEOS Binding for OpenHab
 
 
 {% include base.html %}
@@ -30,12 +30,16 @@ Nether the less also manual configuration is possible
 
 ## Binding Configuration
 This binding does not require any configuration via a .cfg file. The configuration is done via the Thing definition.
+Within the binding the callback URL can be set. This URL is needed if a player or a group is registered as an audio sink within OpenHab.
+The URL is in most of the cases the URL if the OpenHab server. Also the port has to be defined.
+Example: http://192.168.0.7:8080 or if the sound file is located on the OpenHab server http://localhost:8080
+
 
 ## Thing Configuration
 **It is recommended to configure the things via the PaperUI or HABmin**
 
 ### Bridge Configuration
-The bridge can be added via the PaperUI. After adding the bridge the username and password can set by editing the thing via the PaperUI. For manual configuration the following parameter can be defined. The ipAddress has to be defined. All other fields are optional.
+The bridge can be added via the PaperUI. After adding the bridge the user name and password can set by editing the thing via the PaperUI. For manual configuration the following parameter can be defined. The ipAddress has to be defined. All other fields are optional.
 ````
 Bridge heos:bridge:main "name" [ipAddress="192.168.0.1", name="Default", unserName="xxx", password="123456"]  
 ````
@@ -97,6 +101,7 @@ CurrentPosition | String | Shows the current trakc position in milliseconds
 Duration | String | The overall track duration in milliseconds
 Type | String | The type of the played media. Station or song for example
 Station | String | The station name if it is a station (Spotify shows track name....)
+Play URL | String | Plays a media file located at the URL
 
 
 ####Example:
@@ -123,6 +128,7 @@ Duration | String | The overall track duration in milliseconds
 Type | String | The type of the played media. Station or song for example
 Station | String | The station name if it is a station (Spotify shows track name....)
 Inputs | String | The input to be switched to. Input values from HEOS protocol
+Play URL | String | Plays a media file located at the URL
 
 #### Inputs depending on Player type (Date 12.02.2017):
 
@@ -169,8 +175,9 @@ Channel ID | Item Type | Description
 Reboot | Switch | Reboot the whole HEOS System. Can be used if you get in trouble with the system
 DynamicGroupHandling | Switch | If this option id activated the system automatically removes groups if they are ungrouped. Only works if the group is added via an UI.
 BuildGroup | Switch | Is used to define a group. The player which shall be grouped has to be selected first. If Switch is then activated the group is build.
-Playlists | String | Plays a Playlist on the prior selected Player Channel (see below) Playlists are identified by numbers. List can be found in the HEOS App
-RawCommand | String | A channel where every heos cli command can be send to.
+Playlists | String | Plays a playlist on the prior selected Player Channel (see below) Playlists are identified by numbers. List can be found in the HEOS App
+RawCommand | String | A channel where every HEOS CLI command can be send to.
+Play URL | String | Plays a media file located at the URL. First select the player channel where the stram shall be played. Then send the stream via the Play URL channel.
 
 #### RawCommand example
 
@@ -241,7 +248,7 @@ String LivingRoom_Album "Album [%s]" {channel="heos:player:main:LivingRoom:Album
 
 ###demo.sitemap
 ```
-   Frame label="Arbeitszimmer" {
+   Frame label="LivingRoom" {
     	Default item=LivingRoom_Control
     	Default item=LivingRoom_Mute
     	Default item=LivingRoom_Volume
@@ -257,7 +264,7 @@ This section gives some detailed explanations how to use the binding.
 
 ### Grouping Players
 
-Playes can be grouped via the binding. To do so, select the player channels of the players you want to group at the bridge and then use the "Made Group" channel to creat the group. The first player which is selected will be the group leader. The group GID then is the same as the PID of the group leader. Therefore changing play pause and some other things at the leading player will also change that at the group. Muting and the Volume on the other hand can be changed individually for each player also for the group leader. If you want to change that for the whole group you have to do it via the group thing.
+Players can be grouped via the binding. To do so, select the player channels of the players you want to group at the bridge and then use the "Made Group" channel to create the group. The first player which is selected will be the group leader. The group GID then is the same as the PID of the group leader. Therefore changing play pause and some other things at the leading player will also change that at the group. Muting and the Volume on the other hand can be changed individually for each player also for the group leader. If you want to change that for the whole group you have to do it via the group thing.
 
 ### Inputs
 
