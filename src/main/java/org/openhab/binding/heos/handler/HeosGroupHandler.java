@@ -123,6 +123,8 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                     bridge.getSelectedPlayer().clear();
                 }
             }
+        } else if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
+            api.playURL(gid, command.toString());
         }
     }
 
@@ -131,7 +133,6 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
      * during start up phase. Gathering all information can take longer
      * than 5 seconds which can throw an error within the openhab system.
      */
-
     @Override
     public void initialize() {
 
@@ -150,6 +151,25 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
         api.unregisterforChangeEvents(this);
         super.dispose();
 
+    }
+
+    /**
+     * Plays a media file from an external source. Can be
+     * used for audio sink function
+     * 
+     * @param url The external URL where the file is located
+     */
+    public void playURL(String url) {
+        api.playURL(gid, url);
+
+    }
+
+    public PercentType getNotificationSoundVolume() {
+        return PercentType.valueOf(heosGroup.getLevel());
+    }
+
+    public void setNotificationSoundVolume(PercentType volume) {
+        api.volume(volume.toString(), gid);
     }
 
     @Override

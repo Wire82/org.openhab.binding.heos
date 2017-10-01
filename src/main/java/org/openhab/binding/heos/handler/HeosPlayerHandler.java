@@ -44,7 +44,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     private HeosSystem heos;
     private String pid;
     private HashMap<String, HeosPlayer> playerMap;
-    private HeosPlayer player;
+    private HeosPlayer player = new HeosPlayer();
     private HeosBridgeHandler bridge;
 
     private Logger logger = LoggerFactory.getLogger(HeosPlayerHandler.class);
@@ -119,6 +119,8 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                 }
             }
 
+        } else if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
+            api.playURL(pid, command.toString());
         }
 
     }
@@ -136,8 +138,26 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     @Override
     public void dispose() {
+        super.dispose();
         api.unregisterforChangeEvents(this);
+    }
 
+    /**
+     * Plays a media file from an external source. Can be
+     * used for audio sink function
+     *
+     * @param url The external URL where the file is located
+     */
+    public void playURL(String url) {
+        api.playURL(pid, url);
+    }
+
+    public PercentType getNotificationSoundVolume() {
+        return PercentType.valueOf(player.getLevel());
+    }
+
+    public void setNotificationSoundVolume(PercentType volume) {
+        api.volume(volume.toString(), pid);
     }
 
     @Override
@@ -149,12 +169,15 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
                     case PLAY:
                         updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
+                        player.setState(PLAY);
                         break;
                     case PAUSE:
                         updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
+                        player.setState(PAUSE);
                         break;
                     case STOP:
                         updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
+                        player.setState(PAUSE);
                         break;
                 }
 
@@ -182,6 +205,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
             }
             if (event.equals(DURATION)) {
                 this.updateState(CH_ID_DURATION, StringType.valueOf(command));
+                player.setDuration(command);
             }
 
         }
@@ -190,6 +214,8 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     @Override
     public void playerMediaChangeEvent(String pid, HashMap<String, String> info) {
+
+        this.player.updateMediaInfo(info);
 
         if (pid.equals(this.pid)) {
             for (String key : info.keySet()) {
@@ -227,6 +253,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                         }
 
                         break;
+
                 }
 
             }
