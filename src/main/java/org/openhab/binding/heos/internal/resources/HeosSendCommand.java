@@ -53,18 +53,23 @@ public class HeosSendCommand {
                 if (response.getEvent().getResult().equals(FAIL)) {
                     executeSendCommand();
                     ++sendTryCounter;
-                } else if (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(TRUE)) {
+                }
+                if (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(TRUE)) {
 
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    ArrayList<String> readResultList = client.readLine(15000);
+                    while (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(TRUE)) {
 
-                    for (int i = 0; i < readResultList.size(); i++) {
-                        parser.parseResult(readResultList.get(i));
-                        eventController.handleEvent(0); // Important don't remove it. Costs you some live time... ;)
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        ArrayList<String> readResultList = client.readLine(15000);
+
+                        for (int i = 0; i < readResultList.size(); i++) {
+                            parser.parseResult(readResultList.get(i));
+                            eventController.handleEvent(0); // Important don't remove it. Costs you some live time... ;)
+                        }
                     }
 
                 } else {
