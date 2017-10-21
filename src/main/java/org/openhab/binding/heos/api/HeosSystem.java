@@ -303,7 +303,6 @@ public class HeosSystem {
         });
     }
 
-    // Debug: Synchronized removed
     public void closeConnection() {
         logger.info("Shutting down HEOS Heart Beat");
         keepAlive.shutdown();

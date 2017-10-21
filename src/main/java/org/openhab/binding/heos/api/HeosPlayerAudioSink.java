@@ -58,9 +58,6 @@ public class HeosPlayerAudioSink implements AudioSink {
         this.handler = handler;
         this.audioHTTPServer = audioHTTPServer;
         this.callbackUrl = callbackUrl;
-
-        // Debug
-        // this.callbackUrl = "http://localhost:8080";
     }
 
     @Override
