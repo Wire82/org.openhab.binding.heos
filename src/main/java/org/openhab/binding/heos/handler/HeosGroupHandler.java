@@ -156,7 +156,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     /**
      * Plays a media file from an external source. Can be
      * used for audio sink function
-     * 
+     *
      * @param url The external URL where the file is located
      */
     public void playURL(String url) {
@@ -176,7 +176,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     public void playerStateChangeEvent(String pid, String event, String command) {
 
         if (this.getThing().getStatus().toString().equals(ThingStatus.UNINITIALIZED)) {
-            logger.error("Can't Handle Event. Group {} not initialized. Status is: {}", this.getConfig().get(NAME),
+            logger.info("Can't Handle Event. Group {} not initialized. Status is: {}", this.getConfig().get(NAME),
                     this.getThing().getStatus().toString());
             return;
 

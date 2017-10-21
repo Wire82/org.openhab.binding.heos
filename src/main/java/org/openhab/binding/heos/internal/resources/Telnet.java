@@ -247,8 +247,6 @@ public class Telnet {
                 readLineResult = readLineResult.trim();
             }
             readResultList.add(readLineResult);
-            // Debug
-            // System.out.println("List size: " + readResultList.size());
 
             return -1;
         }

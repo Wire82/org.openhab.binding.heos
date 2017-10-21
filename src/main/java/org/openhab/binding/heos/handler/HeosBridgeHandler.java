@@ -93,7 +93,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
         Channel channel = this.thing.getChannel(channelUID.getId());
         if (channel == null) {
-            logger.error("Channel {} not found", channelUID.toString());
+            logger.debug("Channel {} not found", channelUID.toString());
             return;
         }
         if (channel.getChannelTypeUID().toString().equals("heos:ch_player")) {
@@ -211,7 +211,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         while (!bridgeIsConnected) {
             heos.closeConnection();
             bridgeIsConnected = heos.establishConnection(connectionDelay);
-            logger.error("Could not initialize connection to HEOS system");
+            logger.warn("Could not initialize connection to HEOS system");
         }
 
         if (!isRegisteredForChangeEvents) {
@@ -630,7 +630,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 api.logIn(name, password);
 
             } else {
-                logger.error("Can not log in. Username and Password not set");
+                logger.warn("Can not log in. Username and Password not set");
             }
         }
     }

@@ -111,8 +111,7 @@ public class HeosSendCommand {
      */
 
     private boolean executeSendCommand() throws ReadException, IOException {
-        // Debug
-        // System.out.println("Sending Command: " + command);
+
         boolean sendSuccess = client.send(command);
         if (sendSuccess) {
 

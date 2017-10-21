@@ -98,28 +98,28 @@ public class HeosSystem {
             if (sendCommand.send(command)) {
                 return true;
             } else {
-                logger.error("Could not send message. Client is not connected");
+                logger.warn("Could not send message. Client is not connected");
                 return false;
             }
         } catch (ReadException e) {
-            logger.error("HEOS System read failure during response. message: {}", e.getMessage());
-            logger.error("HEOS failed command: {}", command);
-            logger.error("HEOS System trys to send command again....");
+            logger.warn("HEOS System read failure during response. message: {}", e.getMessage());
+            logger.debug("HEOS failed command: {}", command);
+            logger.debug("HEOS System trys to send command again....");
 
             try {
                 if (sendCommand.send(command)) {
                     return true;
                 } else {
-                    logger.error("Could not send message. Client is not connected");
+                    logger.warn("Could not send message. Client is not connected");
                     return false;
                 }
             } catch (ReadException | IOException e1) {
-                logger.error("HEOS System second try sending command not successful");
+                logger.warn("HEOS System second try sending command not successful");
                 // e1.printStackTrace();
                 return false;
             }
         } catch (IOException e) {
-            logger.error("IO Exception during send HEOS command with message: {}", e.getMessage());
+            logger.warn("IO Exception during send HEOS command with message: {}", e.getMessage());
             // e.printStackTrace();
             return false;
 
@@ -139,7 +139,7 @@ public class HeosSystem {
         if (sendCommand.sendWithoutResponse(command)) {
             return true;
         } else {
-            logger.error("Could not send message. Client is not connected");
+            logger.warn("Could not send message. Client is not connected");
             return false;
         }
     }
@@ -192,7 +192,7 @@ public class HeosSystem {
         if (commandLineConnected) {
             logger.info("HEOS command line connected at IP {} @ port {}", connectionIP, connectionPort);
         } else {
-            logger.error("Could not connect HEOS command line at IP {} @ port {}", connectionIP, connectionPort);
+            logger.warn("Could not connect HEOS command line at IP {} @ port {}", connectionIP, connectionPort);
         }
 
         sendCommand.setTelnetClient(commandLine);
@@ -213,7 +213,7 @@ public class HeosSystem {
         if (eventLineConnected) {
             logger.info("HEOS event line connected at IP {} @ port {}", connectionIP, connectionPort);
         } else {
-            logger.error("Could not connect HEOS event line at IP {} @ port {}", connectionIP, connectionPort);
+            logger.warn("Could not connect HEOS event line at IP {} @ port {}", connectionIP, connectionPort);
         }
 
         if (connectionDelay) { // Allows the HEOS system to find all need things internally.
@@ -240,7 +240,7 @@ public class HeosSystem {
 
     private void retryEstablishConnection() {
 
-        logger.error("Connection to HEOS-System timed out. Trying again....");
+        logger.warn("Connection to HEOS-System timed out. Trying again....");
         try {
             Thread.sleep(5000);
             if (commandLine.isConnected()) {
@@ -644,11 +644,11 @@ public class HeosSystem {
                 if (sendCommand.isConnectionAlive()) {
                     logger.debug("Sending Heos Heart Beat");
                     if (!sendCommand.send(command().heartBeat())) {
-                        logger.error("Connection to HEOS Network lost!");
+                        logger.warn("Connection to HEOS Network lost!");
                         restartConnection();
                     }
                 } else {
-                    logger.error("Connection to HEOS Network lost!");
+                    logger.warn("Connection to HEOS Network lost!");
                     restartConnection();
                 }
 
@@ -657,7 +657,7 @@ public class HeosSystem {
                 // detected by isConnectionAlive()
 
             } catch (ReadException | IOException e) {
-                logger.error("Failure during HEOS Heart Beat command with message: {}", e.getMessage());
+                logger.warn("Failure during HEOS Heart Beat command with message: {}", e.getMessage());
                 restartConnection();
             }
 
@@ -671,14 +671,14 @@ public class HeosSystem {
             try {
 
                 while (!sendCommand.isConnectionAlive()) {
-                    logger.error("Trying to reconnect to HEOS Network...");
+                    logger.info("Trying to reconnect to HEOS Network...");
                     Thread.sleep(5000);
                 }
-                logger.error("Reconnecting to Bridge with IP {} @ port {}", connectionIP, connectionPort);
+                logger.info("Reconnecting to Bridge with IP {} @ port {}", connectionIP, connectionPort);
                 Thread.sleep(15000); // Waiting time is needed because System needs some time to start up
 
             } catch (InterruptedException e) {
-                logger.error("Failure during restart procedure. Trying again simplified....");
+                logger.warn("Failure during restart procedure. Trying again simplified....");
                 eventController.connectionToSystemRestored();
                 return;
             }

@@ -55,9 +55,6 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         this.scanningRunnable = new PlayerScan();
         bridge.setHeosPlayerDiscovery(this);
 
-        // Debug
-        // this.startBackgroundDiscovery();
-
     }
 
     @Override
@@ -77,8 +74,6 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         playerMap = bridge.getNewPlayer();
 
         if (playerMap == null) {
-            // Debug
-            // System.out.println("Debug: Player Map = Null");
 
         } else {
 
@@ -108,8 +103,6 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         groupMap = bridge.getNewGroups();
 
         if (playerMap == null) {
-            // Debug
-            // System.out.println("Debug: Player Map = Null");
 
         } else {
 
@@ -193,10 +186,6 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
                     INITIAL_DELAY, SCAN_INTERVAL, TimeUnit.SECONDS);
         }
         logger.trace("scanningJob active");
-
-        // Debug
-        // System.out.println("start background discover");
-
     }
 
     @Override
@@ -218,8 +207,6 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
     public void scanForNewPlayers() {
 
         scanningRunnable.run();
-        // Debug: does not work....
-        // removeOlderResults(getTimestampOfLastScan());
     }
 
     public class PlayerScan implements Runnable {

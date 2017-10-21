@@ -29,8 +29,6 @@ import com.google.gson.JsonParseException;
 
 public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePayload> {
 
-    // Debug: Return value of PLayerList has to be defined if no player found
-
     private HeosResponsePayload responsePayload = new HeosResponsePayload();
 
     @Override
@@ -81,8 +79,6 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
                     } else {
                         payload.put(entry.getKey(), entry.getValue().getAsString());
 
-                        // Debug
-                        // System.out.println(entry.getKey() + ": " + entry.getValue());
                     }
 
                 }
@@ -113,8 +109,6 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
                 } else {
 
                     payload.put(entry.getKey(), entry.getValue().getAsString());
-                    // Debug
-                    // System.out.println(entry.getKey()+ ": " + entry.getValue());
                 }
 
             }

@@ -54,15 +54,6 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             properties.put(NAME, device.getDetails().getModelDetails().getModelName());
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(device.getDetails().getFriendlyName()).withRepresentationProperty(PLAYER_TYPE).build();
-            // Debug
-            // System.out.println(device.getDetails().getFriendlyName());
-            // System.out.println(uid.toString());
-            // System.out.println(device.getDetails().getManufacturerDetails().getManufacturer());
-            // System.out.println(device.getDetails().getModelDetails().getModelName());
-            // System.out.println(device.getIdentity().getDescriptorURL().getHost().toString());
-            // System.out.println(device.getIdentity().getUdn().getIdentifierString());
-            // System.out.println(device.getType().getType() + "\n");
-
             logger.info("Found HEOS device with UID: {}", uid.getAsString());
             return result;
         }

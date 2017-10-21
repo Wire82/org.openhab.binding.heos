@@ -38,8 +38,7 @@ public class HeosJsonParser {
     }
 
     public synchronized HeosResponse parseResult(String receivedMessage) {
-        // Debug!!!
-        // System.out.println(receivedMessage);
+
         response.setRawResponseMessage(receivedMessage);
 
         this.eventResponse = gson.fromJson(receivedMessage, HeosResponseEvent.class);
@@ -53,11 +52,7 @@ public class HeosJsonParser {
         // Setting the pid to 0 can be used to check of message failed during further investigation
 
         if (eventResponse.getMessagesMap().containsKey("pid")) {
-            // Debug. Removed if no longer needed. Not all PID are only 9 digits long
-            // if (eventResponse.getMessagesMap().get("pid").length() > 15) {
-            // response.setPid("0");
-            // return response;
-            // }
+
             response.setPid((eventResponse.getMessagesMap().get("pid")));
         }
 
