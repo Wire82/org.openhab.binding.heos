@@ -265,7 +265,6 @@ public class HeosCommands {
         if (!username.isEmpty() && !password.isEmpty()) {
             return signIn;
         } else {
-            System.out.println("No user Data set");
             return null;
         }
 
