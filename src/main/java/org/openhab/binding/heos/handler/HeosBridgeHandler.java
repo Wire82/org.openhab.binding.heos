@@ -239,7 +239,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         bridgeIsConnected = false;
         initPhaseExecutor.shutdownNow(); // Prevents doubled execution if OpenHab doubles initialization of the
                                          // bridge
-        updateStatus(ThingStatus.OFFLINE);
+        // updateStatus(ThingStatus.OFFLINE);
+        super.dispose();
 
     }
 
@@ -269,7 +270,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     public synchronized void childHandlerDisposed(ThingHandler childHandler, Thing childThing) {
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }

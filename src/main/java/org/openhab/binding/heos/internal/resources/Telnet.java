@@ -235,8 +235,10 @@ public class Telnet {
      */
 
     private int concatReadLineResult(String value) {
+
         readLineResult = readLineResult.concat(value);
-        if (readLineResult.contains("\r\n")) {
+
+        if (readLineResult.endsWith("\r\n")) {
             readLineResult = readLineResult.trim();
             while (readLineResult.contains("\r\n")) {
                 int indexFirstElement = readLineResult.indexOf("\r\n");

@@ -115,12 +115,12 @@ public class HeosSystem {
                 }
             } catch (ReadException | IOException e1) {
                 logger.error("HEOS System second try sending command not successful");
-                e1.printStackTrace();
+                // e1.printStackTrace();
                 return false;
             }
         } catch (IOException e) {
             logger.error("IO Exception during send HEOS command with message: {}", e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
             return false;
 
         }
