@@ -2,7 +2,6 @@
 HEOS Binding for OpenHab
 
 
-{% include base.html %}
 
 # <bindingName> Binding
 This binding support the HEOS-System from Denon for OpenHab 2. The binding provides basic control for the player and groups of the network. It also supports selecting favorites and play them on several players or groups on the HEOS-Network. 
@@ -189,7 +188,7 @@ At the moment no feedback is provided which can be used. Result of the command c
 
 
 
-## **Experimental**
+## *Dynamic Channels*
 
 Also the bridge supports dynamic channels which represent the player of the network and the favorites. They are dynamically added if player are found and if favorites are defined within the HEOS Account. To activate Favorites the system has to be signed in to the HEOS Account.
 
@@ -373,6 +372,3 @@ Switch item=HeosKitchen_Playlist  	mappings=[0="San Glaser", 1="Classic", 2="Bea
 ### 
 
 
-## Note
-This is a very early state of the binding. It was started as a private project for using at home and never for publishing. But hopefully it will reach a state where it can be included into OpenHab.
-At the moment it may work by some functions are not well tested and can cause trouble. But enjoy testing and feel free to give feedback.
