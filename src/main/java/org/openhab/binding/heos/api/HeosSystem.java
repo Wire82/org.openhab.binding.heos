@@ -346,8 +346,8 @@ public class HeosSystem {
         send(command().getPlayerInfo(pid));
         while (response.getEvent().getResult().equals(FAIL)) {
             try {
-                for (int i = 3; i > 0; i--) {
-                    logger.warn("HEOS System waiting for player with PID: '{}' to be available. Open tries: {}", pid,
+                for (int i = 2; i > 0; i--) {
+                    logger.info("HEOS System waiting for player with PID: '{}' to be available. Open tries: {}", pid,
                             i);
                     Thread.sleep(3000);
                     send(command().getPlayerInfo(pid));
@@ -504,8 +504,8 @@ public class HeosSystem {
         while (response.getEvent().getResult().equals(FAIL)) {
             try {
 
-                for (int i = 3; i > 0; i--) {
-                    logger.warn("HEOS System waiting for group with PID: '{}' to be available. Open tries: {}", gid, i);
+                for (int i = 2; i > 0; i--) {
+                    logger.info("HEOS System waiting for group with PID: '{}' to be available. Open tries: {}", gid, i);
                     Thread.sleep(3000);
                     send(command().getGroupInfo(gid));
                 }
