@@ -11,18 +11,18 @@ package org.openhab.binding.heos.internal.api;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
 
 /**
- * The {@link HeosAPI} is the interface for handling commands, which are
+ * The {@link HeosFacade} is the interface for handling commands, which are
  * sent to the HEOS system.
  *
  * @author Johannes Einig - Initial contribution
  */
 
-public class HeosAPI {
+public class HeosFacade {
 
     private HeosSystem controller = null;
     private HeosEventController event = null;
 
-    public HeosAPI(HeosSystem controller, HeosEventController event) {
+    public HeosFacade(HeosSystem controller, HeosEventController event) {
         this.controller = controller;
         this.event = event;
     }
@@ -68,7 +68,7 @@ public class HeosAPI {
      *
      * @param pid The PID of the dedicated player
      */
-    public void prevoious(String pid) {
+    public void previous(String pid) {
         controller.send(controller.command().playPrevious(pid));
     }
 
@@ -230,20 +230,26 @@ public class HeosAPI {
     }
 
     /**
-     * Plays a specified input source on the player.
-     * Set {@code source_pid} to null if destination and source is the same
+     * Plays a specified local input source on the player.
+     * Input name as per specified in HEOS CLI Protocol
+     *
+     * @param pid
+     * @param input
+     */
+    public void playInputSource(String pid, String input) {
+        controller.send(controller.command().playInputSource(pid, pid, input));
+    }
+
+    /**
+     * Plays a specified input source from another player on the selected player.
      * Input name as per specified in HEOS CLI Protocol
      *
      * @param des_pid the PID where the source shall be played
-     * @param source_pid the PID where the source is located. NULL if destination and source are the same
+     * @param source_pid the PID where the source is located.
      * @param input the input name
      */
     public void playInputSource(String des_pid, String source_pid, String input) {
-        if (source_pid == null) {
-            controller.send(controller.command().playInputSource(des_pid, des_pid, input));
-        } else {
-            controller.send(controller.command().playInputSource(des_pid, source_pid, input));
-        }
+        controller.send(controller.command().playInputSource(des_pid, source_pid, input));
     }
 
     /**
