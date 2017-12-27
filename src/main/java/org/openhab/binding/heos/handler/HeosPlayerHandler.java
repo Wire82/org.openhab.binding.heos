@@ -25,7 +25,8 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.heos.internal.api.HeosAPI;
+import org.eclipse.smarthome.core.types.RefreshType;
+import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.api.HeosSystem;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
 import org.openhab.binding.heos.internal.resources.HeosPlayer;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public class HeosPlayerHandler extends BaseThingHandler implements HeosEventListener {
-    private HeosAPI api;
+    private HeosFacade api;
     private HeosSystem heos;
     private String pid;
     private HashMap<String, HeosPlayer> playerMap;
@@ -49,7 +50,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     private Logger logger = LoggerFactory.getLogger(HeosPlayerHandler.class);
 
-    public HeosPlayerHandler(Thing thing, HeosSystem heos, HeosAPI api) {
+    public HeosPlayerHandler(Thing thing, HeosSystem heos, HeosFacade api) {
         super(thing);
         this.heos = heos;
         this.api = api;
@@ -58,7 +59,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (command.toString().equals("REFRESH")) {
+        if (command instanceof RefreshType) {
             return;
         }
         if (channelUID.getId().equals(CH_ID_CONTROL)) {
@@ -75,7 +76,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                     api.next(pid);
                     break;
                 case "PREVIOUS":
-                    api.prevoious(pid);
+                    api.previous(pid);
                     break;
                 case "ON":
                     api.play(pid);
@@ -97,7 +98,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
             // Only one source can be selected
         } else if (channelUID.getId().equals(CH_ID_INPUTS)) {
             if (bridge.getSelectedPlayer().isEmpty()) {
-                api.playInputSource(pid, null, command.toString());
+                api.playInputSource(pid, command.toString());
             } else if (bridge.getSelectedPlayer().size() > 1) {
                 logger.warn("Only one source can be selected for HEOS Input. Selected amount of sources: {} ",
                         bridge.getSelectedPlayer().size());
