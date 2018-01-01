@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.heos.internal.api;
 
+import java.net.URL;
+
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
 
 /**
@@ -105,8 +107,26 @@ public class HeosFacade {
      * @param vol The volume the player shall be set to (value between 0 -100)
      * @param pid
      */
-    public void volume(String vol, String pid) {
+    public void setVolume(String vol, String pid) {
         controller.send(controller.command().setVolume(vol, pid));
+    }
+
+    /**
+     * Increases the HEOS player volume 1 Step
+     *
+     * @param pid
+     */
+    public void increaseVolume(String pid) {
+        controller.send(controller.command().volumeUp(pid));
+    }
+
+    /**
+     * Decreases the HEOS player volume 1 Step
+     *
+     * @param pid
+     */
+    public void decreaseVolume(String pid) {
+        controller.send(controller.command().volumeDown(pid));
     }
 
     /**
@@ -144,6 +164,24 @@ public class HeosFacade {
      */
     public void volumeGroup(String vol, String gid) {
         controller.send(controller.command().setGroupVolume(vol, gid));
+    }
+
+    /**
+     * Increases the HEOS group volume 1 Step
+     *
+     * @param pid
+     */
+    public void increaseGroupVolume(String gid) {
+        controller.send(controller.command().setGroupVolumeUp(gid));
+    }
+
+    /**
+     * Decreases the HEOS group volume 1 Step
+     *
+     * @param pid
+     */
+    public void decreaseGroupVolume(String gid) {
+        controller.send(controller.command().setGroupVolumeDown(gid));
     }
 
     /**
@@ -258,8 +296,8 @@ public class HeosFacade {
      * @param pid the PID where the file shall be played
      * @param url the complete URL the file is located
      */
-    public void playURL(String pid, String url) {
-        controller.send(controller.command().playURL(pid, url));
+    public void playURL(String pid, URL url) {
+        controller.send(controller.command().playURL(pid, url.toString()));
     }
 
     /**
