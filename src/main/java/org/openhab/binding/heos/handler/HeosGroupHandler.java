@@ -11,6 +11,8 @@ package org.openhab.binding.heos.handler;
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -123,7 +125,12 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
                 }
             }
         } else if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
-            api.playURL(gid, command.toString());
+            try {
+                URL url = new URL(command.toString());
+                api.playURL(gid, url);
+            } catch (MalformedURLException e) {
+                logger.debug("Command '{}' is not a propper URL. Error: {}", command.toString(), e.getMessage());
+            }
         }
     }
 
@@ -154,8 +161,13 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
      *
      * @param url The external URL where the file is located
      */
-    public void playURL(String url) {
-        api.playURL(gid, url);
+    public void playURL(String urlStr) {
+        try {
+            URL url = new URL(urlStr);
+            api.playURL(gid, url);
+        } catch (MalformedURLException e) {
+            logger.debug("Command '{}' is not a propper URL. Error: {}", urlStr, e.getMessage());
+        }
     }
 
     public PercentType getNotificationSoundVolume() {
@@ -163,7 +175,7 @@ public class HeosGroupHandler extends BaseThingHandler implements HeosEventListe
     }
 
     public void setNotificationSoundVolume(PercentType volume) {
-        api.volume(volume.toString(), gid);
+        api.setVolume(volume.toString(), gid);
     }
 
     @SuppressWarnings("null")

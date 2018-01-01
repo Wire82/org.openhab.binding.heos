@@ -11,11 +11,14 @@ package org.openhab.binding.heos.handler;
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.smarthome.core.library.types.IncreaseDecreaseType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.PlayPauseType;
@@ -86,7 +89,15 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                     break;
             }
         } else if (channelUID.getId().equals(CH_ID_VOLUME)) {
-            api.volume(command.toString(), pid);
+            if (command instanceof IncreaseDecreaseType) {
+                if (command.equals(IncreaseDecreaseType.INCREASE)) {
+                    api.increaseVolume(pid);
+                } else {
+                    api.decreaseVolume(pid);
+                }
+            } else {
+                api.setVolume(command.toString(), pid);
+            }
         } else if (channelUID.getId().equals(CH_ID_MUTE)) {
             if (command.toString().equals("ON")) {
                 api.muteON(pid);
@@ -110,7 +121,13 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
                 }
             }
         } else if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
-            api.playURL(pid, command.toString());
+            try {
+                URL url = new URL(command.toString());
+                api.playURL(pid, url);
+            } catch (MalformedURLException e) {
+                logger.debug("Command '{}' is not a propper URL. Error: {}", command.toString(), e.getMessage());
+            }
+
         }
     }
 
@@ -134,8 +151,13 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
      *
      * @param url The external URL where the file is located
      */
-    public void playURL(String url) {
-        api.playURL(pid, url);
+    public void playURL(String urlStr) {
+        try {
+            URL url = new URL(urlStr);
+            api.playURL(pid, url);
+        } catch (MalformedURLException e) {
+            logger.debug("Command '{}' is not a propper URL. Error: {}", urlStr, e.getMessage());
+        }
     }
 
     public PercentType getNotificationSoundVolume() {
@@ -143,7 +165,7 @@ public class HeosPlayerHandler extends BaseThingHandler implements HeosEventList
     }
 
     public void setNotificationSoundVolume(PercentType volume) {
-        api.volume(volume.toString(), pid);
+        api.setVolume(volume.toString(), pid);
     }
 
     @SuppressWarnings("null")
