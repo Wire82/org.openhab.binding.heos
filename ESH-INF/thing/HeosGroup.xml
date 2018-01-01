@@ -25,7 +25,7 @@
 		        <channel id="Duration"        typeId="duration"/>
 		        <channel id="Type"            typeId="type"/>
 		        <channel id="Station"         typeId="station"/>
-		        <channel id="PlayURL"         typeId="playUrl"/>
+		        <channel id="PlayUrl"         typeId="playUrl"/>
 		        <channel id="Ungroup"         typeId="ungroup" />  		             
             </channels>
             

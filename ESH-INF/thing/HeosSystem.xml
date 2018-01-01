@@ -15,7 +15,7 @@
             <channel typeId="buildGroup"            id="BuildGroup"></channel> 
             <channel typeId="playlists"             id="Playlists"></channel>
             <channel typeId="rawCommand"            id="RawCommand"></channel>
-            <channel typeId="playUrl"               id="PlayURL"></channel>
+            <channel typeId="playUrl"               id="PlayUrl"></channel>
              
                
         </channels>
