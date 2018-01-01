@@ -11,6 +11,8 @@ package org.openhab.binding.heos.handler;
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -178,8 +180,13 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             if (!selectedPlayerList.isEmpty()) {
                 for (int i = 0; i < selectedPlayerList.size(); i++) {
                     String pid = selectedPlayerList.get(i)[0];
-                    String url = command.toString();
-                    api.playURL(pid, url);
+                    try {
+                        URL url = new URL(command.toString());
+                        api.playURL(pid, url);
+                    } catch (MalformedURLException e) {
+                        logger.debug("Command '{}' is not a propper URL. Error: {}", command.toString(),
+                                e.getMessage());
+                    }
                 }
             }
             resetPlayerList(CH_ID_PLAY_URL);
