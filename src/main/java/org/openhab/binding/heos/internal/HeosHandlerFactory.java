@@ -28,9 +28,8 @@ import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.handler.HeosGroupHandler;
 import org.openhab.binding.heos.handler.HeosPlayerHandler;
+import org.openhab.binding.heos.internal.api.HeosAudioSink;
 import org.openhab.binding.heos.internal.api.HeosFacade;
-import org.openhab.binding.heos.internal.api.HeosGroupAudioSink;
-import org.openhab.binding.heos.internal.api.HeosPlayerAudioSink;
 import org.openhab.binding.heos.internal.api.HeosSystem;
 import org.openhab.binding.heos.internal.discovery.HeosPlayerDiscovery;
 import org.osgi.framework.ServiceRegistration;
@@ -48,6 +47,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     private Logger logger = LoggerFactory.getLogger(HeosHandlerFactory.class);
+    private HeosChannelHandlerFactory channelHandlerFactory = null;
     private HeosSystem heos = new HeosSystem();
     private HeosFacade api = heos.getAPI();
 
@@ -76,6 +76,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
 
         if (thingTypeUID.equals(THING_TYPE_BRIDGE)) {
             HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing, heos, api);
+            channelHandlerFactory = new HeosChannelHandlerFactory(bridgeHandler, api);
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
             playerDiscovery.addDiscoveryListener(bridgeHandler);
             discoveryServiceRegs.put(bridgeHandler.getThing().getUID(), bundleContext.registerService(
@@ -86,9 +87,9 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return bridgeHandler;
         }
         if (thingTypeUID.equals(THING_TYPE_PLAYER)) {
-            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing, heos, api);
+            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing, heos, api, channelHandlerFactory);
             // register the speaker as an audio sink
-            HeosPlayerAudioSink audioSink = new HeosPlayerAudioSink(playerHandler, audioHTTPServer, callbackUrl);
+            HeosAudioSink audioSink = new HeosAudioSink(playerHandler, audioHTTPServer, callbackUrl);
             @SuppressWarnings("unchecked")
             ServiceRegistration<AudioSink> reg = (ServiceRegistration<AudioSink>) bundleContext
                     .registerService(AudioSink.class.getName(), audioSink, new Hashtable<String, Object>());
@@ -96,9 +97,9 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return playerHandler;
         }
         if (thingTypeUID.equals(THING_TYPE_GROUP)) {
-            HeosGroupHandler groupHandler = new HeosGroupHandler(thing, heos, api);
+            HeosGroupHandler groupHandler = new HeosGroupHandler(thing, heos, api, channelHandlerFactory);
             // register the group as an audio sink
-            HeosGroupAudioSink audioSink = new HeosGroupAudioSink(groupHandler, audioHTTPServer, callbackUrl);
+            HeosAudioSink audioSink = new HeosAudioSink(groupHandler, audioHTTPServer, callbackUrl);
             @SuppressWarnings("unchecked")
             ServiceRegistration<AudioSink> reg = (ServiceRegistration<AudioSink>) bundleContext
                     .registerService(AudioSink.class.getName(), audioSink, new Hashtable<String, Object>());
