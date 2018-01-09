@@ -11,13 +11,15 @@ package org.openhab.binding.heos.internal.resources;
 import java.util.EventListener;
 import java.util.HashMap;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * The {@link HeosEventListener } is an Event Listener
  * for the HEOS network
  *
  * @author Johannes Einig - Initial contribution
  */
-
+@NonNullByDefault
 public interface HeosEventListener extends EventListener {
 
     void playerStateChangeEvent(String pid, String event, String command);
