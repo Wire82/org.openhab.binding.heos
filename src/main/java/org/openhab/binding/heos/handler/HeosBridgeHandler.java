@@ -91,7 +91,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         this.api = api;
     }
 
-    // @SuppressWarnings("null")
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
@@ -574,6 +573,13 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
     public void setSelectedPlayer(HashMap<String, String> selectedPlayer) {
         this.selectedPlayer = selectedPlayer;
+    }
+
+    /**
+     * @return the selectedPlayerList
+     */
+    public ArrayList<String[]> getSelectedPlayerList() {
+        return selectedPlayerList;
     }
 
     private void scheduledStartUp() {
