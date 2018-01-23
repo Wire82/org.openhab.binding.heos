@@ -200,7 +200,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         }
         loggedIn = false;
 
-        logger.info("Initit Brige '{}' with IP '{}'", thing.getConfiguration().get(NAME),
+        logger.info("Initialize Bridge '{}' with IP '{}'", thing.getConfiguration().get(NAME),
                 thing.getConfiguration().get(HOST));
 
         heartBeatPulse = Integer.valueOf(thing.getConfiguration().get(HEART_BEAT).toString());
@@ -234,7 +234,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         logger.info("HEOS bridge removed from change notifications");
         isRegisteredForChangeEvents = false;
         loggedIn = false;
-        logger.info("Dispose Brige '{}'", thing.getConfiguration().get(NAME));
+        logger.info("Dispose Bridge '{}'", thing.getConfiguration().get(NAME));
         heos.closeConnection();
         bridgeIsConnected = false;
         initPhaseExecutor.shutdownNow(); // Prevents doubled execution if OpenHab doubles initialization of the
@@ -256,7 +256,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         thingOnlineState.put(childThing.getUID(), ThingStatus.ONLINE);
         this.addPlayerChannel(childThing);
 
-        logger.info("Inizialize child handler for: {}.", childThing.getUID().getId());
+        logger.info("Initialize child handler for: {}.", childThing.getUID().getId());
 
     }
 
@@ -620,7 +620,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
             heos.startEventListener();
             heos.startHeartBeat(heartBeatPulse);
-            logger.info("HEOS System heart beat startet. Pulse time is {}s", heartBeatPulse);
+            logger.info("HEOS System heart beat started. Pulse time is {}s", heartBeatPulse);
             updateState(CH_ID_DYNGROUPSHAND, OnOffType.ON); // activates dynamic group handling by default
 
             if (thing.getConfiguration().containsKey(USER_NAME) && thing.getConfiguration().containsKey(PASSWORD)) {
@@ -630,7 +630,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
                 api.logIn(name, password);
 
             } else {
-                logger.error("Can not log in. Username and Password not set");
+                logger.error("Cannot log in. Username and Password not set");
             }
         }
     }
