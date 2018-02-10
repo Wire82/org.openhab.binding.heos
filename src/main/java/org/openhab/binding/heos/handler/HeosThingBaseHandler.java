@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -45,15 +45,14 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     protected HeosSystem heos;
     protected HeosFacade api;
     protected HeosChannelHandlerFactory channelHandlerFactory;
+    protected HeosBridgeHandler bridge;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public HeosThingBaseHandler(Thing thing, HeosSystem heos, HeosFacade api,
-            HeosChannelHandlerFactory channelHandlerFactory) {
+    public HeosThingBaseHandler(Thing thing, HeosSystem heos, HeosFacade api) {
         super(thing);
         this.heos = heos;
         this.api = api;
-        this.channelHandlerFactory = channelHandlerFactory;
         setId();
     }
 
@@ -72,6 +71,20 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         }
         if (thing.getConfiguration().containsKey(PID)) {
             this.id = thing.getConfiguration().get(PID).toString();
+        }
+    }
+
+    /**
+     * Has to be called by the player or group handler to initialize
+     * {@link HeosChannelHandlerFactory} and bridge
+     */
+
+    protected void initChannelHandlerFatory() {
+        if (getBridge() != null) {
+            this.bridge = (HeosBridgeHandler) getBridge().getHandler();
+            this.channelHandlerFactory = bridge.getChannelHandlerFactory();
+        } else {
+            logger.warn("No Bridge set within handler");
         }
     }
 
@@ -112,8 +125,7 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
      */
 
     protected void handleThingStateUpdate(String event, String command) {
-
-        if (event.equals(STATE)) {
+        if (event.equals(HEOS_STATE)) {
             switch (command) {
                 case PLAY:
                     updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
@@ -127,10 +139,10 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
                     break;
             }
         }
-        if (event.equals(VOLUME)) {
+        if (event.equals(HEOS_VOLUME)) {
             updateState(CH_ID_VOLUME, PercentType.valueOf(command));
         }
-        if (event.equals(MUTE)) {
+        if (event.equals(HEOS_MUTE)) {
             if (command != null) {
                 switch (command) {
                     case ON:
@@ -142,10 +154,10 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
                 }
             }
         }
-        if (event.equals(CUR_POS)) {
+        if (event.equals(HEOS_CUR_POS)) {
             this.updateState(CH_ID_CUR_POS, StringType.valueOf(command));
         }
-        if (event.equals(DURATION)) {
+        if (event.equals(HEOS_DURATION)) {
             this.updateState(CH_ID_DURATION, StringType.valueOf(command));
         }
     }
