@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.openhab.binding.heos.internal.channelHandler;
+package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
@@ -32,7 +32,7 @@ public class HeosChannelHandlerControl extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandPlayer(Command command) {
+    protected void handleCommandPlayer() {
         handleCommand(command);
     }
 
@@ -44,7 +44,7 @@ public class HeosChannelHandlerControl extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandGroup(Command command) {
+    protected void handleCommandGroup() {
         handleCommand(command);
     }
 
@@ -56,7 +56,7 @@ public class HeosChannelHandlerControl extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandBridge(Command command) {
+    protected void handleCommandBridge() {
         // No such channel within bridge
     }
 
