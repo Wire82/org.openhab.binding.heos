@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,16 +10,25 @@ package org.openhab.binding.heos.internal;
 
 import static org.openhab.binding.heos.HeosBindingConstants.*;
 
+import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandler;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandlerControl;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandlerGrouping;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandlerInputs;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandlerMute;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandlerPlayURL;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandlerVolume;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandler;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerBuildGroup;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerControl;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerDynGroupHandling;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerFavoriteSelect;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerGrouping;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerInputs;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerMute;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerPlayURL;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerPlayerSelect;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerPlaylist;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerRawCommand;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerReboot;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandlerVolume;
 
 /**
  * @author Johannes Einig - initial contributor
@@ -36,7 +45,15 @@ public class HeosChannelHandlerFactory {
         this.api = api;
     }
 
-    public HeosChannelHandler getChannelHandler(ChannelUID channelUID, String id) {
+    public HeosChannelHandler getChannelHandler(ChannelUID channelUID) {
+        ChannelTypeUID channelTypeUID;
+        Channel channel = bridge.getThing().getChannel(channelUID.getId());
+        if (channel == null) {
+            channelTypeUID = null;
+        } else {
+            channelTypeUID = channel.getChannelTypeUID();
+        }
+
         if (channelUID.getId().equals(CH_ID_CONTROL)) {
             return new HeosChannelHandlerControl(bridge, api);
         }
@@ -55,7 +72,29 @@ public class HeosChannelHandlerFactory {
         if (channelUID.getId().equals(CH_ID_UNGROUP)) {
             return new HeosChannelHandlerGrouping(bridge, api);
         }
+        if (channelUID.getId().equals(CH_ID_RAW_COMMAND)) {
+            return new HeosChannelHandlerRawCommand(bridge, api);
+        }
+        if (channelUID.getId().equals(CH_ID_REBOOT)) {
+            return new HeosChannelHandlerReboot(bridge, api);
+        }
+        if (channelUID.getId().equals(CH_ID_DYNGROUPSHAND)) {
+            return new HeosChannelHandlerDynGroupHandling(bridge, api);
+        }
+        if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
+            return new HeosChannelHandlerBuildGroup(bridge, api);
+        }
+        if (channelUID.getId().equals(CH_ID_PLAYLISTS)) {
+            return new HeosChannelHandlerPlaylist(bridge, api);
+        }
+        if (channelTypeUID != null) {
+            if (channelTypeUID.equals(CH_TYPE_FAVORIT)) {
+                return new HeosChannelHandlerFavoriteSelect(bridge, api);
+            }
+            if (channelTypeUID.equals(CH_TYPE_PLAYER)) {
+                return new HeosChannelHandlerPlayerSelect(bridge, api);
+            }
+        }
         return null;
     }
-
 }
