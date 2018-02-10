@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -257,7 +257,7 @@ public class HeosSystem {
         keepAliveRunnable = new KeepALiveRunnable();
 
         @SuppressWarnings("unused")
-        ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleAtFixedRate(this.keepAliveRunnable, START_DELAY,
+        ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleWithFixedDelay(this.keepAliveRunnable, START_DELAY,
                 heartBeatPulse, TimeUnit.SECONDS);
     }
 
@@ -462,7 +462,6 @@ public class HeosSystem {
      */
 
     public synchronized HeosGroup getGroupState(HeosGroup heosGroup) {
-        // HeosGroup heosGroup = new HeosGroup();
         String gid = heosGroup.getGid();
         send(command().getGroupInfo(gid));
 
@@ -586,7 +585,7 @@ public class HeosSystem {
     /**
      * A class which provides a runnable for the HEOS Heart Beat
      *
-     * @author Johannes
+     * @author Johannes Einig
      *
      */
 
