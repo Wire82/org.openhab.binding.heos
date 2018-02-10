@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -25,10 +25,9 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.heos.internal.HeosChannelHandlerFactory;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.api.HeosSystem;
-import org.openhab.binding.heos.internal.channelHandler.HeosChannelHandler;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandler;
 import org.openhab.binding.heos.internal.resources.HeosPlayer;
 
 /**
@@ -42,22 +41,21 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
 
     private String pid;
     private HeosPlayer player = new HeosPlayer();
-    private HeosBridgeHandler bridge;
 
-    public HeosPlayerHandler(Thing thing, HeosSystem heos, HeosFacade api,
-            HeosChannelHandlerFactory channelHandlerFactory) {
-        super(thing, heos, api, channelHandlerFactory);
+    public HeosPlayerHandler(Thing thing, HeosSystem heos, HeosFacade api) {
+        super(thing, heos, api);
         pid = thing.getConfiguration().get(PID).toString();
     }
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
+            new InitializationRunnable().run();
             return;
         }
-        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID, pid);
+        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
         if (channelHandler != null) {
-            channelHandler.handleCommand(command, pid, this);
+            channelHandler.handleCommand(command, pid, this, channelUID);
             return;
         }
     }
@@ -90,7 +88,6 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     @Override
     public void playerMediaChangeEvent(String pid, HashMap<String, String> info) {
         this.player.updateMediaInfo(info);
-
         if (pid.equals(this.pid)) {
             handleThingMediaUpdate(info);
         }
@@ -113,16 +110,15 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
         @SuppressWarnings("null")
         @Override
         public void run() {
-            bridge = (HeosBridgeHandler) getBridge().getHandler();
-
+            initChannelHandlerFatory();
             player = heos.getPlayerState(pid);
 
             if (!player.isOnline()) {
                 setStatusOffline();
-                bridge.thingStatusOffline(thing.getUID());
+                bridge.setThingStatusOffline(thing.getUID());
                 return;
             }
-            bridge.thingStatusOnline(thing.getUID());
+            bridge.setThingStatusOnline(thing.getUID());
 
             if (player.getLevel() != null) {
                 updateState(CH_ID_VOLUME, PercentType.valueOf(player.getLevel()));
