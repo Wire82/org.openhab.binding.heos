@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -47,7 +47,6 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
     private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     private Logger logger = LoggerFactory.getLogger(HeosHandlerFactory.class);
-    private HeosChannelHandlerFactory channelHandlerFactory = null;
     private HeosSystem heos = new HeosSystem();
     private HeosFacade api = heos.getAPI();
 
@@ -76,7 +75,6 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
 
         if (thingTypeUID.equals(THING_TYPE_BRIDGE)) {
             HeosBridgeHandler bridgeHandler = new HeosBridgeHandler((Bridge) thing, heos, api);
-            channelHandlerFactory = new HeosChannelHandlerFactory(bridgeHandler, api);
             HeosPlayerDiscovery playerDiscovery = new HeosPlayerDiscovery(bridgeHandler);
             playerDiscovery.addDiscoveryListener(bridgeHandler);
             discoveryServiceRegs.put(bridgeHandler.getThing().getUID(), bundleContext.registerService(
@@ -87,7 +85,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return bridgeHandler;
         }
         if (thingTypeUID.equals(THING_TYPE_PLAYER)) {
-            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing, heos, api, channelHandlerFactory);
+            HeosPlayerHandler playerHandler = new HeosPlayerHandler(thing, heos, api);
             // register the speaker as an audio sink
             HeosAudioSink audioSink = new HeosAudioSink(playerHandler, audioHTTPServer, callbackUrl);
             @SuppressWarnings("unchecked")
@@ -97,7 +95,7 @@ public class HeosHandlerFactory extends BaseThingHandlerFactory {
             return playerHandler;
         }
         if (thingTypeUID.equals(THING_TYPE_GROUP)) {
-            HeosGroupHandler groupHandler = new HeosGroupHandler(thing, heos, api, channelHandlerFactory);
+            HeosGroupHandler groupHandler = new HeosGroupHandler(thing, heos, api);
             // register the group as an audio sink
             HeosAudioSink audioSink = new HeosAudioSink(groupHandler, audioHTTPServer, callbackUrl);
             @SuppressWarnings("unchecked")
