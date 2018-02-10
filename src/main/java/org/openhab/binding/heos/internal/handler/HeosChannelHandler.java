@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,8 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.openhab.binding.heos.internal.channelHandler;
+package org.openhab.binding.heos.internal.handler;
 
+import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.handler.HeosGroupHandler;
@@ -28,6 +29,8 @@ public abstract class HeosChannelHandler {
     protected HeosBridgeHandler bridge;
     protected HeosFacade api;
     protected String id;
+    protected Command command;
+    protected ChannelUID channelUID;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -42,46 +45,44 @@ public abstract class HeosChannelHandler {
 
     /**
      * Handle a command received from a channel. Requires the class which
-     * wants to handle the command to decide which subclass has to be used
-     *
+     * wants to handle the command to decide which subclass has to be used *
+     * 
      * @param command the command to handle
-     * @param id of the group or player
+     * @param id of the group or player; Null if bridge
      * @param handler The class which wants to handle the command
+     * @param channelUID the channelUID of the handleCommand function
      */
 
-    public void handleCommand(Command command, String id, Object handler) {
+    public void handleCommand(Command command, String id, Object handler, ChannelUID channelUID) {
+        this.command = command;
         this.id = id;
         this.handler = handler;
+        this.channelUID = channelUID;
+
         if (handler.getClass() == HeosPlayerHandler.class) {
-            handleCommandPlayer(command);
+            handleCommandPlayer();
         } else if (handler.getClass() == HeosGroupHandler.class) {
-            handleCommandGroup(command);
+            handleCommandGroup();
         } else if (handler.getClass() == HeosBridgeHandler.class) {
-            handleCommandBridge(command);
+            handleCommandBridge();
         }
     }
 
     /**
      * Handles the command for HEOS player
-     *
-     * @param command the command to handle
      */
 
-    protected abstract void handleCommandPlayer(Command command);
+    protected abstract void handleCommandPlayer();
 
     /**
      * Handles the command for HEOS groups
-     *
-     * @param command the command to handle
      */
 
-    protected abstract void handleCommandGroup(Command command);
+    protected abstract void handleCommandGroup();
 
     /**
      * Handles the command for the HEOS bridge
-     *
-     * @param command the command to handle
      */
 
-    protected abstract void handleCommandBridge(Command command);
+    protected abstract void handleCommandBridge();
 }
