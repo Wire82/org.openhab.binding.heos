@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.internal.channelHandler;
+package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
@@ -38,7 +38,7 @@ public class HeosChannelHandlerInputs extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandPlayer(Command command) {
+    protected void handleCommandPlayer() {
         handleCommand(command);
     }
 
@@ -50,7 +50,7 @@ public class HeosChannelHandlerInputs extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandGroup(Command command) {
+    protected void handleCommandGroup() {
         handleCommand(command);
     }
 
@@ -62,8 +62,8 @@ public class HeosChannelHandlerInputs extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandBridge(Command command) {
-        // TODO Auto-generated method stub
+    protected void handleCommandBridge() {
+        // not used on bridge
 
     }
 

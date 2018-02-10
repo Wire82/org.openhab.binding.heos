@@ -6,10 +6,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.internal.channelHandler;
+package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.handler.HeosGroupHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
@@ -37,7 +36,7 @@ public class HeosChannelHandlerGrouping extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandPlayer(Command command) {
+    protected void handleCommandPlayer() {
         // No such channel on player
 
     }
@@ -50,7 +49,7 @@ public class HeosChannelHandlerGrouping extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandGroup(Command command) {
+    protected void handleCommandGroup() {
         if (command.equals(OnOffType.OFF)) {
             api.ungroupGroup(id);
         } else if (command.equals(OnOffType.ON)) {
@@ -69,7 +68,7 @@ public class HeosChannelHandlerGrouping extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandBridge(Command command) {
+    protected void handleCommandBridge() {
         // No such channel on Bridge
 
     }

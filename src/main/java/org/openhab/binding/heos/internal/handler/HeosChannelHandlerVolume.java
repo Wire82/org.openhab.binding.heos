@@ -1,15 +1,14 @@
 /**
- * Copyright (c) 2010-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.internal.channelHandler;
+package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.library.types.IncreaseDecreaseType;
-import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 
@@ -34,7 +33,7 @@ public class HeosChannelHandlerVolume extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandPlayer(Command command) {
+    protected void handleCommandPlayer() {
         if (command instanceof IncreaseDecreaseType) {
             if (command.equals(IncreaseDecreaseType.INCREASE)) {
                 api.increaseVolume(id);
@@ -54,7 +53,7 @@ public class HeosChannelHandlerVolume extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandGroup(Command command) {
+    protected void handleCommandGroup() {
         if (command instanceof IncreaseDecreaseType) {
             if (command.equals(IncreaseDecreaseType.INCREASE)) {
                 api.increaseGroupVolume(id);
@@ -74,7 +73,7 @@ public class HeosChannelHandlerVolume extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandBridge(Command command) {
-        // TODO Auto-generated method stub
+    protected void handleCommandBridge() {
+        // not used on bridge
     }
 }

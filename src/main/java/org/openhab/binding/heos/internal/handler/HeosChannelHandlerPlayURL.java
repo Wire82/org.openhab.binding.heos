@@ -6,9 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.internal.channelHandler;
-
-import static org.openhab.binding.heos.HeosBindingConstants.CH_ID_PLAY_URL;
+package org.openhab.binding.heos.internal.handler;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,7 +37,7 @@ public class HeosChannelHandlerPlayURL extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandPlayer(Command command) {
+    protected void handleCommandPlayer() {
         handleCommand(command);
     }
 
@@ -51,7 +49,7 @@ public class HeosChannelHandlerPlayURL extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandGroup(Command command) {
+    protected void handleCommandGroup() {
         handleCommand(command);
     }
 
@@ -63,14 +61,14 @@ public class HeosChannelHandlerPlayURL extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandBridge(Command command) {
+    protected void handleCommandBridge() {
         if (!bridge.getSelectedPlayerList().isEmpty()) {
             for (int i = 0; i < bridge.getSelectedPlayerList().size(); i++) {
                 this.id = bridge.getSelectedPlayerList().get(i)[0];
                 handleCommand(command);
             }
         }
-        bridge.resetPlayerList(CH_ID_PLAY_URL);
+        bridge.resetPlayerList(channelUID);
     }
 
     private void handleCommand(Command command) {

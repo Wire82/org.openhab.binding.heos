@@ -6,10 +6,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.heos.internal.channelHandler;
+package org.openhab.binding.heos.internal.handler;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.heos.handler.HeosBridgeHandler;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 
@@ -25,7 +24,6 @@ public class HeosChannelHandlerMute extends HeosChannelHandler {
      */
     public HeosChannelHandlerMute(HeosBridgeHandler bridge, HeosFacade api) {
         super(bridge, api);
-        // TODO Auto-generated constructor stub
     }
 
     /*
@@ -36,7 +34,7 @@ public class HeosChannelHandlerMute extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandPlayer(Command command) {
+    protected void handleCommandPlayer() {
         if (command.equals(OnOffType.ON)) {
             api.muteON(id);
         } else if (command.equals(OnOffType.OFF)) {
@@ -52,7 +50,7 @@ public class HeosChannelHandlerMute extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandGroup(Command command) {
+    protected void handleCommandGroup() {
         if (command.equals(OnOffType.ON)) {
             api.muteGroupON(id);
         } else if (command.equals(OnOffType.OFF)) {
@@ -68,7 +66,7 @@ public class HeosChannelHandlerMute extends HeosChannelHandler {
      * Command)
      */
     @Override
-    protected void handleCommandBridge(Command command) {
+    protected void handleCommandBridge() {
         // No such channel on bridge
     }
 
