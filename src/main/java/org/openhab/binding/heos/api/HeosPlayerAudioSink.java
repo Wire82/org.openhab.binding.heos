@@ -20,6 +20,7 @@ import org.eclipse.smarthome.core.audio.FileAudioStream;
 import org.eclipse.smarthome.core.audio.FixedLengthAudioStream;
 import org.eclipse.smarthome.core.audio.URLAudioStream;
 import org.eclipse.smarthome.core.audio.UnsupportedAudioFormatException;
+import org.eclipse.smarthome.core.audio.utils.AudioStreamUtils;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.util.ThingHandlerHelper;
 import org.openhab.binding.heos.handler.HeosPlayerHandler;
@@ -92,11 +93,11 @@ public class HeosPlayerAudioSink implements AudioSink {
                     logger.warn("HEOS speaker '{}' is not initialized - status is {}", handler.getThing().getUID(),
                             handler.getThing().getStatus());
                 } else if (AudioFormat.MP3.isCompatible(audioFormat)) {
-                    handler.playURL(url + FileAudioStream.MP3_EXTENSION);
+                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.MP3_EXTENSION);
                 } else if (AudioFormat.WAV.isCompatible(audioFormat)) {
-                    handler.playURL(url + FileAudioStream.WAV_EXTENSION);
+                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.WAV_EXTENSION);
                 } else if (AudioFormat.WAV.isCompatible(audioFormat)) {
-                    handler.playURL(url + FileAudioStream.AAC_EXTENSION);
+                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.AAC_EXTENSION);
                 } else {
                     throw new UnsupportedAudioFormatException("HEOS only supports MP3 or WAV.", audioFormat);
                 }
@@ -113,6 +114,11 @@ public class HeosPlayerAudioSink implements AudioSink {
     @Override
     public Set<AudioFormat> getSupportedFormats() {
         return SUPPORTED_AUDIO_FORMATS;
+    }
+
+    @Override
+    public Set<Class<? extends AudioStream>> getSupportedStreams() {
+        return SUPPORTED_AUDIO_STREAMS;
     }
 
     @Override
