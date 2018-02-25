@@ -42,14 +42,14 @@ public class HeosChannelHandlerFactory {
     //Save the created channel handlers in this HashMap, so that you have one channel handler object per handler object
     //this will enable you to save state information within channel handlers
     //remind to cleanup the cache on handlers disposal
-    private HashMap<BaseThingHandler, HeosBaseChannelHandler> channelHandlerCache;
+    private Map<BaseThingHandler, Map<ChannelUID, HeosBaseChannelHandler>> channelHandlerCache = new HashMap<>();
 
     public HeosChannelHandlerFactory(HeosBridgeHandler bridge, HeosFacade api) {
         this.bridge = bridge;
         this.api = api;
     }
 
-    public HeosChannelHandler getChannelHandler(ChannelUID channelUID) {
+    public HeosChannelHandler getChannelHandler(BaseThingHandler handler, ChannelUID channelUID) {
         ChannelTypeUID channelTypeUID;
         Channel channel = bridge.getThing().getChannel(channelUID.getId());
         if (channel == null) {
@@ -58,47 +58,61 @@ public class HeosChannelHandlerFactory {
             channelTypeUID = channel.getChannelTypeUID();
         }
 
-        if (channelUID.getId().equals(CH_ID_CONTROL)) {
-            return new HeosChannelHandlerControl(bridge, api, channelUID);
+        Map<ChannelUID, HeosBaseChannelHandler> handlerChannelHandlers = channelHandlerCache.get(handler);
+
+        if(handlerChannelHandlers == null) {
+            handlerChannelHandlers = new HashMap();
+            handlerChannelHandlers.set(handler, handlerChannelHandlers);
         }
-        if (channelUID.getId().equals(CH_ID_VOLUME)) {
-            return new HeosChannelHandlerVolume(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_MUTE)) {
-            return new HeosChannelHandlerMute(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
-            return new HeosChannelHandlerPlayURL(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_INPUTS)) {
-            return new HeosChannelHandlerInputs(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_UNGROUP)) {
-            return new HeosChannelHandlerGrouping(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_RAW_COMMAND)) {
-            return new HeosChannelHandlerRawCommand(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_REBOOT)) {
-            return new HeosChannelHandlerReboot(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_DYNGROUPSHAND)) {
-            return new HeosChannelHandlerDynGroupHandling(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
-            return new HeosChannelHandlerBuildGroup(bridge, api, channelUID);
-        }
-        if (channelUID.getId().equals(CH_ID_PLAYLISTS)) {
-            return new HeosChannelHandlerPlaylist(bridge, api, channelUID);
-        }
-        if (channelTypeUID != null) {
-            if (channelTypeUID.equals(CH_TYPE_FAVORIT)) {
-                return new HeosChannelHandlerFavoriteSelect(bridge, api, channelUID);
+
+        channelHandler = handlerChannelHandlers.get(channelUID);
+
+        if(channelHandler == null) {
+            if (channelUID.getId().equals(CH_ID_CONTROL)) {
+                channelHandler = HeosChannelHandlerControl(bridge, api, channelUID);
             }
-            if (channelTypeUID.equals(CH_TYPE_PLAYER)) {
-                return new HeosChannelHandlerPlayerSelect(bridge, api, channelUID);
+            if (channelUID.getId().equals(CH_ID_VOLUME)) {
+                channelHandler = HeosChannelHandlerVolume(bridge, api, channelUID);
             }
+            if (channelUID.getId().equals(CH_ID_MUTE)) {
+                channelHandler = HeosChannelHandlerMute(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
+                channelHandler = HeosChannelHandlerPlayURL(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_INPUTS)) {
+                channelHandler = HeosChannelHandlerInputs(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_UNGROUP)) {
+                channelHandler = HeosChannelHandlerGrouping(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_RAW_COMMAND)) {
+                channelHandler = HeosChannelHandlerRawCommand(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_REBOOT)) {
+                channelHandler = HeosChannelHandlerReboot(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_DYNGROUPSHAND)) {
+                channelHandler = HeosChannelHandlerDynGroupHandling(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
+                channelHandler = HeosChannelHandlerBuildGroup(bridge, api, channelUID);
+            }
+            if (channelUID.getId().equals(CH_ID_PLAYLISTS)) {
+                channelHandler = HeosChannelHandlerPlaylist(bridge, api, channelUID);
+            }            
+            if (channelTypeUID != null) {
+                if (channelTypeUID.equals(CH_TYPE_FAVORIT)) {
+                    channelHandler = HeosChannelHandlerFavoriteSelect(bridge, api, channelUID);
+                }
+                if (channelTypeUID.equals(CH_TYPE_PLAYER)) {
+                    channelHandler = HeosChannelHandlerPlayerSelect(bridge, api, channelUID);
+                }
+            }
+
+            handlerChannelHandlers.set(channelUID, channelHandler);
         }
-        return null;
+
+        return channelHandler;
     }
 }
