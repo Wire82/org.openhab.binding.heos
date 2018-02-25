@@ -66,12 +66,12 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
                 logger.warn("Refresh for channel {}", channelUID.getAsString());
                 handleRefresh();
             }
-            return;
         }
-        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
-        if (channelHandler != null) {
-            channelHandler.handleCommand(command, gid, this, channelUID);
-            return;
+        else {
+            HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
+            if (channelHandler != null) {
+                channelHandler.handleCommand(command, gid, this, channelUID);
+            }
         }
     }
 
