@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
-import org.eclipse.smarthome.config.discovery.UpnpDiscoveryParticipant;
+import org.eclipse.smarthome.config.discovery.upnp.UpnpDiscoveryParticipant;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.jupnp.model.meta.DeviceDetails;
@@ -32,46 +35,33 @@ import org.slf4j.LoggerFactory;
  *
  * @author Johannes Einig - Initial contribution
  */
-
+@NonNullByDefault
 public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
 
     private Logger logger = LoggerFactory.getLogger(HeosDiscoveryParticipant.class);
 
     @Override
     public Set<ThingTypeUID> getSupportedThingTypeUIDs() {
-
         return Collections.singleton(THING_TYPE_BRIDGE);
     }
 
     @Override
-    public DiscoveryResult createResult(RemoteDevice device) {
-
+    public @Nullable DiscoveryResult createResult(RemoteDevice device) {
         ThingUID uid = getThingUID(device);
         if (uid != null) {
-
             Map<String, Object> properties = new HashMap<>(2);
             properties.put(HOST, device.getIdentity().getDescriptorURL().getHost());
             properties.put(NAME, device.getDetails().getModelDetails().getModelName());
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
                     .withLabel(device.getDetails().getFriendlyName()).withRepresentationProperty(PLAYER_TYPE).build();
-            // Debug
-            // System.out.println(device.getDetails().getFriendlyName());
-            // System.out.println(uid.toString());
-            // System.out.println(device.getDetails().getManufacturerDetails().getManufacturer());
-            // System.out.println(device.getDetails().getModelDetails().getModelName());
-            // System.out.println(device.getIdentity().getDescriptorURL().getHost().toString());
-            // System.out.println(device.getIdentity().getUdn().getIdentifierString());
-            // System.out.println(device.getType().getType() + "\n");
-
             logger.info("Found HEOS device with UID: {}", uid.getAsString());
             return result;
         }
-
         return null;
     }
 
     @Override
-    public ThingUID getThingUID(RemoteDevice device) {
+    public @Nullable ThingUID getThingUID(RemoteDevice device) {
         DeviceDetails details = device.getDetails();
         if (details != null) {
             ModelDetails modelDetails = details.getModelDetails();
@@ -88,13 +78,9 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
                             }
                         }
                     }
-
                 }
             }
-
         }
-
         return null;
     }
-
 }

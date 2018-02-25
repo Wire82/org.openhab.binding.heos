@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,11 +80,9 @@ public class HeosCommands {
     private String playURL = "heos://browse/play_stream?pid=";
 
     public HeosCommands() {
-
     }
 
     public HeosCommands(String playerID) {
-
         this.playerID = playerID;
     }
 
@@ -199,11 +198,11 @@ public class HeosCommands {
         return deleteQueueItem + pid + "&qid=" + qid;
     }
 
-    public String BrowseSource(String sid) {
+    public String browseSource(String sid) {
         return browseSource + sid;
     }
 
-    public String PlayStation(String pid) {
+    public String playStation(String pid) {
         return playStation + pid;
     }
 
@@ -230,7 +229,6 @@ public class HeosCommands {
         }
         if (sid != null) {
             newCommand = newCommand + "&sid=" + sid;
-
         }
         if (cid != null) {
             newCommand = newCommand + "&cid=" + cid;
@@ -242,11 +240,9 @@ public class HeosCommands {
             newCommand = newCommand + "&name=" + name;
         }
         return newCommand;
-
     }
 
     public String playInputSource(String des_pid, String source_pid, String input) {
-
         return playInputSource + des_pid + "&spid=" + source_pid + "&input=inputs/" + input;
     }
 
@@ -257,7 +253,6 @@ public class HeosCommands {
     }
 
     public String playURL(String pid, String url) {
-
         return playURL + pid + "&url=" + url;
     }
 
@@ -265,10 +260,8 @@ public class HeosCommands {
         if (!username.isEmpty() && !password.isEmpty()) {
             return signIn;
         } else {
-            System.out.println("No user Data set");
             return null;
         }
-
     }
 
     public String signIn(String username, String password) {
@@ -310,6 +303,14 @@ public class HeosCommands {
         return setGroupVolume + gid + "&level=" + volume;
     }
 
+    public String setGroupVolumeUp(String gid) {
+        return groupVolumeUp + gid + "&step=1";
+    }
+
+    public String setGroupVolumeDown(String gid) {
+        return groupVolumeDown + gid + "&step=1";
+    }
+
     public String getGroupMute(String gid) {
         return getGroupMute + gid;
     }
@@ -325,13 +326,4 @@ public class HeosCommands {
     public String getToggleGroupMute(String gid) {
         return toggleGroupMute + gid;
     }
-
-    public String getGroupVolumeUp(String gid) {
-        return groupVolumeUp;
-    }
-
-    public String getGroupVolumeDown(String gid) {
-        return groupVolumeDown;
-    }
-
 }
