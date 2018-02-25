@@ -39,6 +39,10 @@ public class HeosChannelHandlerFactory {
 
     private HeosBridgeHandler bridge;
     private HeosFacade api;
+    //Save the created channel handlers in this HashMap, so that you have one channel handler object per handler object
+    //this will enable you to save state information within channel handlers
+    //remind to cleanup the cache on handlers disposal
+    private HashMap<BaseThingHandler, HeosBaseChannelHandler> channelHandlerCache;
 
     public HeosChannelHandlerFactory(HeosBridgeHandler bridge, HeosFacade api) {
         this.bridge = bridge;
@@ -55,44 +59,44 @@ public class HeosChannelHandlerFactory {
         }
 
         if (channelUID.getId().equals(CH_ID_CONTROL)) {
-            return new HeosChannelHandlerControl(bridge, api);
+            return new HeosChannelHandlerControl(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_VOLUME)) {
-            return new HeosChannelHandlerVolume(bridge, api);
+            return new HeosChannelHandlerVolume(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_MUTE)) {
-            return new HeosChannelHandlerMute(bridge, api);
+            return new HeosChannelHandlerMute(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_PLAY_URL)) {
-            return new HeosChannelHandlerPlayURL(bridge, api);
+            return new HeosChannelHandlerPlayURL(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_INPUTS)) {
-            return new HeosChannelHandlerInputs(bridge, api);
+            return new HeosChannelHandlerInputs(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_UNGROUP)) {
-            return new HeosChannelHandlerGrouping(bridge, api);
+            return new HeosChannelHandlerGrouping(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_RAW_COMMAND)) {
-            return new HeosChannelHandlerRawCommand(bridge, api);
+            return new HeosChannelHandlerRawCommand(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_REBOOT)) {
-            return new HeosChannelHandlerReboot(bridge, api);
+            return new HeosChannelHandlerReboot(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_DYNGROUPSHAND)) {
-            return new HeosChannelHandlerDynGroupHandling(bridge, api);
+            return new HeosChannelHandlerDynGroupHandling(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_BUILDGROUP)) {
-            return new HeosChannelHandlerBuildGroup(bridge, api);
+            return new HeosChannelHandlerBuildGroup(bridge, api, channelUID);
         }
         if (channelUID.getId().equals(CH_ID_PLAYLISTS)) {
-            return new HeosChannelHandlerPlaylist(bridge, api);
+            return new HeosChannelHandlerPlaylist(bridge, api, channelUID);
         }
         if (channelTypeUID != null) {
             if (channelTypeUID.equals(CH_TYPE_FAVORIT)) {
-                return new HeosChannelHandlerFavoriteSelect(bridge, api);
+                return new HeosChannelHandlerFavoriteSelect(bridge, api, channelUID);
             }
             if (channelTypeUID.equals(CH_TYPE_PLAYER)) {
-                return new HeosChannelHandlerPlayerSelect(bridge, api);
+                return new HeosChannelHandlerPlayerSelect(bridge, api, channelUID);
             }
         }
         return null;

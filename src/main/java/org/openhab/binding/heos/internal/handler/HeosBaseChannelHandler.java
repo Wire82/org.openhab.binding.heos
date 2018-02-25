@@ -23,13 +23,12 @@ import org.slf4j.LoggerFactory;
  *
  */
 
-public abstract class HeosChannelHandler {
+public abstract class BaseHeosChannelHandler {
 
-    protected Object handler;
+    protected BaseThingHandler handler;
     protected HeosBridgeHandler bridge;
     protected HeosFacade api;
     protected String id;
-    protected Command command;
     protected ChannelUID channelUID;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -38,7 +37,7 @@ public abstract class HeosChannelHandler {
      * @param bridge Requires the HeosBridgeHandler
      * @param api The HeosFacade class
      */
-    public HeosChannelHandler(HeosBridgeHandler bridge, HeosFacade api) {
+    public HeosBaseChannelHandler(HeosBridgeHandler bridge, HeosFacade api) {
         this.bridge = bridge;
         this.api = api;
     }
@@ -53,36 +52,17 @@ public abstract class HeosChannelHandler {
      * @param channelUID the channelUID of the handleCommand function
      */
 
-    public void handleCommand(Command command, String id, Object handler, ChannelUID channelUID) {
-        this.command = command;
+    public void handleCommand(Command command, String id, BaseThingHandler handler, ChannelUID channelUID) {
         this.id = id;
         this.handler = handler;
         this.channelUID = channelUID;
 
-        if (handler.getClass() == HeosPlayerHandler.class) {
-            handleCommandPlayer();
-        } else if (handler.getClass() == HeosGroupHandler.class) {
-            handleCommandGroup();
-        } else if (handler.getClass() == HeosBridgeHandler.class) {
-            handleCommandBridge();
+        if (handler instanceof HeosPlayerHandler) {
+            ((HeosPlayerChannelHandler) this).handleCommandOnPlayer(command);
+        } else if (handler instanceof HeosGroupHandler) {
+            ((HeosGroupChannelHandler) this).handleCommandOnGroup(command);
+        } else if (handler instanceof HeosBridgeHandler) {
+            ((HeosBidgeChannelHandler) this).handleCommandOnBridge(command);
         }
     }
-
-    /**
-     * Handles the command for HEOS player
-     */
-
-    protected abstract void handleCommandPlayer();
-
-    /**
-     * Handles the command for HEOS groups
-     */
-
-    protected abstract void handleCommandGroup();
-
-    /**
-     * Handles the command for the HEOS bridge
-     */
-
-    protected abstract void handleCommandBridge();
 }
