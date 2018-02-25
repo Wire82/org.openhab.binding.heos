@@ -51,13 +51,8 @@ public class HeosPlayerHandler extends HeosThingBaseHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
             new InitializationRunnable().run();
-            return;
-        }
-        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
-        if (channelHandler != null) {
-            channelHandler.handleCommand(command, pid, this, channelUID);
-            return;
-        }
+        }        
+        super.handleCommand(channelUID, command);
     }
 
     @Override
