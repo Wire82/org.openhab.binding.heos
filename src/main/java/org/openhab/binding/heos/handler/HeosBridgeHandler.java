@@ -93,19 +93,6 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         channelHandlerFactory = new HeosChannelHandlerFactory(this, api);
     }
 
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        if (command instanceof RefreshType) {
-            return;
-        }
-
-        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
-        if (channelHandler != null) {
-            channelHandler.handleCommand(command, null, this, channelUID);
-            return;
-        }
-    }
-
     public void resetPlayerList(@NonNull ChannelUID channelUID) {
         for (int i = 0; i < selectedPlayerList.size(); i++) {
             updateState(selectedPlayerList.get(i)[1], OnOffType.OFF);

@@ -57,7 +57,12 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     }
 
     @Override
-    public abstract void handleCommand(@NonNull ChannelUID channelUID, @NonNull Command command);
+    public void handleCommand(@NonNull ChannelUID channelUID, @NonNull Command command) {
+        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
+        if (channelHandler != null) {
+            channelHandler.handleCommand(command, id, this, channelUID);
+        }
+    }
 
     public abstract void setStatusOffline();
 
