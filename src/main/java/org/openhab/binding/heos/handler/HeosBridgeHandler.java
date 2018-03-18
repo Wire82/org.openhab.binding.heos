@@ -75,7 +75,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
     private HeosSystem heos;
     private HeosFacade api;
 
-    private int heartBeatPulse = 0;
+    private int heartbeatPulse = 0;
 
     private boolean isRegisteredForChangeEvents = false;
     private boolean bridgeIsConnected = false;
@@ -91,6 +91,18 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         this.heos = heos;
         this.api = api;
         channelHandlerFactory = new HeosChannelHandlerFactory(this, api);
+    }
+
+    @Override
+    public void handleCommand(@NonNull ChannelUID channelUID, @NonNull Command command) {
+        if (command instanceof RefreshType) {
+            return;
+        }
+        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
+        if (channelHandler != null) {
+            channelHandler.handleCommand(command, this, channelUID);
+            return;
+        }
     }
 
     public void resetPlayerList(@NonNull ChannelUID channelUID) {
@@ -111,7 +123,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         logger.info("Initit Brige '{}' with IP '{}'", thing.getConfiguration().get(NAME),
                 thing.getConfiguration().get(HOST));
 
-        heartBeatPulse = Integer.valueOf(thing.getConfiguration().get(HEARTBEAT).toString());
+        heartbeatPulse = Integer.valueOf(thing.getConfiguration().get(HEARTBEAT).toString());
         heos.setConnectionIP(thing.getConfiguration().get(HOST).toString());
         heos.setConnectionPort(1255);
         bridgeIsConnected = heos.establishConnection(connectionDelay); // the connectionDelay gives the HEOS time to
@@ -539,8 +551,8 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
             bridgeHandlerdisposalOngoing = false;
 
             heos.startEventListener();
-            heos.startHeartBeat(heartBeatPulse);
-            logger.info("HEOS System heart beat startet. Pulse time is {}s", heartBeatPulse);
+            heos.startHeartBeat(heartbeatPulse);
+            logger.info("HEOS System heart beat startet. Pulse time is {}s", heartbeatPulse);
             updateState(CH_ID_DYNGROUPSHAND, OnOffType.ON); // activates dynamic group handling by default
 
             if (thing.getConfiguration().containsKey(USERNAME) && thing.getConfiguration().containsKey(PASSWORD)) {
