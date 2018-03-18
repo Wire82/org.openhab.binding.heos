@@ -45,10 +45,10 @@ public abstract class HeosChannelHandler {
 
     /**
      * Handle a command received from a channel. Requires the class which
-     * wants to handle the command to decide which subclass has to be used *
-     * 
+     * wants to handle the command to decide which subclass has to be used
+     *
      * @param command the command to handle
-     * @param id of the group or player; Null if bridge
+     * @param id of the group or player
      * @param handler The class which wants to handle the command
      * @param channelUID the channelUID of the handleCommand function
      */
@@ -59,11 +59,24 @@ public abstract class HeosChannelHandler {
         this.handler = handler;
         this.channelUID = channelUID;
 
-        if (handler.getClass() == HeosPlayerHandler.class) {
+        if (handler instanceof HeosPlayerHandler) {
             handleCommandPlayer();
-        } else if (handler.getClass() == HeosGroupHandler.class) {
+        } else if (handler instanceof HeosGroupHandler) {
             handleCommandGroup();
-        } else if (handler.getClass() == HeosBridgeHandler.class) {
+        }
+    }
+
+    /**
+     * Handle a command for classes without an id. Used
+     * for BridgeHandler
+     *
+     * @param command the command to handle
+     * @param handler The class which wants to handle the command
+     * @param channelUID the channelUID of the handleCommand function
+     */
+
+    public void handleCommand(Command command, Object handler, ChannelUID channelUID) {
+        if (handler instanceof HeosBridgeHandler) {
             handleCommandBridge();
         }
     }
