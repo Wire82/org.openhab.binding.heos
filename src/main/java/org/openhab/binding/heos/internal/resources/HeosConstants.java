@@ -56,11 +56,9 @@ public class HeosConstants {
     public static final String SOURCES_CHANGED = "sources_changed";
 
     // Browse Command
-
     public static final String FAVORIT_SID = "1028";
     public static final String PLAYLISTS_SID = "1025";
     public static final String INPUT_SID = "1027";
-
     public static final String CID = "cid";
     public static final String MID = "mid";
     public static final String SID = "sid";
@@ -73,6 +71,11 @@ public class HeosConstants {
     public static final String HEOS_STATE = "state";
     public static final String HEOS_CUR_POS = "cur_pos";
     public static final String HEOS_DURATION = "duration";
+
+    // Several command
+
+    public static final String HEOS_ROLE = "role";
+    public static final String HEOS_LEADER = "leader";
 
     // Player commands
     public static final String GET_NOW_PLAYING_MEDIA = "get_now_playing_media";
