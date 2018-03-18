@@ -24,9 +24,11 @@ import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.eclipse.smarthome.core.types.RefreshType;
 import org.openhab.binding.heos.internal.HeosChannelHandlerFactory;
 import org.openhab.binding.heos.internal.api.HeosFacade;
 import org.openhab.binding.heos.internal.api.HeosSystem;
+import org.openhab.binding.heos.internal.handler.HeosChannelHandler;
 import org.openhab.binding.heos.internal.resources.HeosEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,10 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
     protected HeosChannelHandlerFactory channelHandlerFactory;
     protected HeosBridgeHandler bridge;
 
+    private long refreshStartTime = 0;
+    private long refreshRequestTime = 0;
+    private final int REFRESH_BLOCK_TIME = 5000;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public HeosThingBaseHandler(Thing thing, HeosSystem heos, HeosFacade api) {
@@ -56,19 +62,58 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
         setId();
     }
 
-    @Override
-    public void handleCommand(@NonNull ChannelUID channelUID, @NonNull Command command) {
-        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
-        if (channelHandler != null) {
-            channelHandler.handleCommand(command, id, this, channelUID);
-        }
-    }
+    /**
+     * To be implemented by extending class by the command
+     * for updating the HEOS thing via the {@link HeosSystem}. As example
+     * for a player the command would be {@link HeosSystem#getPlayerState(String)}
+     */
+
+    protected abstract void updateHeosThingState();
+
+    /**
+     * The channels which has to be updated during the refresh command
+     * For more information about refreshing the channels see
+     * {link {@link HeosThingBaseHandler#handleRefresh()}
+     */
+
+    protected abstract void refreshChannels();
 
     public abstract void setStatusOffline();
 
     public abstract PercentType getNotificationSoundVolume();
 
     public abstract void setNotificationSoundVolume(PercentType volume);
+
+    @Override
+    public void handleCommand(@NonNull ChannelUID channelUID, @NonNull Command command) {
+        if (command instanceof RefreshType) {
+            if (this.getThing().getStatus().toString().equals(ONLINE)) {
+                handleRefresh();
+            }
+            return;
+        }
+        HeosChannelHandler channelHandler = channelHandlerFactory.getChannelHandler(channelUID);
+        if (channelHandler != null) {
+            channelHandler.handleCommand(command, id, this, channelUID);
+        }
+    }
+
+    /**
+     * Handles the Refresh command.
+     * Because refreshing the channels requires a request of the current state
+     * via the Telnet connection, updating all channels after each other would
+     * lead to a high amount of network traffic. So the handleRefresh() blocks
+     * the update request of {@link HeosThingBaseHandler#updateHeosThingState()}.
+     */
+
+    private synchronized void handleRefresh() {
+        refreshRequestTime = System.currentTimeMillis();
+        if (refreshRequestTime - refreshStartTime > REFRESH_BLOCK_TIME) {
+            updateHeosThingState();
+            refreshChannels();
+            refreshStartTime = System.currentTimeMillis();
+        }
+    }
 
     private void setId() {
         if (thing.getConfiguration().containsKey(GID)) {
@@ -134,7 +179,6 @@ public abstract class HeosThingBaseHandler extends BaseThingHandler implements H
             switch (command) {
                 case PLAY:
                     updateState(CH_ID_CONTROL, PlayPauseType.PLAY);
-
                     break;
                 case PAUSE:
                     updateState(CH_ID_CONTROL, PlayPauseType.PAUSE);
