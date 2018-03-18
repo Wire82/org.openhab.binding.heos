@@ -168,8 +168,8 @@ public class HeosPlayerDiscovery extends AbstractDiscoveryService {
         logger.trace("Start HEOS Player background discovery");
 
         if (scanningJob == null || scanningJob.isCancelled()) {
-            this.scanningJob = AbstractDiscoveryService.scheduler.scheduleWithFixedDelay(this.scanningRunnable,
-                    INITIAL_DELAY, SCAN_INTERVAL, TimeUnit.SECONDS);
+            this.scanningJob = this.scheduler.scheduleWithFixedDelay(this.scanningRunnable, INITIAL_DELAY,
+                    SCAN_INTERVAL, TimeUnit.SECONDS);
         }
         logger.trace("scanningJob active");
     }
