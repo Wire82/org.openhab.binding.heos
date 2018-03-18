@@ -12,10 +12,13 @@ import java.util.EventListener;
 import java.util.HashMap;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openhab.binding.heos.internal.api.HeosEventController;
 
 /**
  * The {@link HeosEventListener } is an Event Listener
- * for the HEOS network
+ * for the HEOS network. Handler which wants the get informed
+ * by an HEOS event via the {@link HeosEventController} has to
+ * implement this class and register itself at the {@link HeosEventController}
  *
  * @author Johannes Einig - Initial contribution
  */
