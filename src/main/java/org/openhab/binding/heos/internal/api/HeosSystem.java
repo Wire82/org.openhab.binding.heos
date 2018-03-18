@@ -65,7 +65,7 @@ public class HeosSystem {
     boolean sendSuccess = false;
 
     private ScheduledExecutorService keepAlive;
-    private KeepALiveRunnable keepAliveRunnable = new KeepALiveRunnable();
+    private KeepAliveRunnable keepAliveRunnable = new KeepAliveRunnable();
 
     private final int START_DELAY = 30;
 
@@ -203,7 +203,7 @@ public class HeosSystem {
         } else {
             logger.warn("Could not connect HEOS event line at IP {} @ port {}", connectionIP, connectionPort);
         }
-        if (connectionDelay) { // Allows the HEOS system to find all need things internally.
+        if (connectionDelay) { // Allows the HEOS system to find all needed things internally.
             // During the first connection after a restart or long sleep of the HEOS system,
             // the system needs time to activate all internal processes to provide the information
             // to the bridge
@@ -252,13 +252,13 @@ public class HeosSystem {
      *
      */
 
-    public void startHeartBeat(int heartBeatPulse) {
+    public void startHeartBeat(int heartbeatPulse) {
         keepAlive = Executors.newScheduledThreadPool(1);
-        keepAliveRunnable = new KeepALiveRunnable();
+        keepAliveRunnable = new KeepAliveRunnable();
 
         @SuppressWarnings("unused")
         ScheduledFuture<?> keepAliveHandler = keepAlive.scheduleWithFixedDelay(this.keepAliveRunnable, START_DELAY,
-                heartBeatPulse, TimeUnit.SECONDS);
+                heartbeatPulse, TimeUnit.SECONDS);
     }
 
     public synchronized void startEventListener() {
@@ -378,11 +378,11 @@ public class HeosSystem {
     private synchronized HeosPlayer updatePlayerState(HeosPlayer heosPlayer) {
         String pid = heosPlayer.getPid();
         send(command().getPlayState(pid));
-        heosPlayer.setState(response.getEvent().getMessagesMap().get("state"));
+        heosPlayer.setState(response.getEvent().getMessagesMap().get(HEOS_STATE));
         send(command().getMute(pid));
-        heosPlayer.setMute(response.getEvent().getMessagesMap().get("state"));
+        heosPlayer.setMute(response.getEvent().getMessagesMap().get(HEOS_STATE));
         send(command().getVolume(pid));
-        heosPlayer.setLevel(response.getEvent().getMessagesMap().get("level"));
+        heosPlayer.setLevel(response.getEvent().getMessagesMap().get(HEOS_LEVEL));
         send(command().getNowPlayingMedia(pid));
         heosPlayer.updateMediaInfo(response.getPayload().getPayloadList().get(0));
 
@@ -427,9 +427,9 @@ public class HeosSystem {
                 HashMap<String, String> playerMap = new HashMap<>();
                 playerMap = response.getPayload().getPlayerList().get(groupCounter).get(i);
                 for (String key : playerMap.keySet()) {
-                    if (key.equals("role")) {
-                        if (playerMap.get(key).equals("leader")) {
-                            String leader = playerMap.get("pid");
+                    if (key.equals(HEOS_ROLE)) {
+                        if (playerMap.get(key).equals(HEOS_LEADER)) {
+                            String leader = playerMap.get(PID);
                             heosGroup.setLeader(leader);
                         }
                     }
@@ -486,11 +486,11 @@ public class HeosSystem {
         heosGroup.updateGroupInfo(response.getPayload().getPayloadList().get(0));
         heosGroup.updateGroupPlayers((response.getPayload().getPlayerList().get(0)));
         send(command().getPlayState(gid));
-        heosGroup.setState(response.getEvent().getMessagesMap().get("state"));
+        heosGroup.setState(response.getEvent().getMessagesMap().get(HEOS_STATE));
         send(command().getGroupMute(gid));
-        heosGroup.setMute(response.getEvent().getMessagesMap().get("state"));
+        heosGroup.setMute(response.getEvent().getMessagesMap().get(HEOS_STATE));
         send(command().getGroupVolume(gid));
-        heosGroup.setLevel(response.getEvent().getMessagesMap().get("level"));
+        heosGroup.setLevel(response.getEvent().getMessagesMap().get(HEOS_LEVEL));
         send(command().getNowPlayingMedia(gid));
         heosGroup.updateMediaInfo(response.getPayload().getPayloadList().get(0));
 
@@ -589,13 +589,13 @@ public class HeosSystem {
      *
      */
 
-    public class KeepALiveRunnable implements Runnable {
+    public class KeepAliveRunnable implements Runnable {
         @Override
         public void run() {
             try {
                 if (sendCommand.isConnectionAlive()) {
                     logger.debug("Sending Heos Heart Beat");
-                    if (!sendCommand.send(command().heartBeat())) {
+                    if (!sendCommand.send(command().heartbeat())) {
                         logger.warn("Connection to HEOS Network lost!");
                         restartConnection();
                     }
