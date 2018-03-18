@@ -32,9 +32,6 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
     private String rawResult = null;
     private String rawMessage = null;
 
-    private String errorCode = null;
-    private String errorMessage = null;
-
     private String eventType = null;
     private String commandType = null;
     private HashMap<String, String> messages = new HashMap<String, String>();
@@ -74,7 +71,7 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
                 decodeMessage(rawMessage);
                 responseHeos.setMessagesMap(messages);
             } else {
-                this.messages.put("command under process", "false"); // noch �berarbeiten!!!!
+                this.messages.put("command under process", "false");
                 responseHeos.setMessagesMap(messages);
             }
         }
