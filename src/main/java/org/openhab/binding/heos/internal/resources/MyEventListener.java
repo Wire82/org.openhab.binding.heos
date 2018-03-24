@@ -83,9 +83,6 @@ public class MyEventListener {
      */
 
     public void fireBridgeEvent(String event, String result, String command) {
-        // logger.warn("Bridge Event with {} {} {} List is empty {}", event, result, command, listenerList.size());
-        // Doesn't work. Throws an exception....
-        // listenerList.forEach(element -> element.bridgeChangeEvent(event, result, command));
         for (int i = 0; i < listenerList.size(); i++) {
             listenerList.get(i).bridgeChangeEvent(event, result, command);
         }
