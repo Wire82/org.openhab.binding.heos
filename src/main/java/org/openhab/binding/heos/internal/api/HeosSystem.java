@@ -472,7 +472,7 @@ public class HeosSystem {
             try {
                 for (int i = 2; i > 0; i--) {
                     logger.info("HEOS System waiting for group with PID: '{}' to be available. Open tries: {}", gid, i);
-                    Thread.sleep(3000);
+                    Thread.sleep(1500);
                     send(command().getGroupInfo(gid));
                 }
                 heosGroup.setOnline(false);
