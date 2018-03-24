@@ -76,6 +76,9 @@ public abstract class HeosChannelHandler {
      */
 
     public void handleCommand(Command command, Object handler, ChannelUID channelUID) {
+        this.command = command;
+        this.handler = handler;
+        this.channelUID = channelUID;
         if (handler instanceof HeosBridgeHandler) {
             handleCommandBridge();
         }
