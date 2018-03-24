@@ -120,7 +120,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         }
         loggedIn = false;
 
-        logger.info("Initit Brige '{}' with IP '{}'", thing.getConfiguration().get(NAME),
+        logger.info("Initialize Bridge Brige '{}' with IP '{}'", thing.getConfiguration().get(NAME),
                 thing.getConfiguration().get(HOST));
 
         heartbeatPulse = Integer.valueOf(thing.getConfiguration().get(HEARTBEAT).toString());
@@ -143,7 +143,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         handleGroups = true;
         updateStatus(ThingStatus.ONLINE);
         updateState(CH_ID_REBOOT, OnOffType.OFF);
-        logger.info("HEOS Bridge Online");
+        logger.info("HEOS bridge Online");
         connectionDelay = false; // sets default to false again
     }
 
@@ -154,7 +154,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         logger.info("HEOS bridge removed from change notifications");
         isRegisteredForChangeEvents = false;
         loggedIn = false;
-        logger.info("Dispose Brige '{}'", thing.getConfiguration().get(NAME));
+        logger.info("Dispose bridge '{}'", thing.getConfiguration().get(NAME));
         heos.closeConnection();
         bridgeIsConnected = false;
         initPhaseExecutor.shutdownNow(); // Prevents doubled execution if OpenHab doubles initialization of the
@@ -174,7 +174,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         handlerList.put(childThing.getUID(), childHandler);
         thingOnlineState.put(childThing.getUID(), ThingStatus.ONLINE);
         this.addPlayerChannel(childThing);
-        logger.info("Inizialize child handler for: {}.", childThing.getUID().getId());
+        logger.info("Initzialize child handler for: {}.", childThing.getUID().getId());
     }
 
     /**
@@ -552,7 +552,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
 
             heos.startEventListener();
             heos.startHeartBeat(heartbeatPulse);
-            logger.info("HEOS System heart beat startet. Pulse time is {}s", heartbeatPulse);
+            logger.info("HEOS System heart beat started. Pulse time is {}s", heartbeatPulse);
             updateState(CH_ID_DYNGROUPSHAND, OnOffType.ON); // activates dynamic group handling by default
 
             if (thing.getConfiguration().containsKey(USERNAME) && thing.getConfiguration().containsKey(PASSWORD)) {
