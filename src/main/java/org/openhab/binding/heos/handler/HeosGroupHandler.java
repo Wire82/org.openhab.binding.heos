@@ -69,11 +69,10 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
     @Override
     public void initialize() {
         this.gid = this.thing.getConfiguration().get(GID).toString();
+        this.heosGroup.setGid(gid);
         api.registerforChangeEvents(this);
         ScheduledExecutorService executerPool = Executors.newScheduledThreadPool(1);
         executerPool.schedule(new InitializationRunnable(), 4, TimeUnit.SECONDS);
-        // updateStatus(ThingStatus.ONLINE);
-        updateState(CH_ID_STATUS, StringType.valueOf(ONLINE));
     }
 
     @Override
@@ -183,11 +182,10 @@ public class HeosGroupHandler extends HeosThingBaseHandler {
         public void run() {
             initChannelHandlerFatory();
             heosGroup = heos.getGroupState(heosGroup);
-
-            if (!heosGroup.isOnline()
-                    || !thing.getConfiguration().get(GROUP_MEMBER_HASH).equals(heosGroup.getGroupMemberHash())) {
-                setStatusOffline();
+            if (!heosGroup.isOnline() || !heosGroup.getGroupMemberHash()
+                    .equals(thing.getConfiguration().get(GROUP_MEMBER_HASH).toString())) {
                 bridge.setThingStatusOffline(thing.getUID());
+                setStatusOffline();
                 return;
             }
             updateStatus(ThingStatus.ONLINE);
