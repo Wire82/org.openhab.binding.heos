@@ -41,8 +41,6 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
 
     private Logger logger = LoggerFactory.getLogger(HeosDiscoveryParticipant.class);
 
-    private @Nullable ThingUID thingUID;
-
     @Override
     public Set<ThingTypeUID> getSupportedThingTypeUIDs() {
         return Collections.singleton(THING_TYPE_BRIDGE);
