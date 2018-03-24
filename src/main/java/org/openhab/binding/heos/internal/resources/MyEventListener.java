@@ -11,6 +11,9 @@ package org.openhab.binding.heos.internal.resources;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The {@link MyEventListener } is used for classes which
  * wants to inform players or groups about change events
@@ -22,6 +25,9 @@ import java.util.HashMap;
  */
 
 public class MyEventListener {
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     protected ArrayList<HeosEventListener> listenerList = new ArrayList<HeosEventListener>();
 
     /**
@@ -59,7 +65,7 @@ public class MyEventListener {
 
     /**
      * Notifies the registered listener of a changed media type event
-     * 
+     *
      * @param pid the ID of the player or group which has changed
      * @param info an HashMap which contains the media information
      */
@@ -70,13 +76,18 @@ public class MyEventListener {
 
     /**
      * Notifies the registered listener if a change of the bridge state
-     * 
+     *
      * @param event the event type
      * @param result the result (success or fail)
      * @param command the command of the event
      */
 
     public void fireBridgeEvent(String event, String result, String command) {
-        listenerList.forEach(element -> element.bridgeChangeEvent(event, result, command));
+        // logger.warn("Bridge Event with {} {} {} List is empty {}", event, result, command, listenerList.size());
+        // Doesn't work. Throws an exception....
+        // listenerList.forEach(element -> element.bridgeChangeEvent(event, result, command));
+        for (int i = 0; i < listenerList.size(); i++) {
+            listenerList.get(i).bridgeChangeEvent(event, result, command);
+        }
     }
 }
