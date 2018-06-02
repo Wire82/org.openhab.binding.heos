@@ -120,7 +120,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         }
         loggedIn = false;
 
-        logger.info("Initialize Bridge Brige '{}' with IP '{}'", thing.getConfiguration().get(NAME),
+        logger.info("Initialize Bridge '{}' with IP '{}'", thing.getConfiguration().get(NAME),
                 thing.getConfiguration().get(HOST));
 
         heartbeatPulse = Integer.valueOf(thing.getConfiguration().get(HEARTBEAT).toString());
