@@ -12,7 +12,7 @@ import static org.openhab.binding.heos.internal.resources.HeosConstants.*;
 
 import org.openhab.binding.heos.internal.resources.HeosCommands;
 import org.openhab.binding.heos.internal.resources.HeosResponse;
-import org.openhab.binding.heos.internal.resources.MyEventListener;
+import org.openhab.binding.heos.internal.resources.HeosSystemEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author Johannes Einig - Initial contribution
  */
 
-public class HeosEventController extends MyEventListener {
+public class HeosEventController extends HeosSystemEventListener {
     private HeosResponse response = null;
     private HeosSystem system = null;
     private HeosCommands command = null;
@@ -103,6 +103,13 @@ public class HeosEventController extends MyEventListener {
             case USER_CHANGED:
                 userChanged();
                 break;
+            case SHUFFLE_MODE_CHANGED:
+                shuffleModeChanged();
+                break;
+            case REPEAT_MODE_CHANGED:
+                repeatModeChanged();
+                break;
+
         }
     }
 
@@ -191,6 +198,15 @@ public class HeosEventController extends MyEventListener {
         if (response.getEvent().getMessagesMap().get(COM_UNDER_PROCESS).equals(FALSE)) {
             fireBridgeEvent(EVENTTYPE_SYSTEM, SUCCESS, SING_IN);
         }
+    }
+
+    private void shuffleModeChanged() {
+        fireStateEvent(response.getPid(), SHUFFLE_MODE_CHANGED, response.getEvent().getMessagesMap().get(HEOS_SHUFFLE));
+    }
+
+    private void repeatModeChanged() {
+        fireStateEvent(response.getPid(), REPEAT_MODE_CHANGED,
+                response.getEvent().getMessagesMap().get(HEOS_REPEAT_MODE));
     }
 
     private void userChanged() {
