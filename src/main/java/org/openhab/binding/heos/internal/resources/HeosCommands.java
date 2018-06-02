@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +30,7 @@ public class HeosCommands {
     private String rebootSystem = "heos://system/reboot";
     private String signIn = "heos://system/sign_in?un=" + username + "&pw=" + password;
     private String signOut = "heos://system/sign_out";
-    private String heartBeat = "heos://system/heart_beat";
+    private String heartbeat = "heos://system/heart_beat";
 
     // Player Commands Control
     private String setPlayStatePlay = "heos://player/set_play_state?pid=";
@@ -46,7 +47,7 @@ public class HeosCommands {
     private String playQueueItem = "heos://player/play_queue?pid=";
     private String clearQueue = "heos://player/clear_queue?pid=";
     private String deleteQueueItem = "heos://player/remove_from_queue?pid=";
-    // private String saveQueueToPlayList = ""
+    private String setPlayMode = "heos://player/set_play_mode?pid=";
 
     // Group Commands Control
     private final String getGroups = "heos://group/get_groups";
@@ -69,6 +70,7 @@ public class HeosCommands {
     private String getVolume = "heos://player/get_volume?pid=";
     private String getMute = "heos://player/get_mute?pid=";
     private String getQueue = "heos://player/get_queue?pid=";
+    private String getPlayMode = "heos://player/get_play_mode?pid=";
 
     // Browse Commands
     private String getMusicSources = "heos://browse/get_music_sources";
@@ -79,11 +81,9 @@ public class HeosCommands {
     private String playURL = "heos://browse/play_stream?pid=";
 
     public HeosCommands() {
-
     }
 
     public HeosCommands(String playerID) {
-
         this.playerID = playerID;
     }
 
@@ -137,6 +137,18 @@ public class HeosCommands {
 
     public String setMuteToggle(String pid) {
         return setMuteToggle + pid + "&state=off";
+    }
+
+    public String setShuffleMode(String pid, String shuffle) {
+        return setPlayMode + pid + "&shuffle=" + shuffle;
+    }
+
+    public String setRepeatMode(String pid, String repeat) {
+        return setPlayMode + pid + "&repeat=" + repeat;
+    }
+
+    public String getPlayMode(String pid) {
+        return getPlayMode + pid;
     }
 
     public String playNext(String pid) {
@@ -199,11 +211,11 @@ public class HeosCommands {
         return deleteQueueItem + pid + "&qid=" + qid;
     }
 
-    public String BrowseSource(String sid) {
+    public String browseSource(String sid) {
         return browseSource + sid;
     }
 
-    public String PlayStation(String pid) {
+    public String playStation(String pid) {
         return playStation + pid;
     }
 
@@ -230,7 +242,6 @@ public class HeosCommands {
         }
         if (sid != null) {
             newCommand = newCommand + "&sid=" + sid;
-
         }
         if (cid != null) {
             newCommand = newCommand + "&cid=" + cid;
@@ -242,11 +253,9 @@ public class HeosCommands {
             newCommand = newCommand + "&name=" + name;
         }
         return newCommand;
-
     }
 
     public String playInputSource(String des_pid, String source_pid, String input) {
-
         return playInputSource + des_pid + "&spid=" + source_pid + "&input=inputs/" + input;
     }
 
@@ -257,7 +266,6 @@ public class HeosCommands {
     }
 
     public String playURL(String pid, String url) {
-
         return playURL + pid + "&url=" + url;
     }
 
@@ -265,10 +273,8 @@ public class HeosCommands {
         if (!username.isEmpty() && !password.isEmpty()) {
             return signIn;
         } else {
-            System.out.println("No user Data set");
             return null;
         }
-
     }
 
     public String signIn(String username, String password) {
@@ -279,8 +285,8 @@ public class HeosCommands {
         return signOut;
     }
 
-    public String heartBeat() {
-        return heartBeat;
+    public String heartbeat() {
+        return heartbeat;
     }
 
     public String getGroups() {
@@ -310,6 +316,14 @@ public class HeosCommands {
         return setGroupVolume + gid + "&level=" + volume;
     }
 
+    public String setGroupVolumeUp(String gid) {
+        return groupVolumeUp + gid + "&step=1";
+    }
+
+    public String setGroupVolumeDown(String gid) {
+        return groupVolumeDown + gid + "&step=1";
+    }
+
     public String getGroupMute(String gid) {
         return getGroupMute + gid;
     }
@@ -325,13 +339,4 @@ public class HeosCommands {
     public String getToggleGroupMute(String gid) {
         return toggleGroupMute + gid;
     }
-
-    public String getGroupVolumeUp(String gid) {
-        return groupVolumeUp;
-    }
-
-    public String getGroupVolumeDown(String gid) {
-        return groupVolumeDown;
-    }
-
 }

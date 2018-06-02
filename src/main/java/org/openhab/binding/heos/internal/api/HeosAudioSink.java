@@ -1,12 +1,13 @@
 /**
- * Copyright (c) 2014-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.openhab.binding.heos.api;
+package org.openhab.binding.heos.internal.api;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -20,9 +21,10 @@ import org.eclipse.smarthome.core.audio.FileAudioStream;
 import org.eclipse.smarthome.core.audio.FixedLengthAudioStream;
 import org.eclipse.smarthome.core.audio.URLAudioStream;
 import org.eclipse.smarthome.core.audio.UnsupportedAudioFormatException;
+import org.eclipse.smarthome.core.audio.utils.AudioStreamUtils;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.util.ThingHandlerHelper;
-import org.openhab.binding.heos.handler.HeosGroupHandler;
+import org.openhab.binding.heos.handler.HeosThingBaseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +36,9 @@ import org.slf4j.LoggerFactory;
  *
  */
 
-public class HeosGroupAudioSink implements AudioSink {
+public class HeosAudioSink implements AudioSink {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final HashSet<AudioFormat> SUPPORTED_AUDIO_FORMATS = new HashSet<>();
     private static final HashSet<Class<? extends AudioStream>> SUPPORTED_AUDIO_STREAMS = new HashSet<>();
@@ -44,16 +46,17 @@ public class HeosGroupAudioSink implements AudioSink {
     static {
         SUPPORTED_AUDIO_FORMATS.add(AudioFormat.WAV);
         SUPPORTED_AUDIO_FORMATS.add(AudioFormat.MP3);
+        SUPPORTED_AUDIO_FORMATS.add(AudioFormat.AAC);
 
         SUPPORTED_AUDIO_STREAMS.add(URLAudioStream.class);
         SUPPORTED_AUDIO_STREAMS.add(FixedLengthAudioStream.class);
     }
 
     private AudioHTTPServer audioHTTPServer;
-    private HeosGroupHandler handler;
+    private HeosThingBaseHandler handler;
     private String callbackUrl;
 
-    public HeosGroupAudioSink(HeosGroupHandler handler, AudioHTTPServer audioHTTPServer, String callbackUrl) {
+    public HeosAudioSink(HeosThingBaseHandler handler, AudioHTTPServer audioHTTPServer, String callbackUrl) {
         this.handler = handler;
         this.audioHTTPServer = audioHTTPServer;
         this.callbackUrl = callbackUrl;
@@ -88,9 +91,11 @@ public class HeosGroupAudioSink implements AudioSink {
                     logger.warn("HEOS speaker '{}' is not initialized - status is {}", handler.getThing().getUID(),
                             handler.getThing().getStatus());
                 } else if (AudioFormat.MP3.isCompatible(audioFormat)) {
-                    handler.playURL(url + FileAudioStream.MP3_EXTENSION);
+                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.MP3_EXTENSION);
                 } else if (AudioFormat.WAV.isCompatible(audioFormat)) {
-                    handler.playURL(url + FileAudioStream.WAV_EXTENSION);
+                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.WAV_EXTENSION);
+                } else if (AudioFormat.WAV.isCompatible(audioFormat)) {
+                    handler.playURL(url + AudioStreamUtils.EXTENSION_SEPARATOR + FileAudioStream.AAC_EXTENSION);
                 } else {
                     throw new UnsupportedAudioFormatException("HEOS only supports MP3 or WAV.", audioFormat);
                 }
@@ -101,7 +106,6 @@ public class HeosGroupAudioSink implements AudioSink {
         } else {
             throw new UnsupportedAudioFormatException("HEOS can only handle FixedLengthAudioStreams.", null);
         }
-
     }
 
     @Override
@@ -110,8 +114,12 @@ public class HeosGroupAudioSink implements AudioSink {
     }
 
     @Override
-    public PercentType getVolume() {
+    public Set<Class<? extends AudioStream>> getSupportedStreams() {
+        return SUPPORTED_AUDIO_STREAMS;
+    }
 
+    @Override
+    public PercentType getVolume() {
         return handler.getNotificationSoundVolume();
     }
 
@@ -119,5 +127,4 @@ public class HeosGroupAudioSink implements AudioSink {
     public void setVolume(PercentType volume) {
         handler.setNotificationSoundVolume(volume);
     }
-
 }

@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,9 +32,6 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
     private String rawResult = null;
     private String rawMessage = null;
 
-    private String errorCode = null;
-    private String errorMessage = null;
-
     private String eventType = null;
     private String commandType = null;
     private HashMap<String, String> messages = new HashMap<String, String>();
@@ -41,7 +39,6 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
     @Override
     public HeosResponseEvent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
-
         final JsonObject jsonObject;
         final JsonObject jsonHeos;
 
@@ -74,7 +71,7 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
                 decodeMessage(rawMessage);
                 responseHeos.setMessagesMap(messages);
             } else {
-                this.messages.put("command under process", "false"); // noch �berarbeiten!!!!
+                this.messages.put("command under process", "false");
                 responseHeos.setMessagesMap(messages);
             }
         }
@@ -82,12 +79,10 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
             responseHeos.setErrorCode(messages.get("eid"));
             responseHeos.setErrorMessage(messages.get("text"));
         }
-
         return responseHeos;
     }
 
     private void decodeMessage(String message) {
-
         if (message.contains("command under")) {
             this.messages.put("command under process", "true");
             return;
@@ -116,13 +111,10 @@ public class HeosDeserializerEvent implements JsonDeserializer<HeosResponseEvent
                 value = input.substring(start, stop);
             }
             this.messages.put(key, value);
-
         }
-
     }
 
     private void decodeCommand(String command) {
-
         int start = 0;
         int stop = 0;
         if (command.indexOf("/") > 0) {

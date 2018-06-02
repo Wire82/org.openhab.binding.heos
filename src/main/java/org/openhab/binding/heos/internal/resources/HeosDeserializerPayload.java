@@ -1,5 +1,6 @@
 /**
- * Copyright (c) 2014-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,14 +30,11 @@ import com.google.gson.JsonParseException;
 
 public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePayload> {
 
-    // Debug: Return value of PLayerList has to be defined if no player found
-
     private HeosResponsePayload responsePayload = new HeosResponsePayload();
 
     @Override
     public HeosResponsePayload deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
-
         boolean arrayTrue = false;
         List<HashMap<String, String>> mapList = new ArrayList<HashMap<String, String>>();
         List<List<HashMap<String, String>>> overallPlayerList = new ArrayList<List<HashMap<String, String>>>();
@@ -46,14 +44,11 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
 
         if (jsonObject.has("payload")) {
             if (jsonObject.get("payload").isJsonArray()) {
-
                 arrayTrue = true;
             }
-
         }
 
         if (jsonObject.has("payload") && arrayTrue) {
-
             JsonArray jsonArray = jsonObject.get("payload").getAsJsonArray();
 
             for (int i = 0; i < jsonArray.size(); i++) {
@@ -62,36 +57,25 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
                 JsonObject object = jsonArray.get(i).getAsJsonObject();
 
                 for (Entry<String, JsonElement> entry : object.entrySet()) {
-
                     if (entry.getValue().isJsonArray()) {
                         JsonArray playerArray = entry.getValue().getAsJsonArray();
                         for (int j = 0; j < playerArray.size(); j++) {
-
                             HashMap<String, String> player = new HashMap<String, String>();
                             JsonObject playerObj = playerArray.get(j).getAsJsonObject();
 
                             for (Entry<String, JsonElement> element : playerObj.entrySet()) {
-
                                 player.put(element.getKey(), element.getValue().getAsString());
-
                             }
                             groupPlayerList.add(player);
                         }
-
                     } else {
                         payload.put(entry.getKey(), entry.getValue().getAsString());
-
-                        // Debug
-                        // System.out.println(entry.getKey() + ": " + entry.getValue());
                     }
-
                 }
 
                 mapList.add(payload);
                 overallPlayerList.add(groupPlayerList);
-
             }
-
         } else if (jsonObject.has("payload") && !arrayTrue) {
             HashMap<String, String> payload = new HashMap<String, String>();
             JsonObject jsonPayload = jsonObject.get("payload").getAsJsonObject();
@@ -99,28 +83,20 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
                 if (entry.getValue().isJsonArray()) {
                     JsonArray playerArray = entry.getValue().getAsJsonArray();
                     for (int j = 0; j < playerArray.size(); j++) {
-
                         HashMap<String, String> player = new HashMap<String, String>();
                         JsonObject playerObj = playerArray.get(j).getAsJsonObject();
 
                         for (Entry<String, JsonElement> element : playerObj.entrySet()) {
-
                             player.put(element.getKey(), element.getValue().getAsString());
                         }
                         groupPlayerList.add(player);
                     }
-
                 } else {
-
                     payload.put(entry.getKey(), entry.getValue().getAsString());
-                    // Debug
-                    // System.out.println(entry.getKey()+ ": " + entry.getValue());
                 }
-
             }
             mapList.add(payload);
             overallPlayerList.add(groupPlayerList);
-
         } else {
             HashMap<String, String> player = new HashMap<String, String>();
             HashMap<String, String> payload = new HashMap<String, String>();
@@ -136,6 +112,5 @@ public class HeosDeserializerPayload implements JsonDeserializer<HeosResponsePay
     }
 
     public void itterateValues() {
-
     }
 }
