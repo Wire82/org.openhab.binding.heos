@@ -63,3 +63,5 @@ $RECYCLE.BIN/
 *.lnk
 /README.md
 /target/
+
+_SYNCAPP/
