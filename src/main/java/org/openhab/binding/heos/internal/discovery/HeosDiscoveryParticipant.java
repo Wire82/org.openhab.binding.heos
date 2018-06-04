@@ -54,7 +54,8 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
             properties.put(HOST, device.getIdentity().getDescriptorURL().getHost());
             properties.put(NAME, device.getDetails().getModelDetails().getModelName());
             DiscoveryResult result = DiscoveryResultBuilder.create(uid).withProperties(properties)
-                    .withLabel(device.getDetails().getFriendlyName()).withRepresentationProperty(PLAYER_TYPE).build();
+                    .withLabel(" Bridge - " + device.getDetails().getFriendlyName())
+                    .withRepresentationProperty(PLAYER_TYPE).build();
             logger.info("Found HEOS device with UID: {}", uid.getAsString());
             return result;
         }
@@ -64,6 +65,12 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
     @Override
     public @Nullable ThingUID getThingUID(RemoteDevice device) {
 
+        // System.out.println("Name: " + device.getDetails().getModelDetails().getModelName());
+        // System.out.println("Manufac: " + device.getDetails().getManufacturerDetails().getManufacturer());
+        // System.out.println("Type " + device.getType().getType());
+        // System.out.println("Friendly Name " + device.getDetails().getFriendlyName());
+        // System.out.println("UPC " + device.getDetails().getUpc());
+
         Optional<RemoteDevice> optDevice = Optional.ofNullable(device);
         String modelName = optDevice.map(RemoteDevice::getDetails).map(DeviceDetails::getModelDetails)
                 .map(ModelDetails::getModelName).orElse("UNKNOWN");
@@ -72,7 +79,8 @@ public class HeosDiscoveryParticipant implements UpnpDiscoveryParticipant {
 
         if (modelManufacturer.equals("Denon")) {
             if (modelName.startsWith("HEOS") || modelName.endsWith("H")) {
-                if (device.getType().getType().startsWith("ACT")) {
+                String deviceType = device.getType().getType();
+                if (deviceType.startsWith("ACT") || deviceType.startsWith("Aios")) {
                     return new ThingUID(THING_TYPE_BRIDGE,
                             optDevice.get().getIdentity().getUdn().getIdentifierString());
                 }
