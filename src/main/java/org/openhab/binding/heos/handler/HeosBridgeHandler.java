@@ -174,7 +174,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         handlerList.put(childThing.getUID(), childHandler);
         thingOnlineState.put(childThing.getUID(), ThingStatus.ONLINE);
         this.addPlayerChannel(childThing);
-        logger.info("Initzialize child handler for: {}.", childThing.getUID().getId());
+        logger.info("Initialize child handler for: {}.", childThing.getUID().getId());
     }
 
     /**
@@ -189,7 +189,7 @@ public class HeosBridgeHandler extends BaseBridgeHandler implements HeosEventLis
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            logger.debug("Interrupted Exection - Message: {}", e.getMessage());
+            logger.debug("Interrupted Exception - Message: {}", e.getMessage());
         }
 
         if (bridgeHandlerdisposalOngoing) { // Checks if bridgeHandler is going to disposed (by stopping the binding or
